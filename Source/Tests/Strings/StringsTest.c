@@ -1,0 +1,329 @@
+/*****************************************************************
+|
+|      Stings Test Program
+|
+|      (c) 2001-2005 Gilles Boccon-Gibod
+|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|
+****************************************************************/
+
+/*----------------------------------------------------------------------
+|       includes
++---------------------------------------------------------------------*/
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include "Atomix.h"
+
+/*----------------------------------------------------------------------
+|       Fail
++---------------------------------------------------------------------*/
+static void
+Fail()
+{
+    printf("##################################\n");
+    exit(1);
+}
+
+/*----------------------------------------------------------------------
+|       CompareTest
++---------------------------------------------------------------------*/
+static void
+CompareTest(const char* name, const char* a, const char* b, int result, int expected)
+{
+    if (result < 0) result = -1;
+    if (result > 0) result = 1;
+    printf("%s %s %s = %d [%s]\n", a, name, b, result, result == expected ? "pass" : "fail");
+    if (result != expected) Fail();
+}
+
+/*----------------------------------------------------------------------
+|       EqualTest
++---------------------------------------------------------------------*/
+void
+EqualTest(const char* name, const char* a, ATX_String b, const char* expected)
+{
+    printf("op %s on %s, result = %s ", name, a, ATX_CSTR(b));
+    if (strcmp(expected, ATX_CSTR(b))) {
+        printf(" [fail: exptected %s, got %s]\n", expected, ATX_CSTR(b));
+    } else {
+        printf(" [pass]\n");
+    }
+    if (strcmp(expected, ATX_CSTR(b))) Fail();
+}
+
+/*----------------------------------------------------------------------
+|       StringTest
++---------------------------------------------------------------------*/
+void
+StringTest(const char* name, ATX_String a, const char* expected)
+{
+    printf("%s: %s", name, ATX_CSTR(a));
+    if (strcmp(expected, ATX_CSTR(a))) {
+        printf(" [fail: exptected %s, got %s]\n", expected, ATX_CSTR(a));
+    } else {
+        printf(" [pass]\n");
+    }
+    if (strcmp(expected, ATX_CSTR(a))) Fail();
+}
+
+/*----------------------------------------------------------------------
+|       IntTest
++---------------------------------------------------------------------*/
+void
+IntTest(const char* name, int a, int expected)
+{
+    printf("%s: %d", name, a);
+    if (a != expected) {
+        printf(" [fail: exptected %d, got %d]\n", expected, a);
+    } else {
+        printf(" [pass]\n");
+    }
+    if (a != expected) Fail();
+}
+
+/*----------------------------------------------------------------------
+|       main
++---------------------------------------------------------------------*/
+int
+main(int argc, char** argv)
+{
+    printf(":: testing empty string\n");
+
+    {
+        ATX_String s = ATX_EMPTY_STRING;
+        ATX_ASSERT(sizeof(ATX_String) == sizeof(void*));
+        ATX_ASSERT(ATX_String_GetChars(&s)[0] == '\0');
+    }
+
+    printf(":: testing construction and destruction\n");
+    {
+        ATX_String n0 = ATX_String_Create("Hello");
+        ATX_String_Destruct(&n0);
+    }
+    {
+        ATX_String n1 = ATX_String_Create("Bye");
+        ATX_String_Assign(&n1, "ByeBye");
+        ATX_String_Destruct(&n1);
+    }
+
+    printf(":: testing constructors\n");
+    {
+        ATX_String s00 = ATX_EMPTY_STRING;
+        StringTest("constructor()", s00, "");
+    }
+    {
+        ATX_String s01 = ATX_String_Create("abcdef");
+        StringTest("constructor(const char*)", s01, "abcdef");
+    }
+
+    {
+        ATX_String s03 = ATX_String_CreateFromSubString("abcdefgh", 0, 3);
+        StringTest("constructor(const char* s, unsigned int)", s03, "abc");
+    }
+
+    {
+        ATX_String s06 = ATX_String_Create((const char*)NULL);
+        StringTest("constructor(NULL)", s06, "");
+    }
+
+    {
+        ATX_String s08 = ATX_String_Create("");
+        StringTest("constructor(const char* = \"\")", s08, "");
+    }
+
+    {
+        ATX_String s09 = ATX_String_CreateFromSubString("jkhlkjh\0fgsdfg\0fgsdfg", 0, 10);
+        StringTest("ATX_String s09(\"jkhlkjh\0fgsdfg\0fgsdfg\", 0, 10)", s09, "jkhlkjh");
+    }
+
+    printf(":: testing assignments\n");
+    {
+        ATX_String a00 = ATX_EMPTY_STRING;
+        ATX_String a01 = ATX_EMPTY_STRING;
+        ATX_String_Copy(&a01, &a00);
+        StringTest("operator=(const ATX_String& = empty)", a01, "");
+    }
+
+    printf(":: testing GetLength\n");
+    {
+        ATX_String gl1;
+        ATX_String gl0 = ATX_String_Create("abcefg");
+        IntTest("GetLength", ATX_String_GetLength(&gl0), 6);
+        ATX_String_Assign(&gl0, "");
+        IntTest("GetLength", ATX_String_GetLength(&gl0), 0);
+        ATX_String_Assign(&gl0, "abcd");
+        gl1 = ATX_String_Clone(&gl0);
+        IntTest("GetLength", ATX_String_GetLength(&gl1), 4);
+    }
+
+    printf("::testing Append\n");
+    {
+        ATX_String l = ATX_String_Create("blabla");
+        ATX_String_AppendSubString(&l, "blibliblo", 6);
+        StringTest("append(const char*, int size)", l, "blablablibli");
+    }
+    {
+        ATX_String a = ATX_EMPTY_STRING;
+        ATX_String_AppendSubString(&a, "bloblo", 3);
+        StringTest("append to NULL", a, "blo");
+    }
+    {
+        ATX_String a = ATX_String_Create("abc");
+        ATX_String_Append(&a, "def");
+        StringTest("append 'abc' to 'def'", a, "abcdef");
+    }
+
+    printf("::testing Reserve\n");
+    {
+        ATX_String r = ATX_String_Create("123");
+        ATX_String r_save;
+        ATX_String_Reserve(&r, 100);
+        r_save = r;
+        IntTest("size of string not changed", ATX_String_GetLength(&r), 3);
+        ATX_String_Append(&r, "4");
+        ATX_String_Append(&r, "5");
+        ATX_String_Append(&r, "6");
+        ATX_ASSERT(r.chars == r_save.chars);
+    }
+
+    printf(":: testing substring");
+    {
+        ATX_String sup = ATX_String_Create("abcdefghijklmnopqrstub");
+        ATX_String sub = ATX_String_SubString(&sup, 0, 2);
+        StringTest("substring [0,2] of 'abcdefghijklmnopqrstub'", sub, "ab");
+        sub = ATX_String_SubString(&sup, 3, 4);
+        StringTest("substring [3,4] of 'abcdefghijklmnopqrstub'", sub, "defg");
+        sub = ATX_String_SubString(&sup, 100, 5);
+        StringTest("substring [100,5] of 'abcdefghijklmnopqrstub'", sub, "");
+        sub = ATX_String_SubString(&sup, 8,100);
+        StringTest("substring [8,100] of 'abcdefghijklmnopqrstub'", sub, "ijklmnopqrstub");
+    }
+
+    printf(":: testing trims");
+    {
+        ATX_String trim = ATX_String_Create("*&##just this$&**");
+        ATX_String_TrimCharLeft(&trim, '*');
+        StringTest("TrimLeft('*') of '*&##just this$&**'", trim, "&##just this$&**");
+        ATX_String_TrimCharsLeft(&trim, "*&##");
+        StringTest("TrimLeft('&*##')", trim, "just this$&**");
+        ATX_String_TrimCharRight(&trim, '*');
+        StringTest("TrimRight('*')", trim, "just this$&");
+        ATX_String_TrimCharsRight(&trim, "*&##");
+        StringTest("TrimRight('*&##')", trim, "just this$");
+        ATX_String_Assign(&trim, "*&##just this$&**");
+        ATX_String_TrimChars(&trim, "$&*#");
+        StringTest("Trim('$&*#') of '*&##just this$&**'", trim, "just this");
+        ATX_String_Assign(&trim, "\r\njust this\t   \r\n");
+        ATX_String_TrimWhitespace(&trim);
+        StringTest("Trim() of '\\r\\njust this\\t   \\r\\n'", trim, "just this");
+    }
+
+    printf(":: testing Append\n");
+    {
+        ATX_String o1 = ATX_String_Create("hello");
+        ATX_String o2 = ATX_String_Create(", gilles");
+        ATX_String_Append(&o1,  ATX_CSTR(o2));  
+        StringTest("Append", o1, "hello, gilles");
+        ATX_String_Append(&o1, ", some more");
+        StringTest("Append", o1, "hello, gilles, some more");
+
+        printf(":: testing GetChar\n");
+        ATX_String_Assign(&o1, "abcdefgh");
+        IntTest("o1[0]", 'a', ATX_String_GetChar(&o1, 0));
+        IntTest("o1[1]", 'b', ATX_String_GetChar(&o1, 1));
+        IntTest("o1[2]", 'c', ATX_String_GetChar(&o1, 2));
+    }
+
+    printf(":: testing CompareNoCase\n");
+    {
+        ATX_String s = ATX_String_Create("abc");
+        CompareTest("cnc", "abc", "abc", ATX_String_Compare(&s, "abc", ATX_TRUE), 0);
+        ATX_String_Assign(&s, "AbC3");
+        CompareTest("cnc", "AbC3", "aBC3", ATX_String_Compare(&s, "aBC3", ATX_TRUE), 0);
+        ATX_String_Assign(&s, "AbCc");
+        CompareTest("cnc", "AbC3", "aBC3", ATX_String_Compare(&s, "aBC3", ATX_FALSE), -1);
+        ATX_String_Assign(&s, "AbCc");
+        CompareTest("cnc", "AbCc", "aBcD", ATX_String_Compare(&s, "aBcD", ATX_TRUE), -1);
+        ATX_String_Assign(&s, "AbCC");
+        CompareTest("cnc", "AbCC", "aBcd", ATX_String_Compare(&s, "aBcd", ATX_TRUE), -1);
+        ATX_String_Assign(&s, "bbCc");
+        CompareTest("cnc", "bbCc", "aBcc", ATX_String_Compare(&s, "aBcc", ATX_TRUE), 1);
+        ATX_String_Assign(&s, "BbCC");
+        CompareTest("cnc", "BbCC", "aBcc", ATX_String_Compare(&s, "aBcc", ATX_TRUE), 1);
+    }
+
+    printf(":: testing MakeLowercase\n");
+    {
+        ATX_String lower = ATX_String_Create("abcdEFGhijkl");
+        ATX_String_MakeLowercase(&lower);
+        EqualTest("MakeLowercase (noref)", "abcdEFGhijkl", lower, "abcdefghijkl");
+
+        printf(":: testing ToLowercase\n");
+        ATX_String_Assign(&lower, "abcdEFGhijkl");
+        EqualTest("ToLowercase", "abcdEFGhijkl", ATX_String_ToLowercase(&lower), "abcdefghijkl");
+    }
+
+    printf(":: testing MakeUppercase\n");
+    {
+        ATX_String upper = ATX_String_Create("abcdEFGhijkl");
+        ATX_String_MakeUppercase(&upper);
+        EqualTest("MakeUppercase (noref)", "abcdEFGhijkl", upper, "ABCDEFGHIJKL");
+
+        printf(":: testing ToUppercase\n");
+        ATX_String_Assign(&upper, "abcdEFGhijkl");
+        EqualTest("ToUppercase", "abcdEFGhijkl", ATX_String_ToUppercase(&upper), "ABCDEFGHIJKL");
+    }
+
+    printf(":: testing Find (s=\"au clair de la lune\")\n");
+    {
+        ATX_String s = ATX_String_Create("au clair de la lune");
+        ATX_String s1 = ATX_EMPTY_STRING;
+        int f = ATX_String_FindString(&s, "au");
+        IntTest("Find(\"au\")", f, 0);
+        f = ATX_String_FindString(&s, "clair");
+        IntTest("Find(\"clair\")", f, 3);
+        f = ATX_String_FindString(&s, "luneb");
+        IntTest("Find(\"luneb\")", f, -1);
+        f = ATX_String_FindString(&s, (const char*)NULL);
+        IntTest("Find(NULL)", f, -1);
+        f = ATX_String_FindString(&s, "hello");
+        IntTest("Find(\"hello\")", f, -1);
+        f = ATX_String_FindString(&s, "");
+        IntTest("Find(\"\")", f, 0);
+        f = ATX_String_FindStringFrom(&s, "clair", 2);
+        IntTest("Find(\"clair\", 2)", f, 3);
+        f = ATX_String_FindStringFrom(&s, "clair", 100);
+        IntTest("Find(\"clair\", 100)", f, -1);
+        f = ATX_String_FindString(&s, "au clair de la lune");
+        IntTest("Find(\"au clair de la lune\")", f, 0);
+        f = ATX_String_FindString(&s, "au clair de la lune mon ami");
+        IntTest("Find(\"au clair de la lune mon ami\")", f, -1);
+        f = ATX_String_FindChar(&s, 'c');
+        IntTest("Find('c')", f, 3);
+        f = ATX_String_FindString(&s1, "hello");
+        IntTest("Find() in empty string", f, -1);
+    }
+
+    printf(":: testing Replace\n");
+    {
+        ATX_String r0 = ATX_String_Create("abcdefghijefe");
+        ATX_String_Replace(&r0, 'e','@');
+        StringTest("Replace(char, char)", r0, "abcd@fghij@f@");
+    }
+
+    printf(":: testing Insert\n");
+    {
+        ATX_String in0 = ATX_EMPTY_STRING;
+        ATX_String_Insert(&in0, "hello", 1);
+        StringTest("Insert into NULL, past end", in0, "");
+        ATX_String_Insert(&in0, "hello", 0);
+        StringTest("Insert into NULL, at start", in0, "hello");
+        ATX_String_Insert(&in0, "yoyo", 0);
+        StringTest("Insert at start", in0, "yoyohello");
+        ATX_String_Insert(&in0, "yaya", 3);
+        StringTest("Insert at 3", in0, "yoyyayaohello");
+    }
+
+    return 0;
+}
