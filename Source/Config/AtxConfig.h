@@ -32,41 +32,6 @@
 #define ATX_CPU_LITTLE_ENDIAN 2
 
 /*----------------------------------------------------------------------
-|    platform specifics
-+---------------------------------------------------------------------*/
-/* Windows 32 */
-#if defined(WIN32)
-#if !defined(STRICT)
-#define STRICT
-#endif
-
-#define vsnprintf _vsnprintf
-
-#endif
-
-/* Microsoft C/C++ Compiler */
-#if defined(_MSC_VER)
-#define ATX_CONFIG_HAVE_INT64
-#define ATX_CONFIG_INT64_TYPE __int64
-#endif
-
-/* QNX */
-#if defined(__QNX__)
-#endif
-
-/*----------------------------------------------------------------------
-|    compiler specifics
-+---------------------------------------------------------------------*/
-/* GCC */
-#if defined(__GNUC__)
-#define ATX_COMPILER_UNUSED(p) (void)p
-#define ATX_CONFIG_HAVE_INT64
-#define ATX_CONFIG_INT64_TYPE long long
-#else
-#define ATX_COMPILER_UNUSED(p) 
-#endif
-
-/*----------------------------------------------------------------------
 |    standard C runtime
 +---------------------------------------------------------------------*/
 #if defined(ATX_CONFIG_HAVE_STD_C)
@@ -91,5 +56,33 @@
 #if defined(ATX_CONFIG_HAVE_CTYPE_H)
 #define ATX_CONFIG_HAVE_IS_SPACE
 #endif /* ATX_CONFIG_HAVE_CTYPE_H */
+
+/*----------------------------------------------------------------------
+|    compiler specifics
++---------------------------------------------------------------------*/
+/* GCC */
+#if defined(__GNUC__)
+#define ATX_COMPILER_UNUSED(p) (void)p
+#define ATX_CONFIG_HAVE_INT64
+#define ATX_CONFIG_INT64_TYPE long long
+#else
+#define ATX_COMPILER_UNUSED(p) 
+#endif
+
+/* Microsoft C Compiler */
+#if defined(_MSC_VER)
+#define ATX_strdup _strdup
+#if (_MSC_VER >= 1400)
+#undef ATX_CONFIG_HAVE_STRCPY
+#endif
+#endif
+
+/*----------------------------------------------------------------------
+|    defaults
++---------------------------------------------------------------------*/
+/* some compilers (ex: MSVC 8) deprecate those, so we rename them */
+#if !defined(ATX_strdup)
+#define ATX_strdup strdup
+#endif
 
 #endif /* _ATX_CONFIG_H_ */

@@ -18,6 +18,7 @@
 #include "AtxInterfaces.h"
 #include "AtxTypes.h"
 #include "AtxStrings.h"
+#include "AtxDataBuffer.h"
 
 /*----------------------------------------------------------------------
 |       error codes
@@ -76,6 +77,9 @@ ATX_Result ATX_InputStream_ReadFully(ATX_InputStream* stream,
 
 ATX_Result ATX_InputStream_Skip(ATX_InputStream* stream,
                                 ATX_Size         count);
+
+ATX_Result ATX_InputStream_Load(ATX_InputStream* stream, 
+                                ATX_DataBuffer** buffer);
 
 /*----------------------------------------------------------------------
 |       convenience macros

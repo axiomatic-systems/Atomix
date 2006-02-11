@@ -23,7 +23,7 @@
 |    ATX_BytesFromInt32Be
 +---------------------------------------------------------------------*/
 void 
-ATX_BytesFromInt32Be(unsigned char* buffer, unsigned long value)
+ATX_BytesFromInt32Be(unsigned char* buffer, ATX_UInt32 value)
 {
     buffer[0] = (unsigned char)(value>>24) & 0xFF;
     buffer[1] = (unsigned char)(value>>16) & 0xFF;
@@ -35,7 +35,7 @@ ATX_BytesFromInt32Be(unsigned char* buffer, unsigned long value)
 |    ATX_BytesFromInt16Be
 +---------------------------------------------------------------------*/
 void 
-ATX_BytesFromInt16Be(unsigned char* buffer, unsigned short value)
+ATX_BytesFromInt16Be(unsigned char* buffer, ATX_UInt16 value)
 {
     buffer[0] = (unsigned char)((value>> 8) & 0xFF);
     buffer[1] = (unsigned char)((value    ) & 0xFF);
@@ -44,7 +44,7 @@ ATX_BytesFromInt16Be(unsigned char* buffer, unsigned short value)
 /*----------------------------------------------------------------------
 |    ATX_BytesToInt32Be
 +---------------------------------------------------------------------*/
-unsigned long 
+ATX_UInt32 
 ATX_BytesToInt32Be(const unsigned char* buffer)
 {
     return 
@@ -57,7 +57,7 @@ ATX_BytesToInt32Be(const unsigned char* buffer)
 /*----------------------------------------------------------------------
 |    ATX_BytesToInt16Be
 +---------------------------------------------------------------------*/
-unsigned short 
+ATX_UInt16 
 ATX_BytesToInt16Be(const unsigned char* buffer)
 {
     return 
@@ -69,7 +69,7 @@ ATX_BytesToInt16Be(const unsigned char* buffer)
 |    ATX_BytesFromInt32Le
 +---------------------------------------------------------------------*/
 void 
-ATX_BytesFromInt32Le(unsigned char* buffer, unsigned long value)
+ATX_BytesFromInt32Le(unsigned char* buffer, ATX_UInt32 value)
 {
     buffer[3] = (unsigned char)(value>>24) & 0xFF;
     buffer[2] = (unsigned char)(value>>16) & 0xFF;
@@ -81,7 +81,7 @@ ATX_BytesFromInt32Le(unsigned char* buffer, unsigned long value)
 |    ATX_BytesFromInt16Le
 +---------------------------------------------------------------------*/
 extern void 
-ATX_BytesFromInt16Le(unsigned char* buffer, unsigned short value)
+ATX_BytesFromInt16Le(unsigned char* buffer, ATX_UInt16 value)
 {
     buffer[1] = (unsigned char)((value>> 8) & 0xFF);
     buffer[0] = (unsigned char)((value    ) & 0xFF);
@@ -90,7 +90,7 @@ ATX_BytesFromInt16Le(unsigned char* buffer, unsigned short value)
 /*----------------------------------------------------------------------
 |    ATX_BytesToInt32Le
 +---------------------------------------------------------------------*/
-extern unsigned long 
+extern ATX_UInt32 
 ATX_BytesToInt32Le(const unsigned char* buffer)
 {
     return 
@@ -103,7 +103,7 @@ ATX_BytesToInt32Le(const unsigned char* buffer)
 /*----------------------------------------------------------------------
 |    ATX_BytesToInt16Le
 +---------------------------------------------------------------------*/
-extern unsigned short 
+extern ATX_UInt16 
 ATX_BytesToInt16Le(const unsigned char* buffer)
 {
     return 
@@ -259,3 +259,15 @@ ATX_ParseInteger(const char* str, long* result, ATX_Boolean relaxed)
     return ATX_SUCCESS;
 }
 
+#if !defined(ATX_CONFIG_HAVE_STRCPY)
+/*----------------------------------------------------------------------
+|    ATX_CopyString
++---------------------------------------------------------------------*/
+char*
+ATX_CopyString(char* dst, const char* src)
+{
+	char* result = dst;
+	while(*dst++ = *src++);
+	return result;
+}
+#endif 

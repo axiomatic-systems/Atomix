@@ -1,10 +1,10 @@
 /*****************************************************************
 |
-|      File: AtxFileByteStream.h
+|      File: AtxFile.h
 |
-|      Atomix - File ByteStream
+|      Atomix - File Storage
 |
-|      (c) 2002-2003 Gilles Boccon-Gibod
+|      (c) 2002-2006 Gilles Boccon-Gibod
 |      Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
@@ -17,6 +17,7 @@
 +---------------------------------------------------------------------*/
 #include "AtxTypes.h"
 #include "AtxStreams.h"
+#include "AtxDataBuffer.h"
 
 /*----------------------------------------------------------------------
 |       constants
@@ -79,6 +80,10 @@ extern "C" {
 #endif /* __cplusplus */
 
 extern ATX_Result ATX_File_Create(ATX_CString name, ATX_File* file);
+extern ATX_Result ATX_File_Load(ATX_File* file, ATX_DataBuffer** buffer);
+
+/* helper functions */
+extern ATX_Result ATX_LoadFile(ATX_CString filename, ATX_DataBuffer** buffer);
 
 #ifdef __cplusplus
 }
