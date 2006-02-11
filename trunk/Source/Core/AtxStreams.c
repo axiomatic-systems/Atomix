@@ -32,6 +32,11 @@ typedef struct {
 } ATX_SubInputStream;
 
 /*----------------------------------------------------------------------
+|   constants
++---------------------------------------------------------------------*/
+#define ATX_INPUT_STREAM_LOAD_DEFAULT_READ_CHUNK 4096
+
+/*----------------------------------------------------------------------
 |       forward declarations
 +---------------------------------------------------------------------*/
 ATX_DECLARE_SIMPLE_GET_INTERFACE_IMPLEMENTATION(ATX_SubInputStream)
@@ -165,6 +170,66 @@ ATX_InputStream_Skip(ATX_InputStream* stream, ATX_Size count)
     
     /* seek ahead */
     return ATX_InputStream_Seek(stream, position+count);
+}
+
+/*----------------------------------------------------------------------
+|   ATX_InputStream_Load
++---------------------------------------------------------------------*/
+ATX_Result
+ATX_InputStream_Load(ATX_InputStream* stream, ATX_DataBuffer** buffer)
+{
+    ATX_Result  result;
+    ATX_Size    total_bytes_read;
+    ATX_Boolean buffer_is_external = ATX_TRUE;
+
+    /* create a buffer if none was given */
+    if (*buffer == NULL) {
+        ATX_CHECK(ATX_DataBuffer_Create(0, buffer));
+        buffer_is_external = ATX_FALSE;
+    }
+
+    /* reset the buffer */
+    ATX_DataBuffer_SetDataSize(*buffer, 0);
+
+    /* read the data from the file */
+    total_bytes_read = 0;
+    do {
+        ATX_Size  available = 0;
+        ATX_Size  bytes_to_read;
+        ATX_Size  bytes_read;
+        ATX_Byte* data;
+
+        /* check if we know how much data is available */
+        result = ATX_InputStream_GetAvailable(stream, &available);
+        if (ATX_SUCCEEDED(result) && available != 0) {
+            /* we know how much is available */
+            bytes_to_read = available;
+        } else {
+            bytes_to_read = ATX_INPUT_STREAM_LOAD_DEFAULT_READ_CHUNK;
+        }
+
+        /* allocate space in the buffer */
+        result = ATX_DataBuffer_SetBufferSize(*buffer, total_bytes_read+bytes_to_read);
+        if (ATX_FAILED(result)) break;
+
+        /* read the data */
+        data = ATX_DataBuffer_UseData(*buffer);
+        result = ATX_InputStream_Read(stream, (void*)data, bytes_to_read, &bytes_read);
+        if (ATX_SUCCEEDED(result) && bytes_read != 0) {
+            total_bytes_read += bytes_read;
+            ATX_DataBuffer_SetDataSize(*buffer, total_bytes_read);
+        }
+    } while(ATX_SUCCEEDED(result));
+
+    if (result == ATX_ERROR_EOS) {
+        return ATX_SUCCESS;
+    } else {
+        if (!buffer_is_external) {
+            ATX_DataBuffer_Destroy(*buffer);
+            *buffer = NULL;
+        }
+        return result;
+    }
 }
 
 /*----------------------------------------------------------------------

@@ -20,8 +20,15 @@
 |       constants
 +---------------------------------------------------------------------*/
 #define ATX_STRING_SEARCH_FAILED (-1)
-extern const char* const ATX_String_EmptyString;
 #define ATX_EMPTY_STRING {0}
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+    extern const char* const ATX_String_EmptyString;
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 /*----------------------------------------------------------------------
 |       types
@@ -37,7 +44,7 @@ typedef struct {
 } ATX_StringBuffer;
 
 /*----------------------------------------------------------------------
-|       ATX_String
+|       ATX_String inline functions
 +---------------------------------------------------------------------*/
 #define ATX_String_GetBuffer(str) ( ((ATX_StringBuffer*)((str)->chars))-1 )
 #define ATX_String_Construct(str) do {                  \
@@ -58,6 +65,13 @@ extern ATX_String ATX_String_CreateFromSubString(const char* s, ATX_Ordinal firs
 #define ATX_CSTR(str) ATX_String_GetChars(&(str))
 #define ATX_String_IsEmpty(str) (ATX_String_GetLength((str))==0)
 #define ATX_INIT_STRING(s) do {(s).chars = NULL; } while(0)
+
+/*----------------------------------------------------------------------
+|       ATX_String functions
++---------------------------------------------------------------------*/
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 
 extern ATX_String 
 ATX_String_Clone(const ATX_String* str);
@@ -187,5 +201,9 @@ ATX_String_Insert(ATX_String* str, const char* s, ATX_Ordinal where);
 
 /*void Erase(ATX_Ordinal start, ATX_Cardinal count = 1);*/
 /*void Replace(ATX_Ordinal start, ATX_Cardinal count, const char* s);*/
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif // _ATX_STRINGS_H_

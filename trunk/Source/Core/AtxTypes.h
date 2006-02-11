@@ -26,7 +26,7 @@ typedef long               ATX_Int32;
 typedef unsigned short     ATX_UInt16;
 typedef short              ATX_Int16;
 typedef unsigned char      ATX_UInt8;
-typedef char               ATX_Int8;
+typedef signed char    ATX_Int8;
 typedef int                ATX_Int;
 typedef float              ATX_Float;
 

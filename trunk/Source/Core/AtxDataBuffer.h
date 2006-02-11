@@ -31,13 +31,13 @@ ATX_Result ATX_DataBuffer_SetBuffer(ATX_DataBuffer* buffer,
                                     ATX_Size        buffer_size);
 ATX_Result ATX_DataBuffer_SetBufferSize(ATX_DataBuffer* buffer,
                                         ATX_Size        buffer_size);
-ATX_Size   ATX_DataBuffer_GetBufferSize(ATX_DataBuffer* buffer);
+ATX_Size   ATX_DataBuffer_GetBufferSize(const ATX_DataBuffer* buffer);
 const ATX_Byte*  ATX_DataBuffer_GetData(const ATX_DataBuffer* buffer);
 ATX_Byte*  ATX_DataBuffer_UseData(ATX_DataBuffer* buffer);
 ATX_Size   ATX_DataBuffer_GetDataSize(const ATX_DataBuffer* buffer);
 ATX_Result ATX_DataBuffer_SetDataSize(ATX_DataBuffer* buffer, ATX_Size size);
 ATX_Result ATX_DataBuffer_SetData(ATX_DataBuffer* buffer, 
-                                  ATX_Byte*       data,
+                                  const ATX_Byte* data,
                                   ATX_Size        data_size);
 
 #endif /* _ATX_DATA_BUFFER_H_ */

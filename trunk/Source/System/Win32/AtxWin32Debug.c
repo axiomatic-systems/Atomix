@@ -51,7 +51,12 @@ ATX_Debug(const char* format, ...)
 
     va_start(args, format);
 
-    vsnprintf(buffer, sizeof(buffer), format, args);
+#if (_MSC_VER >= 1400)
+	// use the secure function for VC 8 and above
+	_vsnprintf_s(buffer, sizeof(buffer), sizeof(buffer)-1, format, args);
+#else
+    _vsnprintf(buffer, sizeof(buffer)-1, format, args);
+#endif
     ATX_Print(buffer);
 
     va_end(args);
