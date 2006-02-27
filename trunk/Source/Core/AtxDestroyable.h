@@ -72,9 +72,9 @@ do {                                                                   \
         (object)->interface->GetInterface) {                           \
         ATX_DestroyableInterface* interface;                           \
         if ((object)->interface->GetInterface(                         \
-            (ATX_Instance*)(object)->instance,                         \
+            (ATX_Instance*)(void*)(object)->instance,                  \
             &ATX_INTERFACE_ID__ATX_Destroyable,                        \
-            (const ATX_Interface**)&interface) == ATX_SUCCESS) {       \
+            (const ATX_Interface**)(void*)&interface) == ATX_SUCCESS) {\
             interface->Destroy((ATX_DestroyableInstance*)              \
                                ((object)->instance));                  \
             } else {                                                   \

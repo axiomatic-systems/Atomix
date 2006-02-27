@@ -177,7 +177,7 @@ ATX_HttpUrl_Construct(ATX_HttpUrl* self, const char* url)
         url+= 5;
         mark = url;
 
-        // parse the URL
+        /* parse the URL */
         do  {
             c = *url++;
             switch (state) {
@@ -217,7 +217,7 @@ case ATX_HTTP_URL_PARSER_STATE_PORT:
         if (c == '/') ATX_String_Append(&self->path, url);
         return ATX_SUCCESS;
     } else {
-        // invalid character
+        /* invalid character */
         self->port = ATX_HTTP_INVALID_PORT;
         return ATX_ERROR_INVALID_SYNTAX;
     }
@@ -302,6 +302,7 @@ ATX_HttpClient_SendRequestOnce(ATX_HttpClient*    self,
     ATX_OutputStream  output_stream = ATX_NULL_OBJECT;
     ATX_Result        result;
 
+    ATX_COMPILER_UNUSED(self);
     /* set default return value */
     *response = NULL;
 
@@ -455,7 +456,7 @@ ATX_HttpHeader_SetValue(ATX_HttpHeader* header, ATX_CString value)
 /*----------------------------------------------------------------------
 |    ATX_HttpMessage_Construct
 +---------------------------------------------------------------------*/
-ATX_Result 
+static ATX_Result 
 ATX_HttpMessage_Construct(ATX_HttpMessage* message)
 {
     ATX_Result result;
@@ -497,7 +498,7 @@ ATX_HttpMessage_Create(ATX_HttpMessage** message)
 /*----------------------------------------------------------------------
 |    ATX_HttpMessage_Destruct
 +---------------------------------------------------------------------*/
-ATX_Result
+static ATX_Result
 ATX_HttpMessage_Destruct(ATX_HttpMessage* message)
 {
     /* destroy all headers */
@@ -661,7 +662,7 @@ ATX_HttpMessage_GetBody(const ATX_HttpMessage* self,
 /*----------------------------------------------------------------------
 |    ATX_HttpMessage_Emit
 +---------------------------------------------------------------------*/
-ATX_Result
+static ATX_Result
 ATX_HttpMessage_Emit(const ATX_HttpMessage* message, ATX_OutputStream* stream)
 {
     ATX_ListItem* item = ATX_List_GetFirstItem(message->headers);

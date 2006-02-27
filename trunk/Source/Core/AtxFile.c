@@ -59,8 +59,9 @@ ATX_LoadFile(ATX_CString filename, ATX_DataBuffer** buffer)
     /* load the file */
     result = ATX_File_Load(&file, buffer);
 
-    /* close the file */
+    /* close and destroy the file */
     ATX_File_Close(&file);
+    ATX_DESTROY_OBJECT(&file);
 
     return result;
 }

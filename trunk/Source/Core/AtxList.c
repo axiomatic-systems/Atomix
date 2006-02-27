@@ -261,7 +261,7 @@ ATX_List_ReleaseObjects(ATX_List* list)
     ATX_ListItem* item = list->head;
 
     while (item) {
-        ATX_RELEASE_OBJECT((ATX_PolymorphicObject*)&item->data.object);
+        ATX_RELEASE_OBJECT((ATX_PolymorphicObject*)(void*)&item->data.object);
         item = item->next;
     }
 

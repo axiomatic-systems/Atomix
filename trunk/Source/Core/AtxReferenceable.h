@@ -91,7 +91,7 @@ do {                                                                    \
         if ((object)->interface->GetInterface(                          \
             (ATX_Instance*)((object)->instance),                        \
             &ATX_INTERFACE_ID__ATX_Referenceable,                       \
-            (const ATX_Interface**)&interface) == ATX_SUCCESS) {        \
+            (const ATX_Interface**)(void*)&interface) == ATX_SUCCESS) { \
             interface->Release((ATX_ReferenceableInstance*)             \
                                ((object)->instance));                   \
         } else {                                                        \
@@ -118,7 +118,7 @@ do {                                                                    \
         if ((object)->interface->GetInterface(                          \
             (ATX_Instance*)((object)->instance),                        \
             &ATX_INTERFACE_ID__ATX_Referenceable,                       \
-            (const ATX_Interface**)&interface) == ATX_SUCCESS) {        \
+            (const ATX_Interface**)(void*)&interface) == ATX_SUCCESS) { \
             interface->AddReference((ATX_ReferenceableInstance*)        \
                                     (object)->instance);                \
         } else {                                                        \
