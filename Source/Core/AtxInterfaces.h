@@ -190,7 +190,7 @@ ATX_METHOD _prefix##_GetInterface(ATX_Instance*          instance,           \
     (void)instance;                                                          \
     if (ATX_INTERFACE_IDS_EQUAL(id, &ATX_INTERFACE_ID__ATX_Polymorphic)) {   \
         if (interface) {                                                     \
-            *interface = (const ATX_Interface*)                              \
+            *interface = (const ATX_Interface*)(void*)                       \
                          &(_prefix##_ATX_PolymorphicInterface);              \
         }                                                                    \
         return ATX_SUCCESS;                                                  \
@@ -199,7 +199,7 @@ ATX_METHOD _prefix##_GetInterface(ATX_Instance*          instance,           \
 #define ATX_INTERFACE_MAP_ADD(_name_pfx, _interface_pfx)                     \
 else if (ATX_INTERFACE_IDS_EQUAL(id, &ATX_INTERFACE_ID__##_interface_pfx)) { \
     if (interface) {                                                         \
-        *interface = (const ATX_Interface*)                                  \
+        *interface = (const ATX_Interface*)(void*)                           \
                      &(_name_pfx##_##_interface_pfx##Interface);             \
     }                                                                        \
     return ATX_SUCCESS;                                                      \

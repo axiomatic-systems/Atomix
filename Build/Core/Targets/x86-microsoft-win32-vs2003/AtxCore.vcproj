@@ -63,8 +63,9 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
-				InlineFunctionExpansion="1"
+				Optimization="3"
+				GlobalOptimizations="TRUE"
+				InlineFunctionExpansion="0"
 				OmitFramePointers="TRUE"
 				AdditionalIncludeDirectories="..\..\..\..\Source\Config;..\..\..\..\Source\Atomix"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
@@ -109,6 +110,9 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm">
 			<File
 				RelativePath="..\..\..\..\Source\Core\AtxDataBuffer.c">
+			</File>
+			<File
+				RelativePath="..\..\..\..\Source\Core\AtxFile.c">
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\AtxHttp.c">

@@ -270,4 +270,4 @@ ATX_CopyString(char* dst, const char* src)
 	while(*dst++ = *src++);
 	return result;
 }
-#endif 
+#endif

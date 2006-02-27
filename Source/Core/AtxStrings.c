@@ -658,7 +658,9 @@ ATX_String_TrimWhitespaceLeft(ATX_String* self)
 void 
 ATX_String_TrimCharLeft(ATX_String* self, char c)
 {
-    char s[2] = {c, 0};
+    char s[2];
+    s[0] = c;
+    s[1] = 0;
     ATX_String_TrimCharsLeft(self, (const char*)s);
 }
 
@@ -673,7 +675,7 @@ ATX_String_TrimCharsLeft(ATX_String* self, const char* chars)
 
     if (self->chars == NULL) return;
     s = self->chars;
-    while (c = *s) {
+    while ((c = *s)) {
         const char* x = chars;
         while (*x) {
             if (*x == c) break;
@@ -710,7 +712,9 @@ ATX_String_TrimWhitespaceRight(ATX_String* self)
 void 
 ATX_String_TrimCharRight(ATX_String* self, char c)
 {
-    char s[2] = {c, 0};
+    char s[2];
+    s[0] = c;
+    s[1] = 0;
     ATX_String_TrimCharsRight(self, (const char*)s);
 }
 
@@ -761,7 +765,9 @@ ATX_String_TrimWhitespace(ATX_String* self)
 void 
 ATX_String_TrimChar(ATX_String* self, char c)
 {
-    char s[2] = {c, 0};
+    char s[2];
+    s[0] = c;
+    s[1] = 0;
     ATX_String_TrimCharsLeft(self, (const char*)s);
     ATX_String_TrimCharsRight(self, (const char*)s);
 }

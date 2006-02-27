@@ -94,6 +94,7 @@ main(int argc, char** argv)
         ATX_String s = ATX_EMPTY_STRING;
         ATX_ASSERT(sizeof(ATX_String) == sizeof(void*));
         ATX_ASSERT(ATX_String_GetChars(&s)[0] == '\0');
+        ATX_String_Destruct(&s);
     }
 
     printf(":: testing construction and destruction\n");
@@ -111,30 +112,36 @@ main(int argc, char** argv)
     {
         ATX_String s00 = ATX_EMPTY_STRING;
         StringTest("constructor()", s00, "");
+        ATX_String_Destruct(&s00);
     }
     {
         ATX_String s01 = ATX_String_Create("abcdef");
         StringTest("constructor(const char*)", s01, "abcdef");
+        ATX_String_Destruct(&s01);
     }
 
     {
         ATX_String s03 = ATX_String_CreateFromSubString("abcdefgh", 0, 3);
         StringTest("constructor(const char* s, unsigned int)", s03, "abc");
+        ATX_String_Destruct(&s03);
     }
 
     {
         ATX_String s06 = ATX_String_Create((const char*)NULL);
         StringTest("constructor(NULL)", s06, "");
+        ATX_String_Destruct(&s06);
     }
 
     {
         ATX_String s08 = ATX_String_Create("");
         StringTest("constructor(const char* = \"\")", s08, "");
+        ATX_String_Destruct(&s08);
     }
 
     {
         ATX_String s09 = ATX_String_CreateFromSubString("jkhlkjh\0fgsdfg\0fgsdfg", 0, 10);
         StringTest("ATX_String s09(\"jkhlkjh\0fgsdfg\0fgsdfg\", 0, 10)", s09, "jkhlkjh");
+        ATX_String_Destruct(&s09);
     }
 
     printf(":: testing assignments\n");
@@ -143,6 +150,8 @@ main(int argc, char** argv)
         ATX_String a01 = ATX_EMPTY_STRING;
         ATX_String_Copy(&a01, &a00);
         StringTest("operator=(const ATX_String& = empty)", a01, "");
+        ATX_String_Destruct(&a00);
+        ATX_String_Destruct(&a01);
     }
 
     printf(":: testing GetLength\n");
@@ -155,6 +164,8 @@ main(int argc, char** argv)
         ATX_String_Assign(&gl0, "abcd");
         gl1 = ATX_String_Clone(&gl0);
         IntTest("GetLength", ATX_String_GetLength(&gl1), 4);
+        ATX_String_Destruct(&gl0);
+        ATX_String_Destruct(&gl1);
     }
 
     printf("::testing Append\n");
@@ -162,16 +173,19 @@ main(int argc, char** argv)
         ATX_String l = ATX_String_Create("blabla");
         ATX_String_AppendSubString(&l, "blibliblo", 6);
         StringTest("append(const char*, int size)", l, "blablablibli");
+        ATX_String_Destruct(&l);
     }
     {
         ATX_String a = ATX_EMPTY_STRING;
         ATX_String_AppendSubString(&a, "bloblo", 3);
         StringTest("append to NULL", a, "blo");
+        ATX_String_Destruct(&a);
     }
     {
         ATX_String a = ATX_String_Create("abc");
         ATX_String_Append(&a, "def");
         StringTest("append 'abc' to 'def'", a, "abcdef");
+        ATX_String_Destruct(&a);
     }
 
     printf("::testing Reserve\n");
@@ -185,6 +199,7 @@ main(int argc, char** argv)
         ATX_String_Append(&r, "5");
         ATX_String_Append(&r, "6");
         ATX_ASSERT(r.chars == r_save.chars);
+        ATX_String_Destruct(&r);
     }
 
     printf(":: testing substring");
@@ -192,12 +207,17 @@ main(int argc, char** argv)
         ATX_String sup = ATX_String_Create("abcdefghijklmnopqrstub");
         ATX_String sub = ATX_String_SubString(&sup, 0, 2);
         StringTest("substring [0,2] of 'abcdefghijklmnopqrstub'", sub, "ab");
+        ATX_String_Destruct(&sub);
         sub = ATX_String_SubString(&sup, 3, 4);
         StringTest("substring [3,4] of 'abcdefghijklmnopqrstub'", sub, "defg");
+        ATX_String_Destruct(&sub);
         sub = ATX_String_SubString(&sup, 100, 5);
         StringTest("substring [100,5] of 'abcdefghijklmnopqrstub'", sub, "");
+        ATX_String_Destruct(&sub);
         sub = ATX_String_SubString(&sup, 8,100);
         StringTest("substring [8,100] of 'abcdefghijklmnopqrstub'", sub, "ijklmnopqrstub");
+        ATX_String_Destruct(&sub);
+        ATX_String_Destruct(&sup);
     }
 
     printf(":: testing trims");
@@ -217,6 +237,7 @@ main(int argc, char** argv)
         ATX_String_Assign(&trim, "\r\njust this\t   \r\n");
         ATX_String_TrimWhitespace(&trim);
         StringTest("Trim() of '\\r\\njust this\\t   \\r\\n'", trim, "just this");
+        ATX_String_Destruct(&trim);
     }
 
     printf(":: testing Append\n");
@@ -233,6 +254,8 @@ main(int argc, char** argv)
         IntTest("o1[0]", 'a', ATX_String_GetChar(&o1, 0));
         IntTest("o1[1]", 'b', ATX_String_GetChar(&o1, 1));
         IntTest("o1[2]", 'c', ATX_String_GetChar(&o1, 2));
+        ATX_String_Destruct(&o1);
+        ATX_String_Destruct(&o2);
     }
 
     printf(":: testing CompareNoCase\n");
@@ -251,28 +274,37 @@ main(int argc, char** argv)
         CompareTest("cnc", "bbCc", "aBcc", ATX_String_Compare(&s, "aBcc", ATX_TRUE), 1);
         ATX_String_Assign(&s, "BbCC");
         CompareTest("cnc", "BbCC", "aBcc", ATX_String_Compare(&s, "aBcc", ATX_TRUE), 1);
+        ATX_String_Destruct(&s);
     }
 
     printf(":: testing MakeLowercase\n");
     {
         ATX_String lower = ATX_String_Create("abcdEFGhijkl");
+        ATX_String t;
         ATX_String_MakeLowercase(&lower);
         EqualTest("MakeLowercase (noref)", "abcdEFGhijkl", lower, "abcdefghijkl");
 
         printf(":: testing ToLowercase\n");
         ATX_String_Assign(&lower, "abcdEFGhijkl");
-        EqualTest("ToLowercase", "abcdEFGhijkl", ATX_String_ToLowercase(&lower), "abcdefghijkl");
+        t = ATX_String_ToLowercase(&lower);
+        EqualTest("ToLowercase", "abcdEFGhijkl", t, "abcdefghijkl");
+        ATX_String_Destruct(&lower);
+        ATX_String_Destruct(&t);
     }
 
     printf(":: testing MakeUppercase\n");
     {
         ATX_String upper = ATX_String_Create("abcdEFGhijkl");
+        ATX_String t;
         ATX_String_MakeUppercase(&upper);
         EqualTest("MakeUppercase (noref)", "abcdEFGhijkl", upper, "ABCDEFGHIJKL");
 
         printf(":: testing ToUppercase\n");
         ATX_String_Assign(&upper, "abcdEFGhijkl");
-        EqualTest("ToUppercase", "abcdEFGhijkl", ATX_String_ToUppercase(&upper), "ABCDEFGHIJKL");
+        t = ATX_String_ToUppercase(&upper);
+        EqualTest("ToUppercase", "abcdEFGhijkl", t, "ABCDEFGHIJKL");
+        ATX_String_Destruct(&upper);
+        ATX_String_Destruct(&t);
     }
 
     printf(":: testing Find (s=\"au clair de la lune\")\n");
@@ -303,6 +335,8 @@ main(int argc, char** argv)
         IntTest("Find('c')", f, 3);
         f = ATX_String_FindString(&s1, "hello");
         IntTest("Find() in empty string", f, -1);
+        ATX_String_Destruct(&s);
+        ATX_String_Destruct(&s1);
     }
 
     printf(":: testing Replace\n");
@@ -310,6 +344,7 @@ main(int argc, char** argv)
         ATX_String r0 = ATX_String_Create("abcdefghijefe");
         ATX_String_Replace(&r0, 'e','@');
         StringTest("Replace(char, char)", r0, "abcd@fghij@f@");
+        ATX_String_Destruct(&r0);
     }
 
     printf(":: testing Insert\n");
@@ -323,6 +358,7 @@ main(int argc, char** argv)
         StringTest("Insert at start", in0, "yoyohello");
         ATX_String_Insert(&in0, "yaya", 3);
         StringTest("Insert at 3", in0, "yoyyayaohello");
+        ATX_String_Destruct(&in0);
     }
 
     return 0;

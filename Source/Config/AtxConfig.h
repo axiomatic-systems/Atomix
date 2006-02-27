@@ -72,6 +72,7 @@
 /* Microsoft C Compiler */
 #if defined(_MSC_VER)
 #define ATX_strdup _strdup
+#define snprintf   _snprintf
 #if (_MSC_VER >= 1400)
 #undef ATX_CONFIG_HAVE_STRCPY
 #endif

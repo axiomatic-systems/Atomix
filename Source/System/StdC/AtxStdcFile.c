@@ -405,7 +405,7 @@ ATX_File_Create(const char* filename, ATX_File* object)
     }
 
     /* construct the object */
-    ATX_SET_STRING(file->name, filename);
+    file->name = ATX_String_Create(filename);
 
     /* get the size */
     if (ATX_StringsEqual(filename, ATX_FILE_STANDARD_INPUT)  ||
@@ -437,7 +437,7 @@ StdcFile_Destroy(ATX_DestroyableInstance* instance)
     StdcFile* file = (StdcFile*)instance;
 
     /* release the resources */
-    ATX_DESTROY_STRING(file->name);
+    ATX_String_Destruct(&file->name);
     StdcFileWrapper_Release(file->file);
 
     /* free the memory */
@@ -456,11 +456,11 @@ StdcFile_Open(ATX_FileInstance* instance, ATX_Flags mode)
     FILE*     stdc_file;
 
     /* decide wheter this is a file or stdin/stdout/stderr */
-    if (!strcmp(file->name, "-stdin")) {
+    if (!strcmp(ATX_CSTR(file->name), "-stdin")) {
         stdc_file = stdin;
-    } else if (!strcmp(file->name, "-stdout")) {
+    } else if (!strcmp(ATX_CSTR(file->name), "-stdout")) {
         stdc_file = stdout;
-    } else if (!strcmp(file->name, "-stderr")) {
+    } else if (!strcmp(ATX_CSTR(file->name), "-stderr")) {
         stdc_file = stderr;
     } else {
         const char* fmode = "";
@@ -490,7 +490,7 @@ StdcFile_Open(ATX_FileInstance* instance, ATX_Flags mode)
         }
 
         /* try to open the file */
-        stdc_file = fopen(file->name, fmode);
+        stdc_file = fopen(ATX_CSTR(file->name), fmode);
         if (stdc_file == NULL) {
             switch (errno) {
               case EACCES:
