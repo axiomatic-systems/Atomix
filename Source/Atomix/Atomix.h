@@ -1,11 +1,11 @@
 /*****************************************************************
 |
-|      File: Atomix.h
+|   File: Atomix.h
 |
-|      Atomix - Top Level Header
+|   Atomix - Top Level Header
 |
-|      (c) 2002-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2002-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 /** @file 
@@ -16,15 +16,15 @@
 #define _ATOMIX_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "AtxConfig.h"
 #include "AtxDefs.h"
 #include "AtxTypes.h"
-#include "AtxErrors.h"
+#include "AtxResults.h"
 #include "AtxUtils.h"
 #include "AtxDebug.h"
-#include "AtxStrings.h"
+#include "AtxString.h"
 #include "AtxInterfaces.h"
 #include "AtxDestroyable.h"
 #include "AtxReferenceable.h"

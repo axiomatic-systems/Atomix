@@ -11,7 +11,7 @@
 # sources and object files
 #######################################################################
 ATX_MODULE_SOURCES = AtxInterfaces.c AtxList.c AtxStreams.c AtxUtils.c \
-	AtxProperties.c AtxRingBuffer.c AtxSockets.c AtxDataBuffer.c AtxStrings.c
+	AtxProperties.c AtxRingBuffer.c AtxSockets.c AtxDataBuffer.c AtxString.c AtxFile.c
 ATX_MODULE_OBJECTS = $(ATX_MODULE_SOURCES:.c=.o)
 ATX_INCLUDES_C    += -I$(ATX_SOURCE_ROOT)/Core -I$(ATX_SOURCE_ROOT)/Config
 

@@ -79,10 +79,10 @@ typedef struct {
 +---------------------------------------------------------------------*/
 ATX_DECLARE_INTERFACE(ATX_PropertyListener)
 ATX_BEGIN_INTERFACE_DEFINITION(ATX_PropertyListener)
-    void (*OnPropertyChanged)(ATX_PropertyListenerInstance* listener,
-                              ATX_CString                   name,
-                              ATX_PropertyType              type,
-                              const ATX_PropertyValue*      value);
+    void (*OnPropertyChanged)(ATX_PropertyListener*    self,
+                              ATX_CString              name,
+                              ATX_PropertyType         type,
+                              const ATX_PropertyValue* value);
 ATX_END_INTERFACE_DEFINITION(ATX_PropertyListener)
 
 /*----------------------------------------------------------------------
@@ -100,8 +100,7 @@ ATX_DECLARE_INTERFACE(ATX_Properties)
 ATX_BEGIN_INTERFACE_DEFINITION(ATX_Properties)
     /**
      * Returns the property with a specified name in the property list.
-     * @param instance Instance pointer of the object on which this method 
-     * is called
+     * @param self Pointer to the object on which this method is called
      * @param name Name of the property that is requested
      * @param property Address of the property variable where the property
      * will be returned
@@ -110,45 +109,42 @@ ATX_BEGIN_INTERFACE_DEFINITION(ATX_Properties)
      * with that name in the list, or a negative ATX_Result error code 
      * if the call fails
      */
-    ATX_Result (*GetProperty)(ATX_PropertiesInstance* instance,
-                              ATX_CString             name,
-                              ATX_Property*           property);
+    ATX_Result (*GetProperty)(ATX_Properties* self,
+                              ATX_CString     name,
+                              ATX_Property*   property);
 
     /**
      * Sets the value of a property in a property list.
-     * @param instance Instance pointer of the object on which this method 
-     * is called
+     * @param self Pointer to the object on which this method is called
      * @param name Name of the property to set
      * @param type Type of the property to set
      * @param value Pointer to the value of the property to set, or NULL
      * to unset the property (remove the property from the list)
      * @atx_method_result
      */
-    ATX_Result (*SetProperty)(ATX_PropertiesInstance*  instance,
+    ATX_Result (*SetProperty)(ATX_Properties*          self,
                               ATX_CString              name,
                               ATX_PropertyType         type,
                               const ATX_PropertyValue* value);
 
     /**
      * Unsets (removes) a property from a property list.
-     * @param instance Instance pointer of the object on which this method 
-     * is called
+     * @param self Pointer to the object on which this method is called
      * @param name Name of the property to unset
      * @atx_method_result
      */
-    ATX_Result (*UnsetProperty)(ATX_PropertiesInstance* instance,
-                                ATX_CString             name);
+    ATX_Result (*UnsetProperty)(ATX_Properties* self,
+                                ATX_CString     name);
 
     /**
      * Unsets all properties.
-     * @param instance Instance pointer of the object on which this method 
-     * is called
+     * @param self Pointer to the object on which this method is called
      * @atx_method_result
      */
-    ATX_Result (*Clear)(ATX_PropertiesInstance* instance);
+    ATX_Result (*Clear)(ATX_Properties* self);
 
-    ATX_Result (*GetIterator)(ATX_PropertiesInstance* instance,
-                              ATX_Iterator*           iterator);
+    ATX_Result (*GetIterator)(ATX_Properties* self,
+                              ATX_Iterator**  iterator);
 #if 0
     ATX_Result (*AddAlias)(ATX_PropertiesInstance* instance,
                            ATX_CString             alias,
@@ -170,12 +166,12 @@ ATX_BEGIN_INTERFACE_DEFINITION(ATX_Properties)
                              ATX_CString             name,
                              ATX_Iterator*           iterator);
 #endif
-    ATX_Result (*AddListener)(ATX_PropertiesInstance*     instance,
+    ATX_Result (*AddListener)(ATX_Properties*             self,
                               ATX_CString                 name,
                               ATX_PropertyListener*       listener, 
                               ATX_PropertyListenerHandle* handle);
 
-    ATX_Result (*RemoveListener)(ATX_PropertiesInstance*    instance,
+    ATX_Result (*RemoveListener)(ATX_Properties*            self,
                                  ATX_PropertyListenerHandle handle);
 
 ATX_END_INTERFACE_DEFINITION(ATX_Properties)
@@ -188,7 +184,7 @@ ATX_END_INTERFACE_DEFINITION(ATX_Properties)
  * that implement the ATX_Properties interface 
  */
 #define ATX_Properties_GetProperty(object, name, property)  \
-ATX_INTERFACE(object)->GetProperty(ATX_INSTANCE(object),    \
+ATX_INTERFACE(object)->GetProperty(object,                  \
                                    name,                    \
                                    property)
 
@@ -197,7 +193,7 @@ ATX_INTERFACE(object)->GetProperty(ATX_INSTANCE(object),    \
  * implement the ATX_Properties interface 
  */
 #define ATX_Properties_SetProperty(object, name, type, value)    \
-ATX_INTERFACE(object)->SetProperty(ATX_INSTANCE(object),         \
+ATX_INTERFACE(object)->SetProperty(object,                       \
                                    name,                         \
                                    type,                         \
                                    value)
@@ -207,28 +203,28 @@ ATX_INTERFACE(object)->SetProperty(ATX_INSTANCE(object),         \
  * implement the ATX_Properties interface 
  */
 #define ATX_Properties_UnsetProperty(object, name)               \
-ATX_INTERFACE(object)->UnsetProperty(ATX_INSTANCE(object), name)
+ATX_INTERFACE(object)->UnsetProperty(object, name)
 
 /**
  * Convenience macro used to call the Clear() method on objects that 
  * implement the ATX_Properties interface 
  */
-#define ATX_Properties_Clear(object)                       \
-ATX_INTERFACE(object)->Clear(ATX_INSTANCE(object))
+#define ATX_Properties_Clear(object)                            \
+ATX_INTERFACE(object)->Clear(object))
 
 /**
  * Convenience macro used to call the GetIterator() method on objects that 
  * implement the ATX_Properties interface 
  */
 #define ATX_Properties_GetIterator(object, iterator)               \
-ATX_INTERFACE(object)->GetIterator(ATX_INSTANCE(object), iterator)
+ATX_INTERFACE(object)->GetIterator(object, iterator)
 
 /**
  * Convenience macro used to call the AddListener() method on objects that 
  * implement the ATX_Properties interface 
  */
 #define ATX_Properties_AddListener(object, name, listener, handle) \
-ATX_INTERFACE(object)->AddListener(ATX_INSTANCE(object),           \
+ATX_INTERFACE(object)->AddListener(object,                         \
                                    name,                           \
                                    listener,                       \
                                    handle)
@@ -238,106 +234,22 @@ ATX_INTERFACE(object)->AddListener(ATX_INSTANCE(object),           \
  * implement the ATX_Properties interface 
  */
 #define ATX_Properties_RemoveListener(object, handle)    \
-ATX_INTERFACE(object)->RemoveListener(ATX_INSTANCE(object), handle)
+ATX_INTERFACE(object)->RemoveListener(object, handle)
 
 /**
  * Convenience macro used to call the OnPropertyChanged() method on objects 
  * that implement the ATX_PropertyListener interface 
  */
 #define ATX_PropertyListener_OnPropertyChanged(object, name, type, value) \
-ATX_INTERFACE(object)->OnPropertyChanged(ATX_INSTANCE(object),            \
+ATX_INTERFACE(object)->OnPropertyChanged(object,                          \
                                          name,                            \
                                          type,                            \
                                          value)
 
 /*----------------------------------------------------------------------
-|       templates
-+---------------------------------------------------------------------*/
-#define ATX_IMPLEMENT_SIMPLE_STATIC_PROPERTIES_INTERFACE(_prefix, _array) \
-ATX_METHOD _prefix##GetPropertyCount(ATX_PropertiesInstance* instance,    \
-                                     ATX_Cardinal*           count)       \
-{                                                                         \
-    *count = sizeof(_array)/sizeof((_array)[0]);                          \
-    return ATX_SUCCESS;                                                   \
-}                                                                         \
-ATX_METHOD _prefix##GetPropertyByName(ATX_PropertiesInstance* instance,   \
-                                      ATX_String              name,       \
-                                      ATX_Property*           property)   \
-{                                                                         \
-    ATX_Ordinal i;                                                        \
-    for (i=0; i<sizeof(_array)/sizeof((_array)[0]); i++) {                \
-        if (!strcmp(name, (_array)[i].name)) {                            \
-            *property = (_array)[i];                                      \
-            return ATX_SUCCESS;                                           \
-        }                                                                 \
-    }                                                                     \
-    return ATX_ERROR_NO_SUCH_PROPERTY;                                    \
-}                                                                         \
-ATX_METHOD _prefix##GetPropertyByIndex(ATX_PropertiesInstance* instance,  \
-                                       ATX_Ordinal             index,     \
-                                       ATX_Property*           property)  \
-{                                                                         \
-    if (index >= sizeof(_array)/sizeof((_array)[0])) {                    \
-        return ATX_ERROR_NO_SUCH_PROPERTY;                                \
-    }                                                                     \
-    *property = (_array)[index];                                          \
-    return ATX_SUCCESS;                                                   \
-}                                                                         \
-static const ATX_PropertiesInterface                                      \
-_prefix##ATX_PropertiesInterface = {                                      \
-    _prefix##GetInterface,                                                \
-    _prefix##GetPropertyCount,                                            \
-    _prefix##GetPropertyByName,                                           \
-    _prefix##GetPropertyByIndex,                                          \
-    NULL                                                                  \
-};                              
-
-#define ATX_IMPLEMENT_SIMPLE_MEMBER_PROPERTIES_INTERFACE(_prefix, _array, _set_method)\
-ATX_METHOD _prefix##GetPropertyCount(ATX_PropertiesInstance* instance,      \
-                                     ATX_Cardinal*           count)         \
-{                                                                           \
-    _prefix* lo = (_prefix*)instance;                                       \
-    *count = sizeof(lo->_array)/sizeof(lo->_array[0]);                      \
-    return ATX_SUCCESS;                                                     \
-}                                                                           \
-ATX_METHOD _prefix##GetPropertyByName(ATX_PropertiesInstance* instance,     \
-                                      ATX_String              name,         \
-                                      ATX_Property*           property)     \
-{                                                                           \
-    _prefix* lo = (_prefix*)instance;                                       \
-    ATX_Ordinal i;                                                          \
-    for (i=0; i<sizeof(lo->_array)/sizeof(lo->_array[0]); i++) {            \
-        if (!strcmp(name, lo->_array[i].name)) {                            \
-            *property = lo->_array[i];                                      \
-            return ATX_SUCCESS;                                             \
-        }                                                                   \
-    }                                                                       \
-    return ATX_ERROR_NO_SUCH_PROPERTY;                                      \
-}                                                                           \
-ATX_METHOD _prefix##GetPropertyByIndex(ATX_PropertiesInstance* instance,    \
-                                       ATX_Ordinal             index,       \
-                                       ATX_Property*           property)    \
-{                                                                           \
-    _prefix* lo = (_prefix*)instance;                                       \
-    if (index >= sizeof(lo->_array)/sizeof(lo->_array[0])) {                \
-        return ATX_ERROR_OUT_OF_RANGE;                                      \
-    }                                                                       \
-    *property = lo->_array[index];                                          \
-    return ATX_SUCCESS;                                                     \
-}                                                                           \
-static const ATX_PropertiesInterface                                        \
-_prefix##ATX_PropertiesInterface = {                                        \
-    _prefix##GetInterface,                                                  \
-    _prefix##GetPropertyCount,                                              \
-    _prefix##GetPropertyByName,                                             \
-    _prefix##GetPropertyByIndex,                                            \
-    _set_method                                                             \
-};                              
-
-/*----------------------------------------------------------------------
 |       functions
 +---------------------------------------------------------------------*/
-ATX_Result ATX_Properties_Create(ATX_Properties* properties);
+ATX_Result ATX_Properties_Create(ATX_Properties** properties);
 
 #endif /* _ATX_PROPERTIES_H_ */
 

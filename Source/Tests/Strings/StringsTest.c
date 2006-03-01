@@ -13,7 +13,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "Atomix.h"
+#include "AtxString.h"
+#include "AtxDebug.h"
+#include "AtxUtils.h"
 
 /*----------------------------------------------------------------------
 |       Fail

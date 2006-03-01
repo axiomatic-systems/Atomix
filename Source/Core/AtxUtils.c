@@ -13,7 +13,7 @@
 |       includes
 +---------------------------------------------------------------------*/
 #include "AtxUtils.h"
-#include "AtxErrors.h"
+#include "AtxResults.h"
 #include "AtxConfig.h"
 #if defined(ATX_CONFIG_HAVE_MATH_H)
 #include <math.h>

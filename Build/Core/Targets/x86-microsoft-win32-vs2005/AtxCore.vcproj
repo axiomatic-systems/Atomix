@@ -165,6 +165,14 @@
 			<File
 				RelativePath="..\..\..\..\Source\Core\AtxHttp.c"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\AtxInterfaces.c"
@@ -201,13 +209,28 @@
 			<File
 				RelativePath="..\..\..\..\Source\Core\AtxSockets.c"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\AtxStreams.c"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Source\Core\AtxStrings.c"
+				RelativePath="..\..\..\..\Source\Core\AtxString.c"
 				>
 			</File>
 			<File
@@ -244,10 +267,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Source\Core\AtxErrors.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\Source\Core\AtxFile.h"
 				>
 			</File>
@@ -280,6 +299,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\Source\Core\AtxResults.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\Source\Core\AtxRingBuffer.h"
 				>
 			</File>
@@ -292,7 +315,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Source\Core\AtxStrings.h"
+				RelativePath="..\..\..\..\Source\Core\AtxString.h"
 				>
 			</File>
 			<File

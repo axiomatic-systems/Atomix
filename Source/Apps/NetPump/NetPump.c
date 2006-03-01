@@ -95,11 +95,11 @@ PrintUsageAndExit(void)
 |       ConnectClient
 +---------------------------------------------------------------------*/
 static ATX_Result
-ConnectClient(ATX_Socket*       client, 
-              char*             hostname, 
-              ATX_IpPort        port,
-              ATX_InputStream*  input_stream,
-              ATX_OutputStream* output_stream)
+ConnectClient(ATX_Socket*        client, 
+              char*              hostname, 
+              ATX_IpPort         port,
+              ATX_InputStream**  input_stream,
+              ATX_OutputStream** output_stream)
 {
     ATX_Result result = ATX_SUCCESS;
     
@@ -144,28 +144,28 @@ done:
 |       GetEndPoinStreams
 +---------------------------------------------------------------------*/
 static ATX_Result
-GetEndPointStreams(EndPoint*         endpoint, 
-                   ATX_InputStream*  input_stream,
-                   ATX_OutputStream* output_stream)
+GetEndPointStreams(EndPoint*          endpoint, 
+                   ATX_InputStream**  input_stream,
+                   ATX_OutputStream** output_stream)
 {
     ATX_Result result;
 
     switch (endpoint->type) {
       case ENDPOINT_TYPE_UDP_CLIENT:
         {
-            ATX_DatagramSocket client;
-            ATX_Socket         socket;
+            ATX_DatagramSocket* client;
+            ATX_Socket*         socket;
 
             /* create socket */
             result = ATX_UdpSocket_Create(&client);
             if (result) return result;
 
             /* cast to ATX_Socket interface */
-            result = ATX_CAST_OBJECT(&client, &socket, ATX_Socket);
+            socket = ATX_CAST(client, ATX_Socket);
             if (result != ATX_SUCCESS) return result;
 
             /* connect socket */
-            return ConnectClient(&socket, 
+            return ConnectClient(socket, 
                                  endpoint->info.udp_client.hostname,
                                  endpoint->info.udp_client.port,
                                  input_stream,
@@ -175,14 +175,14 @@ GetEndPointStreams(EndPoint*         endpoint,
 
       case ENDPOINT_TYPE_TCP_CLIENT:
         {
-            ATX_Socket client;
+            ATX_Socket* client;
 
             /* create socket */
             result = ATX_TcpClientSocket_Create(&client);
             if (result) return result;
 
             /* connect socket */
-            return ConnectClient(&client, 
+            return ConnectClient(client, 
                                  endpoint->info.udp_client.hostname,
                                  endpoint->info.udp_client.port,
                                  input_stream,
@@ -192,16 +192,16 @@ GetEndPointStreams(EndPoint*         endpoint,
 
       case ENDPOINT_TYPE_UDP_SERVER:
         {
-            ATX_DatagramSocket server;
-            ATX_Socket         socket;
-            ATX_SocketAddress  address;
+            ATX_DatagramSocket* server;
+            ATX_Socket*         socket;
+            ATX_SocketAddress   address;
 
             /* create socket */
             result = ATX_UdpSocket_Create(&server);
             if (result) return result;
 
             /* cast to ATX_Socket interface */
-            result = ATX_CAST_OBJECT(&server, &socket, ATX_Socket);
+            socket = ATX_CAST(server, ATX_Socket);
             if (result != ATX_SUCCESS) return result;
 
             /* listen on port */
@@ -210,40 +210,40 @@ GetEndPointStreams(EndPoint*         endpoint,
             ATX_SocketAddress_Set(&address,
                                   NULL,
                                   endpoint->info.udp_server.port);
-            ATX_Socket_Bind(&socket, &address);
+            ATX_Socket_Bind(socket, &address);
 
             /* get the input stream */
             if (input_stream) {
-                ATX_Socket_GetInputStream(&socket, input_stream);
+                ATX_Socket_GetInputStream(socket, input_stream);
             }
         }
         break;
 
       case ENDPOINT_TYPE_TCP_SERVER:
         {
-            ATX_ServerSocket  server;
-            ATX_Socket        socket;
-            ATX_Socket        client;
-            ATX_SocketAddress address;
+            ATX_ServerSocket*  server;
+            ATX_Socket*        socket;
+            ATX_Socket*        client;
+            ATX_SocketAddress  address;
 
             /* create socket */
             result = ATX_TcpServerSocket_Create(&server);
             if (result) return result;
 
             /* cast to ATX_Socket interface */
-            result = ATX_CAST_OBJECT(&server, &socket, ATX_Socket);
+            socket = ATX_CAST(server, ATX_Socket);
             if (result != ATX_SUCCESS) return result;
 
             /* bind to local address */
             ATX_SocketAddress_Set(&address,
                                   NULL,
                                   endpoint->info.tcp_server.port);
-            ATX_Socket_Bind(&socket, &address);
+            ATX_Socket_Bind(socket, &address);
 
             /* wait for client */
             fprintf(stderr, ":: waiting for client on port %d...\n", 
                     endpoint->info.tcp_server.port);
-            result = ATX_ServerSocket_WaitForNewClient(&server, &client);
+            result = ATX_ServerSocket_WaitForNewClient(server, &client);
             if (result != ATX_SUCCESS) {
                 fprintf(stderr, 
                         "ERROR: cannot wait for client (%d)\n", 
@@ -254,10 +254,10 @@ GetEndPointStreams(EndPoint*         endpoint,
 
             /* get the streams */
             if (input_stream) {
-                ATX_Socket_GetInputStream(&client, input_stream);
+                ATX_Socket_GetInputStream(client, input_stream);
             }
             if (output_stream) {
-                ATX_Socket_GetOutputStream(&client, output_stream);
+                ATX_Socket_GetOutputStream(client, output_stream);
             }
         }
         break;
@@ -265,7 +265,7 @@ GetEndPointStreams(EndPoint*         endpoint,
       case ENDPOINT_TYPE_FILE:
         {
             /* create a file object */
-            ATX_File file;
+            ATX_File* file;
             result = ATX_File_Create(endpoint->info.file.name, &file);
             if (ATX_FAILED(result)) {
                 fprintf(stderr, "ERROR: cannot create file object (%d)\n", result);
@@ -275,12 +275,12 @@ GetEndPointStreams(EndPoint*         endpoint,
             /* open the file */
             if (endpoint->direction == ENDPOINT_DIRECTION_IN) {
                 result = ATX_File_Open(
-                    &file,
+                    file,
                     ATX_FILE_OPEN_MODE_READ |
                     ATX_FILE_OPEN_MODE_UNBUFFERED);
             } else {
                 result = ATX_File_Open(
-                    &file,
+                    file,
                     ATX_FILE_OPEN_MODE_WRITE     |
                     ATX_FILE_OPEN_MODE_CREATE    |
                     ATX_FILE_OPEN_MODE_TRUNCATE  |
@@ -294,22 +294,22 @@ GetEndPointStreams(EndPoint*         endpoint,
 
             /* get the streams */
             if (input_stream) {
-                result = ATX_File_GetInputStream(&file, input_stream);
+                result = ATX_File_GetInputStream(file, input_stream);
                 if (result != ATX_SUCCESS) {
                     fprintf(stderr, "ERROR: cannot get file input stream\n");
-                    ATX_DESTROY_OBJECT(&file);
+                    ATX_DESTROY_OBJECT(file);
                     return result;
                 }
             }
             if (output_stream) {
-                result = ATX_File_GetOutputStream(&file, output_stream);
+                result = ATX_File_GetOutputStream(file, output_stream);
                 if (result != ATX_SUCCESS) {
                     fprintf(stderr, "ERROR: cannot get file output stream\n");
-                    ATX_DESTROY_OBJECT(&file);
+                    ATX_DESTROY_OBJECT(file);
                     return result;
                 }
             }
-            ATX_DESTROY_OBJECT(&file);
+            ATX_DESTROY_OBJECT(file);
         }
         break;
     }
@@ -439,11 +439,11 @@ main(int argc, char** argv)
 
     /* data pump */
     {
-        ATX_InputStream  in;
-        ATX_OutputStream out;
-        unsigned char*   buffer;
-        ATX_Result       result;
-        unsigned long    offset = 0;
+        ATX_InputStream*  in;
+        ATX_OutputStream* out;
+        unsigned char*    buffer;
+        ATX_Result        result;
+        unsigned long     offset = 0;
 
         /* allocate buffer */
         buffer = (unsigned char*)malloc(packet_size);
@@ -522,10 +522,10 @@ main(int argc, char** argv)
 #endif
 
             /* send */
-            result = ATX_InputStream_Read(&in, buffer, packet_size, &bytes_read);
+            result = ATX_InputStream_Read(in, buffer, packet_size, &bytes_read);
             fprintf(stderr, "[%d] read %ld bytes\n", result, bytes_read);
             if (result == ATX_SUCCESS && bytes_read) {
-                result = ATX_OutputStream_Write(&out, buffer, bytes_read,
+                result = ATX_OutputStream_Write(out, buffer, bytes_read,
                                                 &bytes_written);
                 fprintf(stderr, "[%d] wrote %ld bytes\n", 
                         result, bytes_written);

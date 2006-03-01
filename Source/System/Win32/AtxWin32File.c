@@ -1,30 +1,30 @@
 /*****************************************************************
 |
-|      File: AtxWin32File.c
+|   File: AtxWin32File.c
 |
-|      Atomix - File Streams: Win32 Implementation
+|   Atomix - File Streams: Win32 Implementation
 |
-|      (c) 2002-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2002-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #define STRICT
 #include <windows.h>
 
 #include "AtxInterfaces.h"
 #include "AtxUtils.h"
-#include "AtxErrors.h"
+#include "AtxResults.h"
 #include "AtxStreams.h"
 #include "AtxFile.h"
 #include "AtxReferenceable.h"
 #include "AtxDestroyable.h"
 
 /*----------------------------------------------------------------------
-|       types
+|   types
 +---------------------------------------------------------------------*/
 typedef struct {
     ATX_Cardinal reference_count;
@@ -34,11 +34,22 @@ typedef struct {
 } Win32FileHandleWrapper;
 
 typedef struct {
+    /* interfaces */
+    ATX_IMPLEMENTS(ATX_InputStream);
+    ATX_IMPLEMENTS(ATX_OutputStream);
+    ATX_IMPLEMENTS(ATX_Referenceable);
+
+    /* members */
     ATX_Cardinal            reference_count;
     Win32FileHandleWrapper* file;
 } Win32FileStream;
 
 typedef struct {
+    /* interfaces */
+    ATX_IMPLEMENTS(ATX_File);
+    ATX_IMPLEMENTS(ATX_Destroyable);
+
+    /* members */
     ATX_CString             name;
     ATX_Size                size;
     ATX_Flags               mode;
@@ -46,14 +57,7 @@ typedef struct {
 } Win32File;
 
 /*----------------------------------------------------------------------
-|       forward declarations
-+---------------------------------------------------------------------*/
-ATX_DECLARE_SIMPLE_GET_INTERFACE_IMPLEMENTATION(Win32FileStream)
-static const ATX_InputStreamInterface Win32FileStream_ATX_InputStreamInterface;
-static const ATX_OutputStreamInterface Win32FileStream_ATX_OutputStreamInterface;
-
-/*----------------------------------------------------------------------
-|       Win32FileHandleWrapper_Create
+|   Win32FileHandleWrapper_Create
 +---------------------------------------------------------------------*/
 static ATX_Result
 Win32FileHandleWrapper_Create(HANDLE                   handle, 
@@ -74,42 +78,49 @@ Win32FileHandleWrapper_Create(HANDLE                   handle,
 }
 
 /*----------------------------------------------------------------------
-|       Win32FileHandleWrapper_Destroy
+|   Win32FileHandleWrapper_Destroy
 +---------------------------------------------------------------------*/
 static void
-Win32FileHandleWrapper_Destroy(Win32FileHandleWrapper* wrapper)
+Win32FileHandleWrapper_Destroy(Win32FileHandleWrapper* self)
 {
-    if (wrapper->handle != GetStdHandle(STD_INPUT_HANDLE) &&
-        wrapper->handle != GetStdHandle(STD_OUTPUT_HANDLE) &&
-        wrapper->handle != GetStdHandle(STD_ERROR_HANDLE)) {
-        CloseHandle(wrapper->handle);
+    if (self->handle != GetStdHandle(STD_INPUT_HANDLE) &&
+        self->handle != GetStdHandle(STD_OUTPUT_HANDLE) &&
+        self->handle != GetStdHandle(STD_ERROR_HANDLE)) {
+        CloseHandle(self->handle);
     }
-    ATX_FreeMemory((void*)wrapper);
+    ATX_FreeMemory((void*)self);
 }
 
 /*----------------------------------------------------------------------
-|       Win32FileHandleWrapper_AddReference
+|   Win32FileHandleWrapper_AddReference
 +---------------------------------------------------------------------*/
 static void
-Win32FileHandleWrapper_AddReference(Win32FileHandleWrapper* wrapper)
+Win32FileHandleWrapper_AddReference(Win32FileHandleWrapper* self)
 {
-    ++wrapper->reference_count;
+    ++self->reference_count;
 }
 
 /*----------------------------------------------------------------------
-|       Win32FileHandleWrapper_Release
+|   Win32FileHandleWrapper_Release
 +---------------------------------------------------------------------*/
 static void
-Win32FileHandleWrapper_Release(Win32FileHandleWrapper* wrapper)
+Win32FileHandleWrapper_Release(Win32FileHandleWrapper* self)
 {
-    if (wrapper == NULL) return;
-    if (--wrapper->reference_count == 0) {
-        Win32FileHandleWrapper_Destroy(wrapper);
+    if (self == NULL) return;
+    if (--self->reference_count == 0) {
+        Win32FileHandleWrapper_Destroy(self);
     }
 }
 
 /*----------------------------------------------------------------------
-|       Win32FileStream_Create
+|   forward declarations
++---------------------------------------------------------------------*/
+ATX_DECLARE_INTERFACE_MAP(Win32FileStream, ATX_InputStream)
+ATX_DECLARE_INTERFACE_MAP(Win32FileStream, ATX_OutputStream)
+ATX_DECLARE_INTERFACE_MAP(Win32FileStream, ATX_Referenceable)
+
+/*----------------------------------------------------------------------
+|   Win32FileStream_Create
 +---------------------------------------------------------------------*/
 static ATX_Result
 Win32FileStream_Create(Win32FileHandleWrapper* file, Win32FileStream** stream)
@@ -122,50 +133,55 @@ Win32FileStream_Create(Win32FileHandleWrapper* file, Win32FileStream** stream)
     (*stream)->reference_count = 1;
     (*stream)->file = file;
 
-    /* keep a reference */
+    /* keep a reference to the file */
     Win32FileHandleWrapper_AddReference(file);
 
+    /* setup interfaces */
+    ATX_SET_INTERFACE((*stream), Win32FileStream, ATX_InputStream);
+    ATX_SET_INTERFACE((*stream), Win32FileStream, ATX_OutputStream);
+    ATX_SET_INTERFACE((*stream), Win32FileStream, ATX_Referenceable);
+
     return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|       Win32FileStream_Destroy
+|   Win32FileStream_Destroy
 +---------------------------------------------------------------------*/
 static ATX_Result
-Win32FileStream_Destroy(Win32FileStream* stream)
+Win32FileStream_Destroy(Win32FileStream* self)
 {
-    Win32FileHandleWrapper_Release(stream->file);
-    ATX_FreeMemory((void*)stream);
+    Win32FileHandleWrapper_Release(self->file);
+    ATX_FreeMemory((void*)self);
     return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|       Win32FileStream_Seek
+|   Win32FileStream_Seek
 +---------------------------------------------------------------------*/
 ATX_METHOD
-Win32FileStream_Seek(Win32FileStream* stream, ATX_Offset where)
+Win32FileStream_Seek(Win32FileStream* self, ATX_Offset where)
 {
-    SetFilePointer(stream->file->handle, where, 0, FILE_BEGIN);
-    stream->file->position = where;
+    SetFilePointer(self->file->handle, where, 0, FILE_BEGIN);
+    self->file->position = where;
     return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|       Win32FileStream_Tell
+|   Win32FileStream_Tell
 +---------------------------------------------------------------------*/
 ATX_METHOD
-Win32FileStream_Tell(Win32FileStream* stream, ATX_Offset* where)
+Win32FileStream_Tell(Win32FileStream* self, ATX_Offset* where)
 {
-    if (where) *where = stream->file->position;
+    if (where) *where = self->file->position;
     return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|       Win32FileInputStream_Create
+|   Win32FileInputStream_Create
 +---------------------------------------------------------------------*/
 static ATX_Result
 Win32FileInputStream_Create(Win32FileHandleWrapper* file, 
-                            ATX_InputStream*        stream)
+                            ATX_InputStream**       stream)
 {
     Win32FileStream* file_stream = NULL;
     ATX_Result       result;
@@ -173,38 +189,37 @@ Win32FileInputStream_Create(Win32FileHandleWrapper* file,
     /* create the object */
     result = Win32FileStream_Create(file, &file_stream);
     if (ATX_FAILED(result)) {
-        ATX_CLEAR_OBJECT(stream);
+        *stream = NULL;
         return result;
     }
 
-    /* set the interface */
-    ATX_INSTANCE(stream) = (ATX_InputStreamInstance*)file_stream;
-    ATX_INTERFACE(stream) = &Win32FileStream_ATX_InputStreamInterface;
+    /* select the ATX_InputStream interface */
+    *stream = &ATX_BASE(file_stream, ATX_InputStream);
 
     return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|       Win32FileInputStream_Read
+|   Win32FileInputStream_Read
 +---------------------------------------------------------------------*/
 ATX_METHOD
-Win32FileInputStream_Read(ATX_InputStreamInstance* instance,
-                          ATX_Any                  buffer,
-                          ATX_Size                 bytes_to_read,
-                          ATX_Size*                bytes_read)
+Win32FileInputStream_Read(ATX_InputStream* _self,
+                          ATX_Any          buffer,
+                          ATX_Size         bytes_to_read,
+                          ATX_Size*        bytes_read)
 {
-    Win32FileStream* stream = (Win32FileStream*)instance;
+    Win32FileStream* self = ATX_SELF(Win32FileStream, ATX_InputStream);
     DWORD            nb_read;
     BOOL             result;
 
-    result = ReadFile(stream->file->handle, 
+    result = ReadFile(self->file->handle, 
                       buffer, 
                       bytes_to_read, 
                       &nb_read, 
                       NULL);
     if (result == TRUE) {
         if (bytes_read) *bytes_read = nb_read;
-        stream->file->position += nb_read;
+        self->file->position += nb_read;
         if (nb_read == 0) {
             return ATX_ERROR_EOS;
         } else {
@@ -221,68 +236,57 @@ Win32FileInputStream_Read(ATX_InputStreamInstance* instance,
 }
 
 /*----------------------------------------------------------------------
-|       Win32FileInputStream_Seek
+|   Win32FileInputStream_Seek
 +---------------------------------------------------------------------*/
 ATX_METHOD
-Win32FileInputStream_Seek(ATX_InputStreamInstance* instance, 
-                          ATX_Offset               where)
+Win32FileInputStream_Seek(ATX_InputStream* _self, 
+                          ATX_Offset       where)
 {
-    return Win32FileStream_Seek((Win32FileStream*)instance, where);
+    return Win32FileStream_Seek(ATX_SELF(Win32FileStream, ATX_InputStream), 
+                                where);
 }
 
 /*----------------------------------------------------------------------
-|       Win32FileInputStream_Tell
+|   Win32FileInputStream_Tell
 +---------------------------------------------------------------------*/
 ATX_METHOD
-Win32FileInputStream_Tell(ATX_InputStreamInstance* instance, 
-                          ATX_Offset*              where)
+Win32FileInputStream_Tell(ATX_InputStream* _self, 
+                          ATX_Offset*      where)
 {
-    return Win32FileStream_Tell((Win32FileStream*)instance, where);
+    return Win32FileStream_Tell(ATX_SELF(Win32FileStream, ATX_InputStream), 
+                                where);
 }
 
 /*----------------------------------------------------------------------
-|       Win32FileInputStream_GetSize
+|   Win32FileInputStream_GetSize
 +---------------------------------------------------------------------*/
 ATX_METHOD
-Win32FileInputStream_GetSize(ATX_InputStreamInstance* instance, 
-                             ATX_Size*                size)
+Win32FileInputStream_GetSize(ATX_InputStream* _self, 
+                             ATX_Size*        size)
 {
-    Win32FileStream* stream = (Win32FileStream*)instance;
-    *size = stream->file->size;
+    Win32FileStream* self = ATX_SELF(Win32FileStream, ATX_InputStream);
+    *size = self->file->size;
     return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|       Win32FileInputStream_GetAvailable
+|   Win32FileInputStream_GetAvailable
 +---------------------------------------------------------------------*/
 ATX_METHOD
-Win32FileInputStream_GetAvailable(ATX_InputStreamInstance* instance, 
-                                  ATX_Size*                size)
+Win32FileInputStream_GetAvailable(ATX_InputStream* _self, 
+                                  ATX_Size*        size)
 {
-    Win32FileStream* stream = (Win32FileStream*)instance;
-    *size = stream->file->size - stream->file->position;
+    Win32FileStream* self = ATX_SELF(Win32FileStream, ATX_InputStream);
+    *size = self->file->size - self->file->position;
     return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|       ATX_InputStream interface
-+---------------------------------------------------------------------*/
-static const ATX_InputStreamInterface
-Win32FileStream_ATX_InputStreamInterface = {
-    Win32FileStream_GetInterface,
-    Win32FileInputStream_Read,
-    Win32FileInputStream_Seek,
-    Win32FileInputStream_Tell,
-    Win32FileInputStream_GetSize,
-    Win32FileInputStream_GetAvailable
-};
-
-/*----------------------------------------------------------------------
-|       Win32FileOutputStream_Create
+|   Win32FileOutputStream_Create
 +---------------------------------------------------------------------*/
 static ATX_Result
 Win32FileOutputStream_Create(Win32FileHandleWrapper* file, 
-                             ATX_OutputStream*       stream)
+                             ATX_OutputStream**      stream)
 {
     Win32FileStream* file_stream = NULL;
     ATX_Result       result;
@@ -290,38 +294,37 @@ Win32FileOutputStream_Create(Win32FileHandleWrapper* file,
     /* create the object */
     result = Win32FileStream_Create(file, &file_stream);
     if (ATX_FAILED(result)) {
-        ATX_CLEAR_OBJECT(stream);
+        *stream = NULL;
         return result;
     }
 
-    /* set the interface */
-    ATX_INSTANCE(stream) = (ATX_OutputStreamInstance*)file_stream;
-    ATX_INTERFACE(stream) = &Win32FileStream_ATX_OutputStreamInterface;
+    /* select the ATX_InputStream interface */
+    *stream = &ATX_BASE(file_stream, ATX_OutputStream);
 
     return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|       Win32FileOutputStream_Write
+|   Win32FileOutputStream_Write
 +---------------------------------------------------------------------*/
 ATX_METHOD
-Win32FileOutputStream_Write(ATX_OutputStreamInstance* instance,
-                            ATX_AnyConst              buffer, 
-                            ATX_Size                  bytes_to_write, 
-                            ATX_Size*                 bytes_written)
+Win32FileOutputStream_Write(ATX_OutputStream* _self,
+                            ATX_AnyConst      buffer, 
+                            ATX_Size          bytes_to_write, 
+                            ATX_Size*         bytes_written)
 {
-    Win32FileStream* stream = (Win32FileStream*)instance;
-    DWORD       nb_written;
-    BOOL        result;
+    Win32FileStream* self = ATX_SELF(Win32FileStream, ATX_OutputStream);
+    DWORD            nb_written;
+    BOOL             result;
 
-    result = WriteFile(stream->file->handle, 
+    result = WriteFile(self->file->handle, 
                        buffer, 
                        bytes_to_write, 
                        &nb_written, 
                        NULL);
     if (result == TRUE) {
         if (bytes_written) *bytes_written = nb_written;
-        stream->file->position += nb_written;
+        self->file->position += nb_written;
         return ATX_SUCCESS;
     } else {
         if (bytes_written) *bytes_written = 0;
@@ -330,78 +333,89 @@ Win32FileOutputStream_Write(ATX_OutputStreamInstance* instance,
 }
 
 /*----------------------------------------------------------------------
-|       Win32FileOutputStream_Seek
+|   Win32FileOutputStream_Seek
 +---------------------------------------------------------------------*/
 ATX_METHOD
-Win32FileOutputStream_Seek(ATX_OutputStreamInstance* instance, 
-                           ATX_Offset                where)
+Win32FileOutputStream_Seek(ATX_OutputStream* _self, 
+                           ATX_Offset        where)
 {
-    return Win32FileStream_Seek((Win32FileStream*)instance, where);
+    return Win32FileStream_Seek(ATX_SELF(Win32FileStream, ATX_OutputStream), 
+                                where);
 }
 
 /*----------------------------------------------------------------------
-|       Win32FileOutputStream_Tell
+|   Win32FileOutputStream_Tell
 +---------------------------------------------------------------------*/
 ATX_METHOD
-Win32FileOutputStream_Tell(ATX_OutputStreamInstance* instance, 
-                           ATX_Offset*               where)
+Win32FileOutputStream_Tell(ATX_OutputStream* _self, 
+                           ATX_Offset*       where)
 {
-    return Win32FileStream_Tell((Win32FileStream*)instance, where);
+    return Win32FileStream_Tell(ATX_SELF(Win32FileStream, ATX_OutputStream), 
+                                where);
 }
 
 /*----------------------------------------------------------------------
-|       Win32FileOutputStream_Flush
+|   Win32FileOutputStream_Flush
 +---------------------------------------------------------------------*/
 ATX_METHOD
-Win32FileOutputStream_Flush(ATX_OutputStreamInstance* instance)
+Win32FileOutputStream_Flush(ATX_OutputStream* _self)
 {
     return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|       ATX_OutputStream interface
+|   Win32FileStream_GetInterface
 +---------------------------------------------------------------------*/
-static const ATX_OutputStreamInterface
-Win32FileStream_ATX_OutputStreamInterface = {
-    Win32FileStream_GetInterface,
+ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(Win32FileStream)
+    ATX_GET_INTERFACE_ACCEPT(Win32FileStream, ATX_InputStream)
+    ATX_GET_INTERFACE_ACCEPT(Win32FileStream, ATX_OutputStream)
+    ATX_GET_INTERFACE_ACCEPT(Win32FileStream, ATX_Referenceable)
+ATX_END_GET_INTERFACE_IMPLEMENTATION(Win32FileStream)
+
+/*----------------------------------------------------------------------
+|   ATX_InputStream interface
++---------------------------------------------------------------------*/
+ATX_BEGIN_INTERFACE_MAP(Win32FileStream, ATX_InputStream)
+    Win32FileInputStream_Read,
+    Win32FileInputStream_Seek,
+    Win32FileInputStream_Tell,
+    Win32FileInputStream_GetSize,
+    Win32FileInputStream_GetAvailable
+ATX_END_INTERFACE_MAP(Win32FileStream, ATX_InputStream)
+
+/*----------------------------------------------------------------------
+|   ATX_OutputStream interface
++---------------------------------------------------------------------*/
+ATX_BEGIN_INTERFACE_MAP(Win32FileStream, ATX_OutputStream)
     Win32FileOutputStream_Write,
     Win32FileOutputStream_Seek,
     Win32FileOutputStream_Tell,
     Win32FileOutputStream_Flush
-};
+ATX_END_INTERFACE_MAP(Win32FileStream, ATX_OutputStream)
 
 /*----------------------------------------------------------------------
-|       ATX_Referenceable interface
+|   ATX_Referenceable interface
 +---------------------------------------------------------------------*/
-ATX_IMPLEMENT_SIMPLE_REFERENCEABLE_INTERFACE(Win32FileStream, reference_count)
+ATX_IMPLEMENT_REFERENCEABLE_INTERFACE(Win32FileStream, reference_count)
 
 /*----------------------------------------------------------------------
-|       standard GetInterface implementation
+|   forward declarations
 +---------------------------------------------------------------------*/
-ATX_BEGIN_SIMPLE_GET_INTERFACE_IMPLEMENTATION(Win32FileStream) 
-ATX_INTERFACE_MAP_ADD(Win32FileStream, ATX_InputStream)
-ATX_INTERFACE_MAP_ADD(Win32FileStream, ATX_OutputStream)
-ATX_INTERFACE_MAP_ADD(Win32FileStream, ATX_Referenceable)
-ATX_END_SIMPLE_GET_INTERFACE_IMPLEMENTATION(Win32FileStream)
+ATX_DECLARE_INTERFACE_MAP(Win32File, ATX_File)
+ATX_DECLARE_INTERFACE_MAP(Win32File, ATX_Destroyable)
 
 /*----------------------------------------------------------------------
-|       forward declarations
-+---------------------------------------------------------------------*/
-ATX_DECLARE_SIMPLE_GET_INTERFACE_IMPLEMENTATION(Win32File)
-static const ATX_FileInterface Win32File_ATX_FileInterface;
-
-/*----------------------------------------------------------------------
-|       ATX_File_Create
+|   ATX_File_Create
 +---------------------------------------------------------------------*/
 ATX_Result
-ATX_File_Create(const char* filename, ATX_File* object)
+ATX_File_Create(const char* filename, ATX_File** object)
 {
     Win32File* file;
 
     /* allocate a new object */
     file = (Win32File*)ATX_AllocateZeroMemory(sizeof(Win32File));
     if (file == NULL) {
-        ATX_CLEAR_OBJECT(object);
+        *object = NULL;
         return ATX_ERROR_OUT_OF_MEMORY;
     }
 
@@ -424,44 +438,44 @@ ATX_File_Create(const char* filename, ATX_File* object)
         }
     }
 
-    /* return reference */
-    ATX_INSTANCE(object)  = (ATX_FileInstance*)file;
-    ATX_INTERFACE(object) = &Win32File_ATX_FileInterface;
+    /* setup the interfaces */
+    ATX_SET_INTERFACE(file, Win32File, ATX_File);
+    ATX_SET_INTERFACE(file, Win32File, ATX_Destroyable);
+    *object = &ATX_BASE(file, ATX_File);
 
     return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|       Win32File_Destroy
+|   Win32File_Destroy
 +---------------------------------------------------------------------*/
 ATX_METHOD
-Win32File_Destroy(ATX_DestroyableInstance* instance)
+Win32File_Destroy(ATX_Destroyable* _self)
 {
-    Win32File* file = (Win32File*)instance;
+    Win32File* self = ATX_SELF(Win32File, ATX_Destroyable);
 
     /* release the resources */
-    ATX_DESTROY_CSTRING(file->name);
-    Win32FileHandleWrapper_Release(file->file);
+    ATX_DESTROY_CSTRING(self->name);
+    Win32FileHandleWrapper_Release(self->file);
 
     /* free the memory */
-    ATX_FreeMemory((void*)instance);
+    ATX_FreeMemory((void*)self);
 
     return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|       Win32File_Open
+|   Win32File_Open
 +---------------------------------------------------------------------*/
 ATX_METHOD
-Win32File_Open(ATX_FileInstance* instance, ATX_Flags mode)
+Win32File_Open(ATX_File* _self, ATX_Flags mode)
 {
-    Win32File*  file = (Win32File*)instance;
+    Win32File*  self = ATX_SELF(Win32File, ATX_File);
     HANDLE      handle;
     DWORD       access_mode = 0;
 	DWORD       share_mode  = FILE_SHARE_READ | FILE_SHARE_WRITE;
 	DWORD       create_mode = 0;
-    const char* filename = file->name;
-    ATX_Result  result;
+    const char* filename = self->name;
 
     /* compute modes */
     if (mode & ATX_FILE_OPEN_MODE_READ) {
@@ -512,112 +526,106 @@ Win32File_Open(ATX_FileInstance* instance, ATX_Flags mode)
 	}
 
     /* remember the mode */
-    file->mode = mode;
+    self->mode = mode;
 
     /* create a handle wrapper */
-    result = Win32FileHandleWrapper_Create(handle, file->size, &file->file);
-    if (ATX_FAILED(result)) return result;
-
-    return ATX_SUCCESS;
+    return Win32FileHandleWrapper_Create(handle, self->size, &self->file);
 }
 
 /*----------------------------------------------------------------------
-|       Win32File_Close
+|   Win32File_Close
 +---------------------------------------------------------------------*/
 ATX_METHOD
-Win32File_Close(ATX_FileInstance* instance)
+Win32File_Close(ATX_File* _self)
 {
-    Win32File* file = (Win32File*)instance;
+    Win32File* self = ATX_SELF(Win32File, ATX_File);
 
     /* release the resources and reset */
-    Win32FileHandleWrapper_Release(file->file);
-    file->file = NULL;
-    file->mode = 0;
+    Win32FileHandleWrapper_Release(self->file);
+    self->file = NULL;
+    self->mode = 0;
 
     return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|       Win32File_GetSize
+|   Win32File_GetSize
 +---------------------------------------------------------------------*/
 ATX_METHOD
-Win32File_GetSize(ATX_FileInstance* instance, ATX_Size* size)
+Win32File_GetSize(ATX_File* _self, ATX_Size* size)
 {
-    Win32File* file = (Win32File*)instance;
+    Win32File* self = ATX_SELF(Win32File, ATX_File);
 
     /* check that the file is open */
-    if (file->file == NULL) return ATX_ERROR_FILE_NOT_OPEN;
+    if (self->file == NULL) return ATX_ERROR_FILE_NOT_OPEN;
 
     /* return the size */
-    if (size) *size = file->size;
+    if (size) *size = self->size;
 
     return ATX_SUCCESS;
 }
 
 
 /*----------------------------------------------------------------------
-|       Win32File_GetInputStream
+|   Win32File_GetInputStream
 +---------------------------------------------------------------------*/
 ATX_METHOD
-Win32File_GetInputStream(ATX_FileInstance* instance, 
-                         ATX_InputStream*  stream)
+Win32File_GetInputStream(ATX_File*          _self, 
+                         ATX_InputStream**  stream)
 {
-    Win32File* file = (Win32File*)instance;
+    Win32File* self = ATX_SELF(Win32File, ATX_File);
 
     /* check that the file is open */
-    if (file->file == NULL) return ATX_ERROR_FILE_NOT_OPEN;
+    if (self->file == NULL) return ATX_ERROR_FILE_NOT_OPEN;
 
     /* check that the mode is compatible */
-    if (!(file->mode & ATX_FILE_OPEN_MODE_READ)) {
+    if (!(self->mode & ATX_FILE_OPEN_MODE_READ)) {
         return ATX_ERROR_FILE_NOT_READABLE;
     }
 
-    return Win32FileInputStream_Create(file->file, stream);
+    return Win32FileInputStream_Create(self->file, stream);
 }
 
 /*----------------------------------------------------------------------
-|       Win32File_GetOutputStream
+|   Win32File_GetOutputStream
 +---------------------------------------------------------------------*/
 ATX_METHOD
-Win32File_GetOutputStream(ATX_FileInstance* instance, 
-                          ATX_OutputStream* stream)
+Win32File_GetOutputStream(ATX_File*          _self, 
+                          ATX_OutputStream** stream)
 {
-    Win32File* file = (Win32File*)instance;
+    Win32File* self = ATX_SELF(Win32File, ATX_File);
 
     /* check that the file is open */
-    if (file->file == NULL) return ATX_ERROR_FILE_NOT_OPEN;
+    if (self->file == NULL) return ATX_ERROR_FILE_NOT_OPEN;
 
     /* check that the mode is compatible */
-    if (!(file->mode & ATX_FILE_OPEN_MODE_WRITE)) {
+    if (!(self->mode & ATX_FILE_OPEN_MODE_WRITE)) {
         return ATX_ERROR_FILE_NOT_WRITABLE;
     }
 
-    return Win32FileOutputStream_Create(file->file, stream);
+    return Win32FileOutputStream_Create(self->file, stream);
 }
 
+/*----------------------------------------------------------------------
+|   Win32File_GetInterface
++---------------------------------------------------------------------*/
+ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(Win32File)
+    ATX_GET_INTERFACE_ACCEPT(Win32File, ATX_File)
+    ATX_GET_INTERFACE_ACCEPT(Win32File, ATX_Destroyable)
+ATX_END_GET_INTERFACE_IMPLEMENTATION(Win32File)
 
 /*----------------------------------------------------------------------
-|       ATX_File interface
+|   ATX_File interface
 +---------------------------------------------------------------------*/
-static const ATX_FileInterface
-Win32File_ATX_FileInterface = {
-    Win32File_GetInterface,
+ATX_BEGIN_INTERFACE_MAP(Win32File, ATX_File)
     Win32File_Open,
     Win32File_Close,
     Win32File_GetSize,
     Win32File_GetInputStream,
     Win32File_GetOutputStream
-};
+ATX_END_INTERFACE_MAP(Win32File, ATX_File)
 
 /*----------------------------------------------------------------------
-|       ATX_Destroyable interface
+|   ATX_Destroyable interface
 +---------------------------------------------------------------------*/
-ATX_IMPLEMENT_SIMPLE_DESTROYABLE_INTERFACE(Win32File)
-
-/*----------------------------------------------------------------------
-|       standard GetInterface implementation
-+---------------------------------------------------------------------*/
-ATX_BEGIN_SIMPLE_GET_INTERFACE_IMPLEMENTATION(Win32File) 
-ATX_INTERFACE_MAP_ADD(Win32File, ATX_File)
-ATX_INTERFACE_MAP_ADD(Win32File, ATX_Destroyable)
-ATX_END_SIMPLE_GET_INTERFACE_IMPLEMENTATION(Win32File)
+ATX_IMPLEMENT_DESTROYABLE_INTERFACE(Win32File)

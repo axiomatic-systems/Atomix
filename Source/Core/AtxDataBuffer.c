@@ -2,7 +2,7 @@
 |
 |      Atomix - Data Buffers
 |
-|      (c) 2001-2004 Gilles Boccon-Gibod
+|      (c) 2001-2006 Gilles Boccon-Gibod
 |      Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
@@ -11,7 +11,7 @@
 |       includes
 +---------------------------------------------------------------------*/
 #include "AtxDataBuffer.h"
-#include "AtxErrors.h"
+#include "AtxResults.h"
 #include "AtxUtils.h"
 
 /*----------------------------------------------------------------------

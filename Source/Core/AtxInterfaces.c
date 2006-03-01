@@ -17,10 +17,10 @@
 /*----------------------------------------------------------------------
 |       interface constants
 +---------------------------------------------------------------------*/
-const ATX_InterfaceId ATX_INTERFACE_ID__ATX_Polymorphic      = {0x0001,0x0001};
+const ATX_InterfaceId ATX_INTERFACE_ID__ATX_Object           = {0x0001,0x0001};
 const ATX_InterfaceId ATX_INTERFACE_ID__ATX_Referenceable    = {0x0002,0x0001};
 const ATX_InterfaceId ATX_INTERFACE_ID__ATX_Destroyable      = {0x0003,0x0001};
-const ATX_InterfaceId ATX_INTERFACE_ID__ATX_Class            = {0x0004,0x0001};
+const ATX_InterfaceId ATX_INTERFACE_ID__ATX_Module           = {0x0004,0x0001};
 const ATX_InterfaceId ATX_INTERFACE_ID__ATX_InputStream      = {0x0005,0x0001};
 const ATX_InterfaceId ATX_INTERFACE_ID__ATX_OutputStream     = {0x0006,0x0001};
 const ATX_InterfaceId ATX_INTERFACE_ID__ATX_Socket           = {0x0007,0x0001};

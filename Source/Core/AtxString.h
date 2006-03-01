@@ -207,3 +207,4 @@ ATX_String_Insert(ATX_String* str, const char* s, ATX_Ordinal where);
 #endif /* __cplusplus */
 
 #endif /* _ATX_STRINGS_H_ */
+

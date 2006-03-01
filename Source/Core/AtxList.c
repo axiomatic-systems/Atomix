@@ -15,7 +15,7 @@
 #include "AtxConfig.h"
 #include "AtxTypes.h"
 #include "AtxDefs.h"
-#include "AtxErrors.h"
+#include "AtxResults.h"
 #include "AtxUtils.h"
 #include "AtxList.h"
 #include "AtxReferenceable.h"
@@ -25,8 +25,8 @@
 +---------------------------------------------------------------------*/
 struct ATX_ListItem {
     union {
-        ATX_Any    any;
-        ATX_Object object;
+        ATX_Any     any;
+        ATX_Object* object;
     }             data;
     ATX_ListItem* next;
     ATX_ListItem* prev;
@@ -158,7 +158,7 @@ ATX_List_AddObject(ATX_List* list, ATX_Object* object)
     if (item == NULL) return ATX_ERROR_OUT_OF_MEMORY;
 
     /* attach object to the item */
-    item->data.object = *object;
+    item->data.object = object;
 
     /* add the item to the list */
     return ATX_List_AddItem(list, item);
@@ -242,7 +242,7 @@ ATX_List_RemoveObject(ATX_List* list, ATX_Object* object)
     ATX_ListItem* item = list->head;
 
     while (item) {
-        if (ATX_INSTANCE(&item->data.object) == ATX_INSTANCE(object)) {
+        if (item->data.object == object) {
             /* match, remove the item from the list */
             return ATX_List_RemoveItem(list, item);
         }
@@ -261,7 +261,7 @@ ATX_List_ReleaseObjects(ATX_List* list)
     ATX_ListItem* item = list->head;
 
     while (item) {
-        ATX_RELEASE_OBJECT((ATX_PolymorphicObject*)(void*)&item->data.object);
+        ATX_RELEASE_OBJECT(item->data.object);
         item = item->next;
     }
 
@@ -337,7 +337,7 @@ ATX_ListItem_SetData(ATX_ListItem* item, ATX_Any data)
 |    ATX_ListItem_GetObject
 +---------------------------------------------------------------------*/
 ATX_Result
-ATX_ListItem_GetObject(ATX_ListItem* item, ATX_Object* object)
+ATX_ListItem_GetObject(ATX_ListItem* item, ATX_Object** object)
 {
     *object = item->data.object;
     return ATX_SUCCESS;
@@ -349,7 +349,7 @@ ATX_ListItem_GetObject(ATX_ListItem* item, ATX_Object* object)
 ATX_Result
 ATX_ListItem_SetObject(ATX_ListItem* item, ATX_Object* object)
 {
-    item->data.object = *object;
+    item->data.object = object;
     return ATX_SUCCESS;
 }
 

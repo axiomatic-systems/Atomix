@@ -1,10 +1,10 @@
 /*****************************************************************
 |
-|      File: AtxErrors.h
+|      File: AtxResults.h
 |
-|      Atomix - Error Constants
+|      Atomix - Result Codes
 |
-|      (c) 2002-2003 Gilles Boccon-Gibod
+|      (c) 2002-2006 Gilles Boccon-Gibod
 |      Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
@@ -12,20 +12,12 @@
  * ATX Result and Error codes 
  */
 
-#ifndef _ATX_ERRORS_H_
-#define _ATX_ERRORS_H_
+#ifndef _ATX_RESULTS_H_
+#define _ATX_RESULTS_H_
 
 /*----------------------------------------------------------------------
-|    error codes      
+|    macros      
 +---------------------------------------------------------------------*/
-/** Result indicating that the operation or call succeeded */
-#define ATX_SUCCESS                     0
-/** Result indicating an unspecififed failure condition */
-#define ATX_FAILURE                     (-1)
-
-#define ATX_FAILED(result)              ((result) != ATX_SUCCESS)
-#define ATX_SUCCEEDED(result)           ((result) == ATX_SUCCESS)
-
 #define ATX_CHECK(_x) do {          \
     ATX_Result _result = (_x);      \
     if (_result != ATX_SUCCESS) {   \
@@ -33,8 +25,24 @@
     }                               \
 } while(0)
 
+#define ATX_FAILED(result)              ((result) != ATX_SUCCESS)
+#define ATX_SUCCEEDED(result)           ((result) == ATX_SUCCESS)
+
+/*----------------------------------------------------------------------
+|    result codes      
++---------------------------------------------------------------------*/
+/** Result indicating that the operation or call succeeded */
+#define ATX_SUCCESS                     0
+
+/** Result indicating an unspecififed failure condition */
+#define ATX_FAILURE                     (-1)
+
 /* general error codes */
-#define ATX_ERROR_BASE_GENERAL          (-100)
+#ifndef ATX_ERROR_BASE               
+#define ATX_ERROR_BASE                  (-10000)
+#endif
+
+#define ATX_ERROR_BASE_GENERAL          (ATX_ERROR_BASE-0)
 #define ATX_ERROR_OUT_OF_MEMORY         (ATX_ERROR_BASE_GENERAL - 0)
 #define ATX_ERROR_OUT_OF_RESOURCES      (ATX_ERROR_BASE_GENERAL - 1)
 #define ATX_ERROR_INTERNAL              (ATX_ERROR_BASE_GENERAL - 2)
@@ -48,39 +56,39 @@
 #define ATX_ERROR_INVALID_FORMAT        (ATX_ERROR_BASE_GENERAL - 10)
 
 /* device and i/o errors */
-#define ATX_ERROR_BASE_DEVICE           (-200)
+#define ATX_ERROR_BASE_DEVICE           (ATX_ERROR_BASE-100)
 #define ATX_ERROR_DEVICE_BUSY           (ATX_ERROR_BASE_DEVICE - 0)
 #define ATX_ERROR_NO_SUCH_DEVICE        (ATX_ERROR_BASE_DEVICE - 1)
 #define ATX_ERROR_OPEN_FAILED           (ATX_ERROR_BASE_DEVICE - 2)
 #define ATX_ERROR_NO_MEDIUM             (ATX_ERROR_BASE_DEVICE - 3)
 
 /* object model error codes */
-#define ATX_ERROR_BASE_INTERFACES       (-300)
+#define ATX_ERROR_BASE_INTERFACES       (ATX_ERROR_BASE-200)
 
 /* properties error codes */
-#define ATX_ERROR_BASE_PROPERTIES       (-400)
+#define ATX_ERROR_BASE_PROPERTIES       (ATX_ERROR_BASE-300)
 
 /* iterator error codes */
-#define ATX_ERROR_BASE_ITERATOR         (-500)
+#define ATX_ERROR_BASE_ITERATOR         (ATX_ERROR_BASE-400)
 
 /* byte stream error codes */
-#define ATX_ERROR_BASE_BYTE_STREAM      (-600)
+#define ATX_ERROR_BASE_BYTE_STREAM      (ATX_ERROR_BASE-500)
 
 /* socket error codes */
-#define ATX_ERROR_BASE_SOCKETS          (-700)
+#define ATX_ERROR_BASE_SOCKETS          (ATX_ERROR_BASE-600)
 
 /* file error codes */
-#define ATX_ERROR_BASE_FILE             (-800)
+#define ATX_ERROR_BASE_FILE             (ATX_ERROR_BASE-700)
 
 /* lists error codes */
-#define ATX_ERROR_BASE_LISTS            (-900)
+#define ATX_ERROR_BASE_LISTS            (ATX_ERROR_BASE-800)
 
 /* standard error codes                                  */
 /* these are special codes to convey an errno            */
 /* the error code is (ATX_ERROR_BASE_ERRNO - errno)      */
 /* where errno is the positive integer from errno.h      */
-#define ATX_ERROR_BASE_ERRNO            (-10000)
+#define ATX_ERROR_BASE_ERRNO            (ATX_ERROR_BASE-2000)
 #define ATX_ERROR_ERRNO(e)              (ATX_ERROR_BASE_ERRNO - (e))
 
-#endif /* _ATX_ERRORS_H_ */
+#endif /* _ATX_RESULTS_H_ */
 

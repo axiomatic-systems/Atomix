@@ -83,7 +83,7 @@ main(int argc, char** argv)
     ATX_HttpClient*   client;
     ATX_HttpRequest*  request;
     ATX_HttpResponse* response;
-    ATX_InputStream   response_body = ATX_NULL_OBJECT;
+    ATX_InputStream*  response_body = NULL;
     ATX_Size          response_body_size = 0;
     ATX_Result        result;
 
@@ -108,7 +108,7 @@ main(int argc, char** argv)
 
 
     /* cleanup */
-    ATX_RELEASE_OBJECT(&response_body);
+    ATX_RELEASE_OBJECT(response_body);
     ATX_HttpResponse_Destroy(response);
     ATX_HttpRequest_Destroy(request);
     ATX_HttpClient_Destroy(client);

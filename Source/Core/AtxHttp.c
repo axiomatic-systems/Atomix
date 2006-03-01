@@ -14,7 +14,7 @@
 +---------------------------------------------------------------------*/
 #include "AtxTypes.h"
 #include "AtxDefs.h"
-#include "AtxErrors.h"
+#include "AtxResults.h"
 #include "AtxUtils.h"
 #include "AtxInterfaces.h"
 #include "AtxReferenceable.h"
@@ -47,9 +47,9 @@ typedef struct {
 } ATX_HttpHeader;
 
 struct ATX_HttpMessage {
-    ATX_String      protocol;
-    ATX_List*       headers;
-    ATX_InputStream body;
+    ATX_String       protocol;
+    ATX_List*        headers;
+    ATX_InputStream* body;
 };
 
 struct ATX_HttpRequest {
@@ -296,10 +296,10 @@ ATX_HttpClient_SendRequestOnce(ATX_HttpClient*    self,
                                ATX_HttpResponse** response)
 
 {
-    ATX_Socket        connection = ATX_NULL_OBJECT;
+    ATX_Socket*       connection = NULL;
     ATX_SocketAddress address;
-    ATX_InputStream   input_stream = ATX_NULL_OBJECT;
-    ATX_OutputStream  output_stream = ATX_NULL_OBJECT;
+    ATX_InputStream*  input_stream = NULL;
+    ATX_OutputStream* output_stream = NULL;
     ATX_Result        result;
 
     ATX_COMPILER_UNUSED(self);
@@ -334,19 +334,19 @@ ATX_HttpClient_SendRequestOnce(ATX_HttpClient*    self,
     /* connect to the server */
     ATX_Debug("ATX_HttpClient::SendRequest - connecting on port %d...\n",
                request->url.port);
-    result = ATX_Socket_Connect(&connection, &address, ATX_HTTP_CONNECT_TIMEOUT);
+    result = ATX_Socket_Connect(connection, &address, ATX_HTTP_CONNECT_TIMEOUT);
     if (ATX_FAILED(result)) goto end;
 
     /* emit the request onto the connection */
-    result = ATX_Socket_GetOutputStream(&connection, &output_stream);
+    result = ATX_Socket_GetOutputStream(connection, &output_stream);
     if (ATX_FAILED(result)) goto end;
-    result = ATX_HttpRequest_Emit(request, &output_stream);
+    result = ATX_HttpRequest_Emit(request, output_stream);
     if (ATX_FAILED(result)) goto end;
 
     /* create a response from the connection's input stream */
-    result = ATX_Socket_GetInputStream(&connection, &input_stream);
+    result = ATX_Socket_GetInputStream(connection, &input_stream);
     if (ATX_FAILED(result)) goto end;
-    result = ATX_HttpResponse_CreateFromStream(&input_stream, response);
+    result = ATX_HttpResponse_CreateFromStream(input_stream, response);
     if (ATX_FAILED(result)) goto end;
 
 end:
@@ -355,9 +355,9 @@ end:
             ATX_HttpResponse_Destroy(*response);
         }
     }
-    ATX_RELEASE_OBJECT(&input_stream);
-    ATX_RELEASE_OBJECT(&output_stream);
-    ATX_DESTROY_OBJECT(&connection);
+    ATX_RELEASE_OBJECT(input_stream);
+    ATX_RELEASE_OBJECT(output_stream);
+    ATX_DESTROY_OBJECT(connection);
     return result;
 }
 
@@ -513,7 +513,7 @@ ATX_HttpMessage_Destruct(ATX_HttpMessage* message)
     ATX_String_Destruct(&message->protocol);
 
     /* release the body stream */
-    ATX_RELEASE_OBJECT(&message->body);
+    ATX_RELEASE_OBJECT(message->body);
 
     return ATX_SUCCESS;
 }
@@ -611,12 +611,12 @@ ATX_HttpMessage_SetBody(ATX_HttpMessage* self,
                         ATX_InputStream* stream,
                         ATX_Size         content_length)
 {
-    ATX_RELEASE_OBJECT(&self->body);
-    self->body = *stream;
+    ATX_RELEASE_OBJECT(self->body);
+    self->body = stream;
     ATX_REFERENCE_OBJECT(stream);
 
     /* recompute the content length header */
-    if (ATX_OBJECT_IS_NULL(stream)) {
+    if (stream == NULL) {
         ATX_HttpMessage_SetHeader(self, ATX_HTTP_HEADER_CONTENT_LENGTH, "0");
     } else {
         char length_string[32];
@@ -638,7 +638,7 @@ ATX_HttpMessage_GetBody(const ATX_HttpMessage* self,
 {
     /* return a reference to the stream */
     if (stream) {
-        *stream = self->body;
+        stream = self->body;
         ATX_REFERENCE_OBJECT(stream);
     }
 
@@ -646,7 +646,7 @@ ATX_HttpMessage_GetBody(const ATX_HttpMessage* self,
     if (content_length) {
         const ATX_String* length_string = 
             ATX_HttpMessage_GetHeader(self, ATX_HTTP_HEADER_CONTENT_LENGTH);
-        if (length_string && !ATX_OBJECT_IS_NULL(&self->body)) {
+        if (length_string && self->body) {
             long length = 0;
             if (ATX_SUCCEEDED(ATX_String_ToInteger(length_string, &length, ATX_TRUE))) {
                 *content_length = (ATX_Size)length;
@@ -878,7 +878,7 @@ ATX_HttpResponse_Parse(ATX_HttpResponse* response, ATX_InputStream* stream)
     } while(ATX_SUCCEEDED(result));
 
     /* keep a reference to the stream */
-    response->base.body = *stream;
+    response->base.body = stream;
     ATX_REFERENCE_OBJECT(stream);
 
     /* cleanup */

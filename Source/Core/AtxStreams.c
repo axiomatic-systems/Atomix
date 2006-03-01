@@ -1,34 +1,39 @@
 /*****************************************************************
 |
-|      File: AtxStreams.c
+|   File: AtxStreams.c
 |
-|      Atomix - Streams Runtime Support
+|   Atomix - Streams Runtime Support
 |
-|      (c) 2002-2004 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2002-2004 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "AtxConfig.h"
 #include "AtxTypes.h"
-#include "AtxErrors.h"
+#include "AtxResults.h"
 #include "AtxUtils.h"
 #include "AtxStreams.h"
 #include "AtxReferenceable.h"
 
 /*----------------------------------------------------------------------
-|       types
+|   types
 +---------------------------------------------------------------------*/
 typedef struct {
-    ATX_Cardinal          reference_count;
-    ATX_InputStream       parent;
-    ATX_StreamTransformer transformer;
-    ATX_Size              size;
-    ATX_Offset            offset;
-    ATX_Offset            position;
+    /* interfaces */
+    ATX_IMPLEMENTS(ATX_InputStream);
+    ATX_IMPLEMENTS(ATX_Referenceable);
+
+    /* members */
+    ATX_Cardinal           reference_count;
+    ATX_InputStream*       parent;
+    ATX_StreamTransformer* transformer;
+    ATX_Size               size;
+    ATX_Offset             offset;
+    ATX_Offset             position;
 } ATX_SubInputStream;
 
 /*----------------------------------------------------------------------
@@ -37,16 +42,10 @@ typedef struct {
 #define ATX_INPUT_STREAM_LOAD_DEFAULT_READ_CHUNK 4096
 
 /*----------------------------------------------------------------------
-|       forward declarations
-+---------------------------------------------------------------------*/
-ATX_DECLARE_SIMPLE_GET_INTERFACE_IMPLEMENTATION(ATX_SubInputStream)
-static const ATX_InputStreamInterface ATX_SubInputStream_ATX_InputStreamInterface;
-
-/*----------------------------------------------------------------------
-|       ATX_InputStream_ReadLine
+|   ATX_InputStream_ReadLine
 +---------------------------------------------------------------------*/
 ATX_Result
-ATX_InputStream_ReadLine(ATX_InputStream* stream, 
+ATX_InputStream_ReadLine(ATX_InputStream* self, 
                          char*            buffer, 
                          ATX_Size         size, 
                          ATX_Size*        chars_read)
@@ -62,7 +61,7 @@ ATX_InputStream_ReadLine(ATX_InputStream* stream,
     /* read until EOF or newline */
     do {
         ATX_Size bytes_read;
-        result = ATX_InputStream_Read(stream, buffer, 1, &bytes_read);
+        result = ATX_InputStream_Read(self, buffer, 1, &bytes_read);
         if (ATX_SUCCEEDED(result) && bytes_read == 1) {
             if (*buffer == '\n') {
                 *buffer = '\0';
@@ -97,10 +96,10 @@ ATX_InputStream_ReadLine(ATX_InputStream* stream,
 }
 
 /*----------------------------------------------------------------------
-|       ATX_InputStream_ReadLineString
+|   ATX_InputStream_ReadLineString
 +---------------------------------------------------------------------*/
 ATX_Result
-ATX_InputStream_ReadLineString(ATX_InputStream* stream, 
+ATX_InputStream_ReadLineString(ATX_InputStream* self, 
                                ATX_String*      string,
                                ATX_Size         max_length)
 {
@@ -113,7 +112,7 @@ ATX_InputStream_ReadLineString(ATX_InputStream* stream,
     do {
         ATX_Size bytes_read;
         char     c;
-        result = ATX_InputStream_Read(stream, &c, 1, &bytes_read);
+        result = ATX_InputStream_Read(self, &c, 1, &bytes_read);
         if (ATX_SUCCEEDED(result) && bytes_read == 1) {
             if (c == '\n') {
                 return ATX_SUCCESS;
@@ -134,10 +133,10 @@ ATX_InputStream_ReadLineString(ATX_InputStream* stream,
 }
 
 /*----------------------------------------------------------------------
-|       ATX_InputStream_ReadFully
+|   ATX_InputStream_ReadFully
 +---------------------------------------------------------------------*/
 ATX_Result
-ATX_InputStream_ReadFully(ATX_InputStream* stream, 
+ATX_InputStream_ReadFully(ATX_InputStream* self, 
                           ATX_Any          buffer, 
                           ATX_Size         bytes_to_read)
 {
@@ -145,7 +144,7 @@ ATX_InputStream_ReadFully(ATX_InputStream* stream,
     ATX_Result result;
 
     while (bytes_to_read) {
-        result = ATX_InputStream_Read(stream, buffer, bytes_to_read, &bytes_read);
+        result = ATX_InputStream_Read(self, buffer, bytes_to_read, &bytes_read);
         if (ATX_FAILED(result)) return result;
         if (bytes_read == 0) return ATX_FAILURE;
         bytes_to_read -= bytes_read;
@@ -156,27 +155,27 @@ ATX_InputStream_ReadFully(ATX_InputStream* stream,
 }
 
 /*----------------------------------------------------------------------
-|       ATX_InputStream_Skip
+|   ATX_InputStream_Skip
 +---------------------------------------------------------------------*/
 ATX_Result
-ATX_InputStream_Skip(ATX_InputStream* stream, ATX_Size count)
+ATX_InputStream_Skip(ATX_InputStream* self, ATX_Size count)
 {
     ATX_Offset position;
     ATX_Result result;
 
     /* get the current location */
-    result = ATX_InputStream_Tell(stream, &position);
+    result = ATX_InputStream_Tell(self, &position);
     if (ATX_FAILED(result)) return result;
     
     /* seek ahead */
-    return ATX_InputStream_Seek(stream, position+count);
+    return ATX_InputStream_Seek(self, position+count);
 }
 
 /*----------------------------------------------------------------------
 |   ATX_InputStream_Load
 +---------------------------------------------------------------------*/
 ATX_Result
-ATX_InputStream_Load(ATX_InputStream* stream, ATX_DataBuffer** buffer)
+ATX_InputStream_Load(ATX_InputStream* self, ATX_DataBuffer** buffer)
 {
     ATX_Result  result;
     ATX_Size    total_bytes_read;
@@ -200,7 +199,7 @@ ATX_InputStream_Load(ATX_InputStream* stream, ATX_DataBuffer** buffer)
         ATX_Byte* data;
 
         /* check if we know how much data is available */
-        result = ATX_InputStream_GetAvailable(stream, &available);
+        result = ATX_InputStream_GetAvailable(self, &available);
         if (ATX_SUCCEEDED(result) && available != 0) {
             /* we know how much is available */
             bytes_to_read = available;
@@ -214,7 +213,7 @@ ATX_InputStream_Load(ATX_InputStream* stream, ATX_DataBuffer** buffer)
 
         /* read the data */
         data = ATX_DataBuffer_UseData(*buffer);
-        result = ATX_InputStream_Read(stream, (void*)data, bytes_to_read, &bytes_read);
+        result = ATX_InputStream_Read(self, (void*)data, bytes_to_read, &bytes_read);
         if (ATX_SUCCEEDED(result) && bytes_read != 0) {
             total_bytes_read += bytes_read;
             ATX_DataBuffer_SetDataSize(*buffer, total_bytes_read);
@@ -233,10 +232,10 @@ ATX_InputStream_Load(ATX_InputStream* stream, ATX_DataBuffer** buffer)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_OutputStream_WriteString
+|   ATX_OutputStream_WriteString
 +---------------------------------------------------------------------*/
 ATX_Result
-ATX_OutputStream_WriteString(ATX_OutputStream* stream, ATX_CString string)
+ATX_OutputStream_WriteString(ATX_OutputStream* self, ATX_CString string)
 {
     /* shortcut */
     ATX_Size string_length;
@@ -245,36 +244,42 @@ ATX_OutputStream_WriteString(ATX_OutputStream* stream, ATX_CString string)
     }
 
     /* write the string */
-    return ATX_OutputStream_Write(stream, 
+    return ATX_OutputStream_Write(self, 
                                   (const void*)string, 
                                   string_length, 
                                   NULL);
 }
 
 /*----------------------------------------------------------------------
-|       ATX_OutputStream_WriteLine
+|   ATX_OutputStream_WriteLine
 +---------------------------------------------------------------------*/
 ATX_Result
-ATX_OutputStream_WriteLine(ATX_OutputStream* stream, ATX_CString string)
+ATX_OutputStream_WriteLine(ATX_OutputStream* self, ATX_CString string)
 {
     ATX_Result result;
-    result = ATX_OutputStream_WriteString(stream, string);
+    result = ATX_OutputStream_WriteString(self, string);
     if (ATX_FAILED(result)) return result;
-    result = ATX_OutputStream_Write(stream, (const void*)"\r\n", 2, NULL);
+    result = ATX_OutputStream_Write(self, (const void*)"\r\n", 2, NULL);
     if (ATX_FAILED(result)) return result;
 
     return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|       ATX_SubInputStream_Create
+|   forward declarations
++---------------------------------------------------------------------*/
+ATX_DECLARE_INTERFACE_MAP(ATX_SubInputStream, ATX_InputStream)
+ATX_DECLARE_INTERFACE_MAP(ATX_SubInputStream, ATX_Referenceable)
+
+/*----------------------------------------------------------------------
+|   ATX_SubInputStream_Create
 +---------------------------------------------------------------------*/
 ATX_Result
 ATX_SubInputStream_Create(ATX_InputStream*       parent, 
                           ATX_Offset             offset,
                           ATX_Size               size,
                           ATX_StreamTransformer* transformer,
-                          ATX_InputStream*       object)
+                          ATX_InputStream**      object)
 { 
     ATX_SubInputStream* stream;
     ATX_Result          result;
@@ -285,15 +290,15 @@ ATX_SubInputStream_Create(ATX_InputStream*       parent,
     /* allocate new object */
     stream = (ATX_SubInputStream*)ATX_AllocateZeroMemory(sizeof(ATX_SubInputStream));
     if (stream == NULL) {
-        ATX_CLEAR_OBJECT(object);
+        *object = NULL;
         return ATX_ERROR_OUT_OF_MEMORY;
     }
 
     /* construct object */
     stream->reference_count = 1;
-    stream->parent          = *parent;
+    stream->parent          = parent;
     if (transformer) {
-        stream->transformer = *transformer;
+        stream->transformer = transformer;
     }
 
     /* check the size and offset */
@@ -309,8 +314,8 @@ ATX_SubInputStream_Create(ATX_InputStream*       parent,
             if (parent_size > 0) {
                 /* parent size known */
                 if ((ATX_Size)offset >= parent_size) {
-                    ATX_CLEAR_OBJECT(object);
-                    ATX_FreeMemory(stream);
+                    *object = NULL;
+                    ATX_FreeMemory((void*)stream);
                     return ATX_ERROR_INVALID_PARAMETERS;
                 }
                 if (size == 0) {
@@ -332,43 +337,44 @@ ATX_SubInputStream_Create(ATX_InputStream*       parent,
     /* keep a reference to the parent stream */
     ATX_REFERENCE_OBJECT(parent);
 
-    /* return reference */
-    ATX_INSTANCE(object)  = (ATX_InputStreamInstance*)stream;
-    ATX_INTERFACE(object) = &ATX_SubInputStream_ATX_InputStreamInterface;
+    /* setup the interfaces */
+    ATX_SET_INTERFACE(stream, ATX_SubInputStream, ATX_InputStream);
+    ATX_SET_INTERFACE(stream, ATX_SubInputStream, ATX_Referenceable);
+    *object = &ATX_BASE(stream, ATX_InputStream);
 
     return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|       ATX_SubInputStream_Destroy
+|   ATX_SubInputStream_Destroy
 +---------------------------------------------------------------------*/
 static ATX_Result
-ATX_SubInputStream_Destroy(ATX_SubInputStream* stream)
+ATX_SubInputStream_Destroy(ATX_SubInputStream* self)
 {
     /* release the reference to the parent */
-    ATX_RELEASE_OBJECT(&stream->parent);
-    ATX_FreeMemory((void*)stream);
+    ATX_RELEASE_OBJECT(self->parent);
+    ATX_FreeMemory((void*)self);
 
     return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|       ATX_SubInputStream_Read
+|   ATX_SubInputStream_Read
 +---------------------------------------------------------------------*/
 ATX_METHOD
-ATX_SubInputStream_Read(ATX_InputStreamInstance* instance,
-                        ATX_Any                  buffer, 
-                        ATX_Size                 bytes_to_read, 
-                        ATX_Size*                bytes_read)
+ATX_SubInputStream_Read(ATX_InputStream* _self,
+                        ATX_Any          buffer, 
+                        ATX_Size         bytes_to_read, 
+                        ATX_Size*        bytes_read)
 {
-    ATX_SubInputStream* stream = (ATX_SubInputStream*)instance;
+    ATX_SubInputStream* self = ATX_SELF(ATX_SubInputStream, ATX_InputStream);
     ATX_Size            local_read;
     ATX_Result          result;
 
     /* clip the request */
-    if (stream->size > 0) {
-        if (bytes_to_read > stream->size - stream->position) {
-            bytes_to_read = stream->size - stream->position;
+    if (self->size > 0) {
+        if (bytes_to_read > self->size - self->position) {
+            bytes_to_read = self->size - self->position;
             if (bytes_to_read == 0) {
                 if (bytes_read != NULL) *bytes_read = 0;
                 return ATX_ERROR_EOS;
@@ -377,18 +383,18 @@ ATX_SubInputStream_Read(ATX_InputStreamInstance* instance,
     }
 
     /* read from the parent */
-    result = ATX_InputStream_Read(&stream->parent, 
+    result = ATX_InputStream_Read(self->parent, 
                                   buffer, 
                                   bytes_to_read, 
                                   &local_read);
     if (ATX_SUCCEEDED(result)) {
         /* transform if there is a transformer */
-        if (!ATX_OBJECT_IS_NULL(&stream->transformer)) {
-            ATX_StreamTransformer_Transform(&stream->transformer, buffer, local_read);
+        if (self->transformer) {
+            ATX_StreamTransformer_Transform(self->transformer, buffer, local_read);
         }
 
         /* update the position */
-        stream->position += local_read;
+        self->position += local_read;
 
         /* return the number of bytes read */
         if (bytes_read) *bytes_read = local_read;
@@ -400,71 +406,71 @@ ATX_SubInputStream_Read(ATX_InputStreamInstance* instance,
 }
 
 /*----------------------------------------------------------------------
-|       ATX_SubInputStream_Seek
+|   ATX_SubInputStream_Seek
 +---------------------------------------------------------------------*/
 ATX_METHOD
-ATX_SubInputStream_Seek(ATX_InputStreamInstance* instance, 
-                        ATX_Offset               where)
+ATX_SubInputStream_Seek(ATX_InputStream* _self, 
+                        ATX_Offset       where)
 {
-    ATX_SubInputStream* stream = (ATX_SubInputStream*)instance;
+    ATX_SubInputStream* self = ATX_SELF(ATX_SubInputStream, ATX_InputStream);
     ATX_Offset          parent_offset;
     ATX_Result          result;
 
     /* shortcut */
-    if (where == stream->position) return ATX_SUCCESS;
+    if (where == self->position) return ATX_SUCCESS;
 
     /* compute the parent offset */
-    parent_offset = where + stream->offset;
+    parent_offset = where + self->offset;
     
     /* seek */
-    result = ATX_InputStream_Seek(&stream->parent, parent_offset);
+    result = ATX_InputStream_Seek(self->parent, parent_offset);
     if (ATX_SUCCEEDED(result)) {
-        stream->position = where;
+        self->position = where;
     }
     return result;
 }
 
 /*----------------------------------------------------------------------
-|       ATX_SubInputStream_Tell
+|   ATX_SubInputStream_Tell
 +---------------------------------------------------------------------*/
 ATX_METHOD
-ATX_SubInputStream_Tell(ATX_InputStreamInstance* instance, 
-                        ATX_Offset*              where)
+ATX_SubInputStream_Tell(ATX_InputStream* _self, 
+                        ATX_Offset*      where)
 {
-    ATX_SubInputStream* stream = (ATX_SubInputStream*)instance;
-    if (where) *where = stream->position;
+    ATX_SubInputStream* self = ATX_SELF(ATX_SubInputStream, ATX_InputStream);
+    if (where) *where = self->position;
     return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|       ATX_SubInputStream_GetSize
+|   ATX_SubInputStream_GetSize
 +---------------------------------------------------------------------*/
 ATX_METHOD
-ATX_SubInputStream_GetSize(ATX_InputStreamInstance* instance,
-                           ATX_Size*                size)
+ATX_SubInputStream_GetSize(ATX_InputStream* _self,
+                           ATX_Size*        size)
 {
-    ATX_SubInputStream* stream = (ATX_SubInputStream*)instance;
-    if (size) *size = stream->size;
+    ATX_SubInputStream* self = ATX_SELF(ATX_SubInputStream, ATX_InputStream);
+    if (size) *size = self->size;
     return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|       ATX_SubInputStream_GetAvailable
+|   ATX_SubInputStream_GetAvailable
 +---------------------------------------------------------------------*/
 ATX_METHOD
-ATX_SubInputStream_GetAvailable(ATX_InputStreamInstance* instance,
-                                ATX_Size*                available)
+ATX_SubInputStream_GetAvailable(ATX_InputStream* _self,
+                                ATX_Size*        available)
 {
-    ATX_SubInputStream* stream = (ATX_SubInputStream*)instance;
+    ATX_SubInputStream* self = ATX_SELF(ATX_SubInputStream, ATX_InputStream);
     ATX_Size            max_possible;
     ATX_Size            parent_available = 0;
     ATX_Result          result;
 
     /* compute the max possible value */
-    max_possible = stream->size - stream->offset;
+    max_possible = self->size - self->offset;
 
     /* see how many bytes are available from the parent */
-    result = ATX_InputStream_GetAvailable(&stream->parent,
+    result = ATX_InputStream_GetAvailable(self->parent,
                                           &parent_available);
     if (ATX_SUCCEEDED(result)) {
         *available = 
@@ -478,11 +484,17 @@ ATX_SubInputStream_GetAvailable(ATX_InputStreamInstance* instance,
 }
 
 /*----------------------------------------------------------------------
-|       ATX_InputStream interface
+|   ATX_SubInputStream_GetInterface
 +---------------------------------------------------------------------*/
-static const ATX_InputStreamInterface
-ATX_SubInputStream_ATX_InputStreamInterface = {
-    ATX_SubInputStream_GetInterface,
+ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(ATX_SubInputStream)
+    ATX_GET_INTERFACE_ACCEPT(ATX_SubInputStream, ATX_InputStream)
+    ATX_GET_INTERFACE_ACCEPT(ATX_SubInputStream, ATX_Referenceable)
+ATX_END_GET_INTERFACE_IMPLEMENTATION(ATX_SubInputStream)
+
+/*----------------------------------------------------------------------
+|   ATX_InputStream interface
++---------------------------------------------------------------------*/
+ATX_BEGIN_INTERFACE_MAP(ATX_SubInputStream, ATX_InputStream)
     ATX_SubInputStream_Read,
     ATX_SubInputStream_Seek,
     ATX_SubInputStream_Tell,
@@ -491,15 +503,7 @@ ATX_SubInputStream_ATX_InputStreamInterface = {
 };
 
 /*----------------------------------------------------------------------
-|       ATX_Referenceable interface
+|   ATX_Referenceable interface
 +---------------------------------------------------------------------*/
-ATX_IMPLEMENT_SIMPLE_REFERENCEABLE_INTERFACE(ATX_SubInputStream, reference_count)
-
-/*----------------------------------------------------------------------
-|       standard GetInterface implementation
-+---------------------------------------------------------------------*/
-ATX_BEGIN_SIMPLE_GET_INTERFACE_IMPLEMENTATION(ATX_SubInputStream) 
-ATX_INTERFACE_MAP_ADD(ATX_SubInputStream, ATX_InputStream)
-ATX_INTERFACE_MAP_ADD(ATX_SubInputStream, ATX_Referenceable)
-ATX_END_SIMPLE_GET_INTERFACE_IMPLEMENTATION(ATX_SubInputStream)
+ATX_IMPLEMENT_REFERENCEABLE_INTERFACE(ATX_SubInputStream, reference_count)
 
