@@ -1,9 +1,9 @@
 /*****************************************************************
 |
-|      Atomix - Data Buffers
+|   Atomix - Data Buffers
 |
-|      (c) 2001-2004 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
@@ -11,18 +11,18 @@
 #define _ATX_DATA_BUFFER_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|    includes
 +---------------------------------------------------------------------*/
 #include "AtxTypes.h"
 #include "AtxDefs.h"
 
 /*----------------------------------------------------------------------
-|       types
+|    types
 +---------------------------------------------------------------------*/
 typedef struct ATX_DataBuffer ATX_DataBuffer;
 
 /*----------------------------------------------------------------------
-|       functions
+|    functions
 +---------------------------------------------------------------------*/
 ATX_Result ATX_DataBuffer_Create(ATX_Size size, ATX_DataBuffer** buffer);
 ATX_Result ATX_DataBuffer_Destroy(ATX_DataBuffer* buffer);

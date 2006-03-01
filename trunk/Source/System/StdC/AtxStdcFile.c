@@ -4,7 +4,7 @@
 |
 |      Atomix - Files: StdC Implementation
 |
-|      (c) 2002-2004 Gilles Boccon-Gibod
+|      (c) 2002-2006 Gilles Boccon-Gibod
 |      Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
@@ -20,7 +20,7 @@
 #include "AtxUtils.h"
 #include "AtxStreams.h"
 #include "AtxFile.h"
-#include "AtxErrors.h"
+#include "AtxResults.h"
 #include "AtxReferenceable.h"
 #include "AtxDestroyable.h"
 
@@ -35,23 +35,27 @@ typedef struct {
 } StdcFileWrapper;
 
 typedef struct {
+    /* interfaces */
+    ATX_IMPLEMENTS(ATX_InputStream);
+    ATX_IMPLEMENTS(ATX_OutputStream);
+    ATX_IMPLEMENTS(ATX_Referenceable);
+
+    /* members */
     ATX_Cardinal     reference_count;
     StdcFileWrapper* file;
 } StdcFileStream;
 
 typedef struct {
-    ATX_String     name;
-    ATX_Size       size;
-    ATX_Flags      mode;
+    /* interfaces */
+    ATX_IMPLEMENTS(ATX_File);
+    ATX_IMPLEMENTS(ATX_Destroyable);
+
+    /* members */
+    ATX_String       name;
+    ATX_Size         size;
+    ATX_Flags        mode;
     StdcFileWrapper* file;
 } StdcFile;
-
-/*----------------------------------------------------------------------
-|       forward declarations
-+---------------------------------------------------------------------*/
-ATX_DECLARE_SIMPLE_GET_INTERFACE_IMPLEMENTATION(StdcFileStream)
-static const ATX_InputStreamInterface StdcFileStream_ATX_InputStreamInterface;
-static const ATX_OutputStreamInterface StdcFileStream_ATX_OutputStreamInterface;
 
 /*----------------------------------------------------------------------
 |       StdcFileWrapper_Create
@@ -78,37 +82,44 @@ StdcFileWrapper_Create(FILE*             file,
 |       StdcFileWrapper_Destroy
 +---------------------------------------------------------------------*/
 static void
-StdcFileWrapper_Destroy(StdcFileWrapper* wrapper)
+StdcFileWrapper_Destroy(StdcFileWrapper* self)
 {
-    if (wrapper->file != NULL   &&
-        wrapper->file != stdin  &&
-        wrapper->file != stdout &&
-        wrapper->file != stderr) {
-        fclose(wrapper->file);
+    if (self->file != NULL   &&
+        self->file != stdin  &&
+        self->file != stdout &&
+        self->file != stderr) {
+        fclose(self->file);
     }
-    ATX_FreeMemory((void*)wrapper);
+    ATX_FreeMemory((void*)self);
 }
 
 /*----------------------------------------------------------------------
 |       StdcFileWrapper_AddReference
 +---------------------------------------------------------------------*/
 static void
-StdcFileWrapper_AddReference(StdcFileWrapper* wrapper)
+StdcFileWrapper_AddReference(StdcFileWrapper* self)
 {
-    ++wrapper->reference_count;
+    ++self->reference_count;
 }
 
 /*----------------------------------------------------------------------
 |       StdcFileWrapper_Release
 +---------------------------------------------------------------------*/
 static void
-StdcFileWrapper_Release(StdcFileWrapper* wrapper)
+StdcFileWrapper_Release(StdcFileWrapper* self)
 {
-    if (wrapper == NULL) return;
-    if (--wrapper->reference_count == 0) {
-        StdcFileWrapper_Destroy(wrapper);
+    if (self == NULL) return;
+    if (--self->reference_count == 0) {
+        StdcFileWrapper_Destroy(self);
     }
 }
+
+/*----------------------------------------------------------------------
+|   forward declarations
++---------------------------------------------------------------------*/
+ATX_DECLARE_INTERFACE_MAP(StdcFileStream, ATX_InputStream)
+ATX_DECLARE_INTERFACE_MAP(StdcFileStream, ATX_OutputStream)
+ATX_DECLARE_INTERFACE_MAP(StdcFileStream, ATX_Referenceable)
 
 /*----------------------------------------------------------------------
 |       StdcFileStream_Create
@@ -127,6 +138,11 @@ StdcFileStream_Create(StdcFileWrapper* file, StdcFileStream** stream)
     /* keep a reference */
     StdcFileWrapper_AddReference(file);
 
+    /* setup interfaces */
+    ATX_SET_INTERFACE((*stream), StdcFileStream, ATX_InputStream);
+    ATX_SET_INTERFACE((*stream), StdcFileStream, ATX_OutputStream);
+    ATX_SET_INTERFACE((*stream), StdcFileStream, ATX_Referenceable);
+
     return ATX_SUCCESS;
 }
 
@@ -134,10 +150,10 @@ StdcFileStream_Create(StdcFileWrapper* file, StdcFileStream** stream)
 |       StdcFileStream_Destroy
 +---------------------------------------------------------------------*/
 static ATX_Result
-StdcFileStream_Destroy(StdcFileStream* stream)
+StdcFileStream_Destroy(StdcFileStream* self)
 {
-    StdcFileWrapper_Release(stream->file);
-    ATX_FreeMemory((void*)stream);
+    StdcFileWrapper_Release(self->file);
+    ATX_FreeMemory((void*)self);
     return ATX_SUCCESS;
 }
 
@@ -145,11 +161,10 @@ StdcFileStream_Destroy(StdcFileStream* stream)
 |       StdcFileStream_Seek
 +---------------------------------------------------------------------*/
 ATX_METHOD
-StdcFileStream_Seek(StdcFileStream* stream, 
-                    ATX_Offset      where)
+StdcFileStream_Seek(StdcFileStream* self, ATX_Offset where)
 {
-    if (fseek(stream->file->file, where, SEEK_SET) == 0) {
-        stream->file->position = where;
+    if (fseek(self->file->file, where, SEEK_SET) == 0) {
+        self->file->position = where;
         return ATX_SUCCESS;
     } else {
         return ATX_FAILURE;
@@ -160,10 +175,19 @@ StdcFileStream_Seek(StdcFileStream* stream,
 |       StdcFileStream_Tell
 +---------------------------------------------------------------------*/
 ATX_METHOD
-StdcFileStream_Tell(StdcFileStream* stream, 
-                    ATX_Offset*     where)
+StdcFileStream_Tell(StdcFileStream* self, ATX_Offset* where)
 {
-    if (where) *where = stream->file->position;
+    if (where) *where = self->file->position;
+    return ATX_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|       StdcFileStream_Flush
++---------------------------------------------------------------------*/
+ATX_METHOD
+StdcFileStream_Flush(StdcFileStream* self)
+{
+    fflush(self->file->file);
     return ATX_SUCCESS;
 }
 
@@ -171,8 +195,8 @@ StdcFileStream_Tell(StdcFileStream* stream,
 |       StdcFileInputStream_Create
 +---------------------------------------------------------------------*/
 static ATX_Result
-StdcFileInputStream_Create(StdcFileWrapper* file, 
-                           ATX_InputStream* stream)
+StdcFileInputStream_Create(StdcFileWrapper*  file, 
+                           ATX_InputStream** stream)
 {
     StdcFileStream* file_stream = NULL;
     ATX_Result      result;
@@ -180,13 +204,12 @@ StdcFileInputStream_Create(StdcFileWrapper* file,
     /* create the object */
     result = StdcFileStream_Create(file, &file_stream);
     if (ATX_FAILED(result)) {
-        ATX_CLEAR_OBJECT(stream);
+        *stream = NULL;
         return result;
     }
 
-    /* set the interface */
-    ATX_INSTANCE(stream) = (ATX_InputStreamInstance*)file_stream;
-    ATX_INTERFACE(stream) = &StdcFileStream_ATX_InputStreamInterface;
+    /* select the ATX_InputStream interface */
+    *stream = &ATX_BASE(file_stream, ATX_InputStream);
 
     return ATX_SUCCESS;
 }
@@ -195,22 +218,22 @@ StdcFileInputStream_Create(StdcFileWrapper* file,
 |       StdcFileInputStream_Read
 +---------------------------------------------------------------------*/
 ATX_METHOD
-StdcFileInputStream_Read(ATX_InputStreamInstance* instance,
-                         ATX_Any                  buffer, 
-                         ATX_Size                 bytes_to_read, 
-                         ATX_Size*                bytes_read)
+StdcFileInputStream_Read(ATX_InputStream* _self,
+                         ATX_Any          buffer, 
+                         ATX_Size         bytes_to_read, 
+                         ATX_Size*        bytes_read)
 {
-    StdcFileStream* stream = (StdcFileStream*)instance;
+    StdcFileStream* self = ATX_SELF(StdcFileStream, ATX_InputStream);
     size_t          nb_read;
 
-    nb_read = fread(buffer, 1, (size_t)bytes_to_read, stream->file->file);
+    nb_read = fread(buffer, 1, (size_t)bytes_to_read, self->file->file);
     if (nb_read > 0 || bytes_to_read == 0) {
         if (bytes_read) *bytes_read = nb_read;
-        stream->file->position += nb_read;
+        self->file->position += nb_read;
         return ATX_SUCCESS;
     } else {
         if (bytes_read) *bytes_read = 0;
-        if (nb_read == 0 || feof(stream->file->file) != 0) {
+        if (nb_read == 0 || feof(self->file->file) != 0) {
             return ATX_ERROR_EOS;
         } else {
             return ATX_FAILURE;
@@ -224,31 +247,33 @@ StdcFileInputStream_Read(ATX_InputStreamInstance* instance,
 |       StdcFileInputStream_Seek
 +---------------------------------------------------------------------*/
 ATX_METHOD
-StdcFileInputStream_Seek(ATX_InputStreamInstance* instance, 
-                         ATX_Offset               where)
+StdcFileInputStream_Seek(ATX_InputStream* _self, 
+                         ATX_Offset       where)
 {
-    return StdcFileStream_Seek((StdcFileStream*)instance, where);
+    return StdcFileStream_Seek(ATX_SELF(StdcFileStream, ATX_InputStream), 
+                               where);
 }
 
 /*----------------------------------------------------------------------
 |       StdcFileInputStream_Tell
 +---------------------------------------------------------------------*/
 ATX_METHOD
-StdcFileInputStream_Tell(ATX_InputStreamInstance* instance, 
-                         ATX_Offset*              where)
+StdcFileInputStream_Tell(ATX_InputStream* _self, 
+                         ATX_Offset*      where)
 {
-    return StdcFileStream_Tell((StdcFileStream*)instance, where);
+    return StdcFileStream_Tell(ATX_SELF(StdcFileStream, ATX_InputStream), 
+                               where);
 }
 
 /*----------------------------------------------------------------------
 |       StdcFileInputStream_GetSize
 +---------------------------------------------------------------------*/
 ATX_METHOD
-StdcFileInputStream_GetSize(ATX_InputStreamInstance* instance, 
-                            ATX_Size*                size)
+StdcFileInputStream_GetSize(ATX_InputStream* _self, 
+                            ATX_Size*        size)
 {
-    StdcFileStream* stream = (StdcFileStream*)instance;
-    *size = stream->file->size;
+    StdcFileStream* self = ATX_SELF(StdcFileStream, ATX_InputStream);
+    *size = self->file->size;
     return ATX_SUCCESS;
 }
 
@@ -256,33 +281,20 @@ StdcFileInputStream_GetSize(ATX_InputStreamInstance* instance,
 |       StdcFileInputStream_GetAvailable
 +---------------------------------------------------------------------*/
 ATX_METHOD
-StdcFileInputStream_GetAvailable(ATX_InputStreamInstance* instance, 
-                                 ATX_Size*                size)
+StdcFileInputStream_GetAvailable(ATX_InputStream* _self, 
+                                 ATX_Size*        size)
 {
-    StdcFileStream* stream = (StdcFileStream*)instance;
-    *size = stream->file->size - stream->file->position;
+    StdcFileStream* self = ATX_SELF(StdcFileStream, ATX_InputStream);
+    *size = self->file->size - self->file->position;
     return ATX_SUCCESS;
 }
-
-/*----------------------------------------------------------------------
-|       ATX_InputStream interface
-+---------------------------------------------------------------------*/
-static const ATX_InputStreamInterface
-StdcFileStream_ATX_InputStreamInterface = {
-    StdcFileStream_GetInterface,
-    StdcFileInputStream_Read,
-    StdcFileInputStream_Seek,
-    StdcFileInputStream_Tell,
-    StdcFileInputStream_GetSize,
-    StdcFileInputStream_GetAvailable
-};
 
 /*----------------------------------------------------------------------
 |       StdcFileOutputStream_Create
 +---------------------------------------------------------------------*/
 static ATX_Result
-StdcFileOutputStream_Create(StdcFileWrapper*  file, 
-                            ATX_OutputStream* stream)
+StdcFileOutputStream_Create(StdcFileWrapper*   file, 
+                            ATX_OutputStream** stream)
 {
     StdcFileStream* file_stream = NULL;
     ATX_Result       result;
@@ -290,13 +302,12 @@ StdcFileOutputStream_Create(StdcFileWrapper*  file,
     /* create the object */
     result = StdcFileStream_Create(file, &file_stream);
     if (ATX_FAILED(result)) {
-        ATX_CLEAR_OBJECT(stream);
+        *stream = NULL;
         return result;
     }
 
-    /* set the interface */
-    ATX_INSTANCE(stream) = (ATX_OutputStreamInstance*)file_stream;
-    ATX_INTERFACE(stream) = &StdcFileStream_ATX_OutputStreamInterface;
+    /* select the ATX_InputStream interface */
+    *stream = &ATX_BASE(file_stream, ATX_OutputStream);
 
     return ATX_SUCCESS;
 }
@@ -305,18 +316,18 @@ StdcFileOutputStream_Create(StdcFileWrapper*  file,
 |       StdcFileOutputStream_Write
 +---------------------------------------------------------------------*/
 ATX_METHOD
-StdcFileOutputStream_Write(ATX_OutputStreamInstance* instance,
-                           ATX_AnyConst              buffer, 
-                           ATX_Size                  bytes_to_write, 
-                           ATX_Size*                 bytes_written)
+StdcFileOutputStream_Write(ATX_OutputStream* _self,
+                           ATX_AnyConst      buffer, 
+                           ATX_Size          bytes_to_write, 
+                           ATX_Size*         bytes_written)
 {
-    StdcFileStream* stream = (StdcFileStream*)instance;
+    StdcFileStream* self = ATX_SELF(StdcFileStream, ATX_OutputStream);
     size_t          nb_written;
 
-    nb_written = fwrite(buffer, 1, (size_t)bytes_to_write, stream->file->file);
+    nb_written = fwrite(buffer, 1, (size_t)bytes_to_write, self->file->file);
     if (nb_written > 0 || bytes_to_write == 0) {
         if (bytes_written) *bytes_written = nb_written;
-        stream->file->position += nb_written;
+        self->file->position += nb_written;
         return ATX_SUCCESS;
     } else {
         if (bytes_written) *bytes_written = 0;
@@ -330,77 +341,86 @@ StdcFileOutputStream_Write(ATX_OutputStreamInstance* instance,
 |       StdcFileOutputStream_Seek
 +---------------------------------------------------------------------*/
 ATX_METHOD
-StdcFileOutputStream_Seek(ATX_OutputStreamInstance* instance, 
-                          ATX_Offset                where)
+StdcFileOutputStream_Seek(ATX_OutputStream* _self, 
+                          ATX_Offset        where)
 {
-    return StdcFileStream_Seek((StdcFileStream*)instance, where);
+    return StdcFileStream_Seek(ATX_SELF(StdcFileStream, ATX_OutputStream), 
+                               where);
 }
 
 /*----------------------------------------------------------------------
 |       StdcFileOutputStream_Tell
 +---------------------------------------------------------------------*/
 ATX_METHOD
-StdcFileOutputStream_Tell(ATX_OutputStreamInstance* instance, 
-                          ATX_Offset*               where)
+StdcFileOutputStream_Tell(ATX_OutputStream* _self, 
+                          ATX_Offset*       where)
 {
-    return StdcFileStream_Tell((StdcFileStream*)instance, where);
+    return StdcFileStream_Tell(ATX_SELF(StdcFileStream, ATX_OutputStream), 
+                               where);
 }
 
 /*----------------------------------------------------------------------
 |       StdcFileOutputStream_Flush
 +---------------------------------------------------------------------*/
 ATX_METHOD
-StdcFileOutputStream_Flush(ATX_OutputStreamInstance* instance)
+StdcFileOutputStream_Flush(ATX_OutputStream* _self)
 {
-    ATX_COMPILER_UNUSED(instance);
-
-    return ATX_SUCCESS;
+    return StdcFileStream_Flush(ATX_SELF(StdcFileStream, ATX_OutputStream));
 }
+
+/*----------------------------------------------------------------------
+|   Win32FileStream_GetInterface
++---------------------------------------------------------------------*/
+ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(StdcFileStream)
+    ATX_GET_INTERFACE_ACCEPT(StdcFileStream, ATX_InputStream)
+    ATX_GET_INTERFACE_ACCEPT(StdcFileStream, ATX_OutputStream)
+    ATX_GET_INTERFACE_ACCEPT(StdcFileStream, ATX_Referenceable)
+ATX_END_GET_INTERFACE_IMPLEMENTATION(StdcFileStream)
+
+/*----------------------------------------------------------------------
+|       ATX_InputStream interface
++---------------------------------------------------------------------*/
+ATX_BEGIN_INTERFACE_MAP(StdcFileStream, ATX_InputStream)
+    StdcFileInputStream_Read,
+    StdcFileInputStream_Seek,
+    StdcFileInputStream_Tell,
+    StdcFileInputStream_GetSize,
+    StdcFileInputStream_GetAvailable
+ATX_END_INTERFACE_MAP(StdcFileStream, ATX_InputStream)
 
 /*----------------------------------------------------------------------
 |       ATX_OutputStream interface
 +---------------------------------------------------------------------*/
-static const ATX_OutputStreamInterface
-StdcFileStream_ATX_OutputStreamInterface = {
-    StdcFileStream_GetInterface,
+ATX_BEGIN_INTERFACE_MAP(StdcFileStream, ATX_OutputStream)
     StdcFileOutputStream_Write,
     StdcFileOutputStream_Seek,
     StdcFileOutputStream_Tell,
     StdcFileOutputStream_Flush
-};
+ATX_END_INTERFACE_MAP(StdcFileStream, ATX_OutputStream)
 
 /*----------------------------------------------------------------------
 |       ATX_Referenceable interface
 +---------------------------------------------------------------------*/
-ATX_IMPLEMENT_SIMPLE_REFERENCEABLE_INTERFACE(StdcFileStream, reference_count)
-
-/*----------------------------------------------------------------------
-|       standard GetInterface implementation
-+---------------------------------------------------------------------*/
-ATX_BEGIN_SIMPLE_GET_INTERFACE_IMPLEMENTATION(StdcFileStream) 
-ATX_INTERFACE_MAP_ADD(StdcFileStream, ATX_InputStream)
-ATX_INTERFACE_MAP_ADD(StdcFileStream, ATX_OutputStream)
-ATX_INTERFACE_MAP_ADD(StdcFileStream, ATX_Referenceable)
-ATX_END_SIMPLE_GET_INTERFACE_IMPLEMENTATION(StdcFileStream)
+ATX_IMPLEMENT_REFERENCEABLE_INTERFACE(StdcFileStream, reference_count)
 
 /*----------------------------------------------------------------------
 |       forward declarations
 +---------------------------------------------------------------------*/
-ATX_DECLARE_SIMPLE_GET_INTERFACE_IMPLEMENTATION(StdcFile)
-static const ATX_FileInterface StdcFile_ATX_FileInterface;
+ATX_DECLARE_INTERFACE_MAP(StdcFile, ATX_File)
+ATX_DECLARE_INTERFACE_MAP(StdcFile, ATX_Destroyable)
 
 /*----------------------------------------------------------------------
 |       ATX_File_Create
 +---------------------------------------------------------------------*/
 ATX_Result
-ATX_File_Create(const char* filename, ATX_File* object)
+ATX_File_Create(const char* filename, ATX_File** object)
 {
     StdcFile* file;
 
     /* allocate a new object */
     file = (StdcFile*)ATX_AllocateZeroMemory(sizeof(StdcFile));
     if (file == NULL) {
-        ATX_CLEAR_OBJECT(object);
+        *object = NULL;
         return ATX_ERROR_OUT_OF_MEMORY;
     }
 
@@ -421,9 +441,10 @@ ATX_File_Create(const char* filename, ATX_File* object)
         }
     }
 
-    /* return reference */
-    ATX_INSTANCE(object)  = (ATX_FileInstance*)file;
-    ATX_INTERFACE(object) = &StdcFile_ATX_FileInterface;
+    /* setup the interfaces */
+    ATX_SET_INTERFACE(file, StdcFile, ATX_File);
+    ATX_SET_INTERFACE(file, StdcFile, ATX_Destroyable);
+    *object = &ATX_BASE(file, ATX_File);
 
     return ATX_SUCCESS;
 }
@@ -432,16 +453,16 @@ ATX_File_Create(const char* filename, ATX_File* object)
 |       StdcFile_Destroy
 +---------------------------------------------------------------------*/
 ATX_METHOD
-StdcFile_Destroy(ATX_DestroyableInstance* instance)
+StdcFile_Destroy(ATX_Destroyable* _self)
 {
-    StdcFile* file = (StdcFile*)instance;
+    StdcFile* self = ATX_SELF(StdcFile, ATX_Destroyable);
 
     /* release the resources */
-    ATX_String_Destruct(&file->name);
-    StdcFileWrapper_Release(file->file);
+    ATX_String_Destruct(&self->name);
+    StdcFileWrapper_Release(self->file);
 
     /* free the memory */
-    ATX_FreeMemory((void*)instance);
+    ATX_FreeMemory((void*)self);
 
     return ATX_SUCCESS;
 }
@@ -450,17 +471,23 @@ StdcFile_Destroy(ATX_DestroyableInstance* instance)
 |       StdcFile_Open
 +---------------------------------------------------------------------*/
 ATX_METHOD
-StdcFile_Open(ATX_FileInstance* instance, ATX_Flags mode)
+StdcFile_Open(ATX_File* _self, ATX_Flags mode)
 { 
-    StdcFile* file = (StdcFile*)instance;
+    StdcFile* self = ATX_SELF(StdcFile, ATX_File);
     FILE*     stdc_file;
 
     /* decide wheter this is a file or stdin/stdout/stderr */
-    if (!strcmp(ATX_CSTR(file->name), "-stdin")) {
+    if (ATX_String_Equals(&self->name, 
+                          ATX_FILE_STANDARD_INPUT, 
+                          ATX_FALSE)) {
         stdc_file = stdin;
-    } else if (!strcmp(ATX_CSTR(file->name), "-stdout")) {
+    } else if (ATX_String_Equals(&self->name, 
+                                 ATX_FILE_STANDARD_OUTPUT, 
+                                 ATX_FALSE)) {
         stdc_file = stdout;
-    } else if (!strcmp(ATX_CSTR(file->name), "-stderr")) {
+    } else if (ATX_String_Equals(&self->name, 
+                                 ATX_FILE_STANDARD_ERROR,
+                                 ATX_FALSE)) {
         stdc_file = stderr;
     } else {
         const char* fmode = "";
@@ -490,7 +517,7 @@ StdcFile_Open(ATX_FileInstance* instance, ATX_Flags mode)
         }
 
         /* try to open the file */
-        stdc_file = fopen(ATX_CSTR(file->name), fmode);
+        stdc_file = fopen(ATX_CSTR(self->name), fmode);
         if (stdc_file == NULL) {
             switch (errno) {
               case EACCES:
@@ -507,28 +534,28 @@ StdcFile_Open(ATX_FileInstance* instance, ATX_Flags mode)
 
     /* set the buffered/unbuffered option */
     if (mode & ATX_FILE_OPEN_MODE_UNBUFFERED) {
-        setbuf(stdc_file, NULL);
+        setvbuf(stdc_file, NULL, _IONBF, 0);
     }
 
     /* remember the mode */
-    file->mode = mode;
+    self->mode = mode;
 
     /* create a wrapper */
-    return StdcFileWrapper_Create(stdc_file, file->size, &file->file);
+    return StdcFileWrapper_Create(stdc_file, self->size, &self->file);
 }
 
 /*----------------------------------------------------------------------
 |       StdcFile_Close
 +---------------------------------------------------------------------*/
 static ATX_Result
-StdcFile_Close(ATX_FileInstance* instance)
+StdcFile_Close(ATX_File* _self)
 {
-    StdcFile* file = (StdcFile*)instance;
+    StdcFile* self = ATX_SELF(StdcFile, ATX_File);
 
     /* release the resources and reset */
-    StdcFileWrapper_Release(file->file);
-    file->file = NULL;
-    file->mode = 0;
+    StdcFileWrapper_Release(self->file);
+    self->file = NULL;
+    self->mode = 0;
 
     return ATX_SUCCESS;
 }
@@ -537,16 +564,15 @@ StdcFile_Close(ATX_FileInstance* instance)
 |       StdcFile_GetSize
 +---------------------------------------------------------------------*/
 ATX_METHOD
-StdcFile_GetSize(ATX_FileInstance* instance,
-                 ATX_Size*         size)
+StdcFile_GetSize(ATX_File* _self, ATX_Size* size)
 {
-    StdcFile* file = (StdcFile*)instance;
+    StdcFile* self = ATX_SELF(StdcFile, ATX_File);
 
     /* check that the file is open */
-    if (file->file == NULL) return ATX_ERROR_FILE_NOT_OPEN;
+    if (self->file == NULL) return ATX_ERROR_FILE_NOT_OPEN;
 
     /* return the size */
-    if (size) *size = file->size;
+    if (size) *size = self->size;
 
     return ATX_SUCCESS;
 }
@@ -555,64 +581,62 @@ StdcFile_GetSize(ATX_FileInstance* instance,
 |       StdcFile_GetInputStream
 +---------------------------------------------------------------------*/
 ATX_METHOD
-StdcFile_GetInputStream(ATX_FileInstance* instance, 
-                        ATX_InputStream*  stream)
+StdcFile_GetInputStream(ATX_File*          _self, 
+                        ATX_InputStream**  stream)
 {
-    StdcFile* file = (StdcFile*)instance;
+    StdcFile* self = ATX_SELF(StdcFile, ATX_File);
 
     /* check that the file is open */
-    if (file->file == NULL) return ATX_ERROR_FILE_NOT_OPEN;
+    if (self->file == NULL) return ATX_ERROR_FILE_NOT_OPEN;
 
     /* check that the mode is compatible */
-    if (!(file->mode & ATX_FILE_OPEN_MODE_READ)) {
+    if (!(self->mode & ATX_FILE_OPEN_MODE_READ)) {
         return ATX_ERROR_FILE_NOT_READABLE;
     }
 
-    return StdcFileInputStream_Create(file->file, stream);
+    return StdcFileInputStream_Create(self->file, stream);
 }
 
 /*----------------------------------------------------------------------
 |       StdcFile_GetOutputStream
 +---------------------------------------------------------------------*/
 ATX_METHOD
-StdcFile_GetOutputStream(ATX_FileInstance* instance, 
-                         ATX_OutputStream* stream)
+StdcFile_GetOutputStream(ATX_File*          _self, 
+                         ATX_OutputStream** stream)
 {
-    StdcFile* file = (StdcFile*)instance;
+    StdcFile* self = ATX_SELF(StdcFile, ATX_File);
 
     /* check that the file is open */
-    if (file->file == NULL) return ATX_ERROR_FILE_NOT_OPEN;
+    if (self->file == NULL) return ATX_ERROR_FILE_NOT_OPEN;
 
     /* check that the mode is compatible */
-    if (!(file->mode & ATX_FILE_OPEN_MODE_WRITE)) {
+    if (!(self->mode & ATX_FILE_OPEN_MODE_WRITE)) {
         return ATX_ERROR_FILE_NOT_WRITABLE;
     }
 
-    return StdcFileOutputStream_Create(file->file, stream);
+    return StdcFileOutputStream_Create(self->file, stream);
 }
+
+/*----------------------------------------------------------------------
+|   StdcFile_GetInterface
++---------------------------------------------------------------------*/
+ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(StdcFile)
+    ATX_GET_INTERFACE_ACCEPT(StdcFile, ATX_File)
+    ATX_GET_INTERFACE_ACCEPT(StdcFile, ATX_Destroyable)
+ATX_END_GET_INTERFACE_IMPLEMENTATION(StdcFile)
 
 /*----------------------------------------------------------------------
 |       ATX_File interface
 +---------------------------------------------------------------------*/
-static const ATX_FileInterface
-StdcFile_ATX_FileInterface = {
-    StdcFile_GetInterface,
+ATX_BEGIN_INTERFACE_MAP(StdcFile, ATX_File)
     StdcFile_Open,
     StdcFile_Close,
     StdcFile_GetSize,
     StdcFile_GetInputStream,
     StdcFile_GetOutputStream
-};
+ATX_END_INTERFACE_MAP(StdcFile, ATX_File)
 
 /*----------------------------------------------------------------------
 |       ATX_Destroyable interface
 +---------------------------------------------------------------------*/
-ATX_IMPLEMENT_SIMPLE_DESTROYABLE_INTERFACE(StdcFile)
-
-/*----------------------------------------------------------------------
-|       standard GetInterface implementation
-+---------------------------------------------------------------------*/
-ATX_BEGIN_SIMPLE_GET_INTERFACE_IMPLEMENTATION(StdcFile) 
-ATX_INTERFACE_MAP_ADD(StdcFile, ATX_File)
-ATX_INTERFACE_MAP_ADD(StdcFile, ATX_Destroyable)
-ATX_END_SIMPLE_GET_INTERFACE_IMPLEMENTATION(StdcFile)
+ATX_IMPLEMENT_DESTROYABLE_INTERFACE(StdcFile)

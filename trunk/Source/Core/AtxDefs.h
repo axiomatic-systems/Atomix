@@ -1,11 +1,11 @@
 /*****************************************************************
 |
-|      File: AtxDefs.h
+|   File: AtxDefs.h
 |
-|      Atomix - Common Definitions
+|   Atomix - Common Definitions
 |
-|      (c) 2002-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2002-2003 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 /** @file
@@ -16,7 +16,7 @@
 #define _ATX_DEFS_H_
 
 /*----------------------------------------------------------------------
-|       constants
+|   constants
 +---------------------------------------------------------------------*/
 #ifndef __cplusplus
 #ifndef NULL
@@ -25,7 +25,7 @@
 #endif /* __cplusplus */
 
 /*----------------------------------------------------------------------
-|       calling conventions
+|   calling conventions
 +---------------------------------------------------------------------*/
 #define ATX_PROCEDURE ATX_Result
 #define ATX_EXPORTED_PROCEDURE ATX_Result

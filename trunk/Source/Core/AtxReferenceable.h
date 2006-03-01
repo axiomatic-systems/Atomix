@@ -37,18 +37,16 @@ ATX_DECLARE_INTERFACE(ATX_Referenceable)
 ATX_BEGIN_INTERFACE_DEFINITION(ATX_Referenceable)
     /**
      * Increments the reference counter.
-     * @param instance Instance pointer of the object on which this method 
-     * is called
+     * @param self Pointer to the object on which this method is called
      * @atx_method_result
      */
-    ATX_Result (*AddReference)(ATX_ReferenceableInstance* instance);
+    ATX_Result (*AddReference)(ATX_Referenceable* self);
     /**
      * Decrements the reference counter.
-     * @param instance Instance pointer of the object on which this method 
-     * is called
+     * @param self Pointer to the object on which this method is called
      * @atx_method_result
      */
-    ATX_Result (*Release)(ATX_ReferenceableInstance* instance);
+    ATX_Result (*Release)(ATX_Referenceable* self);
 ATX_END_INTERFACE_DEFINITION(ATX_Referenceable)
 
 /*----------------------------------------------------------------------
@@ -59,14 +57,14 @@ ATX_END_INTERFACE_DEFINITION(ATX_Referenceable)
  * that implement the ATX_Referenceable interface 
  */
 #define ATX_Referenceable_AddReference(object) \
-ATX_INTERFACE(object)->AddReference(ATX_INSTANCE(object))
+ATX_INTERFACE(object)->AddReference(object)
 
 /**
  * Convenience macro used to call the Release() method on objects 
  * that implement the ATX_Referenceable interface 
  */
-#define ATX_Referenceable_ReleaseReference(object) \
-ATX_INTERFACE(object)->ReleaseReference(ATX_INSTANCE(object))
+#define ATX_Referenceable_Release(object) \
+ATX_INTERFACE(object)->Release(object)
 
 /*----------------------------------------------------------------------
 |       macros
@@ -75,78 +73,60 @@ ATX_INTERFACE(object)->ReleaseReference(ATX_INSTANCE(object))
  * Macro used to safely release a reference on an object.
  *
  * This macro will try to get an ATX_Referenceable interface for the
- * object. If the object does not implement that interface, nothing is done.
+ * object. If the object does not implement that interface, an exception is thrown.
  * If the object implements that interface, the macro will call the Release()
  * method.
  * As a side effect, this macro will also clear its object reference to turn 
  * it into a NULL object reference, so that further use of that object 
  * reference may be prevented
  */
-#define ATX_RELEASE_OBJECT(object)                                      \
-do {                                                                    \
-    if ((object)->instance &&                                           \
-        (object)->interface &&                                          \
-        (object)->interface->GetInterface) {                            \
-        ATX_ReferenceableInterface* interface;                          \
-        if ((object)->interface->GetInterface(                          \
-            (ATX_Instance*)((object)->instance),                        \
-            &ATX_INTERFACE_ID__ATX_Referenceable,                       \
-            (const ATX_Interface**)(void*)&interface) == ATX_SUCCESS) { \
-            interface->Release((ATX_ReferenceableInstance*)             \
-                               ((object)->instance));                   \
-        } else {                                                        \
-            ATX_ASSERT(0); /* not referenceable */                      \
-        }                                                               \
-        ATX_CLEAR_OBJECT(object);                                       \
-    }                                                                   \
+#define ATX_RELEASE_OBJECT(object)                            \
+do {                                                          \
+    if (object) {                                             \
+        ATX_Referenceable* referenceable =                    \
+            ATX_CAST(object, ATX_Referenceable);              \
+        ATX_ASSERT(referenceable != NULL);                    \
+        ATX_Referenceable_Release(referenceable);             \
+        object = NULL;                                        \
+    }                                                         \
 } while(0)
 
 /**
  * Macro used to safely add a reference to an object.
  *
  * This macro will try to get an ATX_Referenceable interface for the
- * object. If the object does not implement that interface, nothing is done.
+ * object. If the object does not implement that interface, an exception is thrown.
  * If the object implements that interface, the macro will call the 
  * AddReference() method.
  */
-#define ATX_REFERENCE_OBJECT(object)                                    \
-do {                                                                    \
-    if ((object)->instance &&                                           \
-        (object)->interface &&                                          \
-        (object)->interface->GetInterface) {                            \
-        ATX_ReferenceableInterface* interface;                          \
-        if ((object)->interface->GetInterface(                          \
-            (ATX_Instance*)((object)->instance),                        \
-            &ATX_INTERFACE_ID__ATX_Referenceable,                       \
-            (const ATX_Interface**)(void*)&interface) == ATX_SUCCESS) { \
-            interface->AddReference((ATX_ReferenceableInstance*)        \
-                                    (object)->instance);                \
-        } else {                                                        \
-            ATX_ASSERT(0); /* not referenceable */                      \
-        }                                                               \
-    }                                                                   \
+#define ATX_REFERENCE_OBJECT(object)                          \
+do {                                                          \
+    if (object) {                                             \
+        ATX_Referenceable* referenceable =                    \
+            ATX_CAST(object, ATX_Referenceable);              \
+        ATX_ASSERT(referenceable != NULL);                    \
+        ATX_Referenceable_AddReference(referenceable);        \
+    }                                                         \
 } while(0)
 
-#define ATX_IMPLEMENT_SIMPLE_REFERENCEABLE_INTERFACE(_prefix, _counter)     \
-ATX_METHOD _prefix##_AddReference(ATX_ReferenceableInstance* instance)      \
-{                                                                           \
-    _prefix* me = (_prefix*)instance;                                       \
-    me->_counter++;                                                         \
-    return ATX_SUCCESS;                                                     \
-}                                                                           \
-ATX_METHOD _prefix##_Release(ATX_ReferenceableInstance* instance)           \
-{                                                                           \
-    _prefix* me = (_prefix*)instance;                                       \
-    if (--me->_counter == 0) {                                              \
-        _prefix##_Destroy(me);                                              \
-    }                                                                       \
-    return ATX_SUCCESS;                                                     \
-}                                                                           \
-static const ATX_ReferenceableInterface                                     \
-_prefix##_ATX_ReferenceableInterface = {                                    \
-    _prefix##_GetInterface,                                                 \
-    _prefix##_AddReference,                                                 \
-    _prefix##_Release                                                       \
+#define ATX_IMPLEMENT_REFERENCEABLE_INTERFACE(_class, _counter)    \
+ATX_METHOD _class##_AddReference(ATX_Referenceable* _self)         \
+{                                                                  \
+    _class* self = ATX_SELF(_class, ATX_Referenceable);            \
+    self->_counter++;                                              \
+    return ATX_SUCCESS;                                            \
+}                                                                  \
+ATX_METHOD _class##_Release(ATX_Referenceable* _self)              \
+{                                                                  \
+    _class* self = ATX_SELF(_class, ATX_Referenceable);            \
+    if (--self->_counter == 0) {                                   \
+        _class##_Destroy(self);                                    \
+    }                                                              \
+    return ATX_SUCCESS;                                            \
+}                                                                  \
+ATX_BEGIN_INTERFACE_MAP(_class, ATX_Referenceable)                 \
+    _class##_AddReference,                                         \
+    _class##_Release                                               \
 };         
  
 #endif /* _ATX_REFERENCEABLE_H_ */

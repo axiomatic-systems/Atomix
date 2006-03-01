@@ -4,7 +4,7 @@
 |
 |      Atomix - Sockets: BSD Implementation
 |
-|      (c) 2002-2003 Gilles Boccon-Gibod
+|      (c) 2002-2006 Gilles Boccon-Gibod
 |      Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
@@ -14,8 +14,16 @@
 +---------------------------------------------------------------------*/
 #if defined(WIN32)
 #define STRICT
-#include <windows.h>
+#define ATX_WIN32_USE_WINSOCK2
+#ifdef ATX_WIN32_USE_WINSOCK2
+/* it is important to include this in this order, because winsock.h and ws2tcpip.h */
+/* have different definitions for the same preprocessor symbols, such as IP_ADD_MEMBERSHIP */
+#include <winsock2.h>
+#include <ws2tcpip.h> 
+#else
 #include <winsock.h>
+#endif
+#include <windows.h>
 #else
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -35,7 +43,7 @@
 #include "AtxReferenceable.h"
 #include "AtxDestroyable.h"
 #include "AtxTypes.h"
-#include "AtxErrors.h"
+#include "AtxResults.h"
 #include "AtxStreams.h"
 #include "AtxSockets.h"
 #include "AtxUtils.h"
@@ -49,9 +57,15 @@
 |       WinSock adaptation layer
 +---------------------------------------------------------------------*/
 #if defined(WIN32)
-#define EINPROGRESS  WSAEWOULDBLOCK
+#define EWOULDBLOCK  WSAEWOULDBLOCK
+#define EINPROGRESS  WSAEINPROGRESS
 #define ECONNREFUSED WSAECONNREFUSED
+#define ECONNRESET   WSAECONNRESET
 #define ETIMEDOUT    WSAETIMEDOUT
+#define ENETRESET    WSAENETRESET
+#define EADDRINUSE   WSAEADDRINUSE
+#define ENETDOWN     WSAENETDOWN
+#define ENETUNREACH  WSAENETUNREACH
 #define EAGAIN       WSAEWOULDBLOCK
 #define EINTR		 WSAEINTR
 #define ATX_BSD_INVALID_SOCKET INVALID_SOCKET
@@ -85,40 +99,45 @@ typedef struct {
 } BsdSocketFdWrapper;
 
 typedef struct {
+    /* interfaces */
+    ATX_IMPLEMENTS(ATX_InputStream);
+    ATX_IMPLEMENTS(ATX_OutputStream);
+    ATX_IMPLEMENTS(ATX_Referenceable);
+    
+    /* members */
     ATX_Cardinal        reference_count;
     BsdSocketFdWrapper* socket_ref;
 } BsdSocketStream;
 
 typedef struct {
+    /* interfaces */
+    ATX_IMPLEMENTS(ATX_Socket);
+    ATX_IMPLEMENTS(ATX_Destroyable);
+
     BsdSocketFdWrapper* socket_ref;
     ATX_SocketInfo      info;
 } BsdSocket;
 
 typedef struct {
-    BsdSocket    base;
+    /* base class */
+    ATX_EXTENDS(BsdSocket);
+
+    /* interfaces */
+    ATX_IMPLEMENTS(ATX_ServerSocket);
+
+    /* members */
     unsigned int max_clients;
 } BsdTcpServerSocket;
 
-/*----------------------------------------------------------------------
-|       forward declarations
-+---------------------------------------------------------------------*/
-ATX_DECLARE_SIMPLE_GET_INTERFACE_IMPLEMENTATION(BsdSocketStream)
-static const ATX_InputStreamInterface BsdSocketStream_ATX_InputStreamInterface;
-static const ATX_OutputStreamInterface BsdSocketStream_ATX_OutputStreamInterface;
+typedef BsdSocket BsdTcpClientSocket;
 
-ATX_DECLARE_SIMPLE_GET_INTERFACE_IMPLEMENTATION(BsdSocket)
-static const ATX_SocketInterface BsdSocket_ATX_SocketInterface;
+typedef struct {
+    /* base class */
+    ATX_EXTENDS(BsdSocket);
 
-ATX_DECLARE_SIMPLE_GET_INTERFACE_IMPLEMENTATION(BsdTcpClientSocket)
-static const ATX_SocketInterface BsdTcpClientSocket_ATX_SocketInterface;
-
-ATX_DECLARE_SIMPLE_GET_INTERFACE_IMPLEMENTATION(BsdTcpServerSocket)
-static const ATX_SocketInterface BsdTcpServerSocket_ATX_SocketInterface;
-static const ATX_ServerSocketInterface BsdTcpServerSocket_ATX_ServerSocketInterface;
-
-ATX_DECLARE_SIMPLE_GET_INTERFACE_IMPLEMENTATION(BsdUdpSocket)
-static const ATX_SocketInterface BsdUdpSocket_ATX_SocketInterface;
-static const ATX_DatagramSocketInterface BsdUdpSocket_ATX_DatagramSocketInterface;
+    /* interfaces */
+    ATX_IMPLEMENTS(ATX_DatagramSocket);
+} BsdUdpSocket;
 
 /*----------------------------------------------------------------------
 |       BsdSockets_Init
@@ -127,10 +146,10 @@ static ATX_Result
 BsdSockets_Init(void)
 {
 #if defined(WIN32)
-	if (WinsockInitialized == ATX_FALSE) {
+    if (WinsockInitialized == ATX_FALSE) {
 		WORD    wVersionRequested;
 		WSADATA wsaData;
-		wVersionRequested = MAKEWORD( 1, 1 );
+		wVersionRequested = MAKEWORD( 2, 0 );
 		if (WSAStartup( wVersionRequested, &wsaData ) != 0) {
 			return ATX_FAILURE;
 		}
@@ -138,6 +157,44 @@ BsdSockets_Init(void)
 	}
 #endif
 	return ATX_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   MapErrorCode
++---------------------------------------------------------------------*/
+static ATX_Result 
+MapErrorCode(int error)
+{
+    switch (error) {
+        case ECONNRESET:
+        case ENETRESET:
+            return ATX_ERROR_CONNECTION_RESET;
+
+        case ECONNREFUSED:
+            return ATX_ERROR_CONNECTION_REFUSED;
+
+        case ETIMEDOUT:
+            return ATX_ERROR_TIMEOUT;
+
+        case EADDRINUSE:
+            return ATX_ERROR_ADDRESS_IN_USE;
+
+        case ENETDOWN:
+            return ATX_ERROR_NETWORK_DOWN;
+
+        case ENETUNREACH:
+            return ATX_ERROR_NETWORK_UNREACHABLE;
+
+        case EINPROGRESS:
+        case EAGAIN:
+#if defined(EWOULDBLOCK) && (EWOULDBLOCK != EAGAIN)
+        case EWOULDBLOCK:
+#endif
+            return ATX_ERROR_WOULD_BLOCK;
+
+        default:
+            return ATX_FAILURE;
+    }
 }
 
 /*----------------------------------------------------------------------
@@ -231,30 +288,30 @@ BsdSocketFdWrapper_Create(SocketFd fd, BsdSocketFdWrapper** wrapper)
 |       BsdSocketFdWrapper_Destroy
 +---------------------------------------------------------------------*/
 static void
-BsdSocketFdWrapper_Destroy(BsdSocketFdWrapper* wrapper)
+BsdSocketFdWrapper_Destroy(BsdSocketFdWrapper* self)
 {
-    closesocket(wrapper->fd);
-    ATX_FreeMemory((void*)wrapper);
+    closesocket(self->fd);
+    ATX_FreeMemory((void*)self);
 }
 
 /*----------------------------------------------------------------------
 |       BsdSocketFdWrapper_AddReference
 +---------------------------------------------------------------------*/
 static void
-BsdSocketFdWrapper_AddReference(BsdSocketFdWrapper* wrapper)
+BsdSocketFdWrapper_AddReference(BsdSocketFdWrapper* self)
 {
-    ++wrapper->reference_count;
+    ++self->reference_count;
 }
 
 /*----------------------------------------------------------------------
 |       BsdSocketFdWrapper_Release
 +---------------------------------------------------------------------*/
 static void
-BsdSocketFdWrapper_Release(BsdSocketFdWrapper* wrapper)
+BsdSocketFdWrapper_Release(BsdSocketFdWrapper* self)
 {
-    if (wrapper == NULL) return;
-    if (--wrapper->reference_count == 0) {
-        BsdSocketFdWrapper_Destroy(wrapper);
+    if (self == NULL) return;
+    if (--self->reference_count == 0) {
+        BsdSocketFdWrapper_Destroy(self);
     }
 }
 
@@ -279,11 +336,18 @@ BsdSocketStream_Create(BsdSocketFdWrapper* socket_ref, BsdSocketStream** stream)
 }
 
 /*----------------------------------------------------------------------
+|       forward declarations
++---------------------------------------------------------------------*/
+ATX_DECLARE_INTERFACE_MAP(BsdSocketStream, ATX_InputStream)
+ATX_DECLARE_INTERFACE_MAP(BsdSocketStream, ATX_OutputStream)
+ATX_DECLARE_INTERFACE_MAP(BsdSocketStream, ATX_Referenceable)
+
+/*----------------------------------------------------------------------
 |       BsdSocketInputStream_Create
 +---------------------------------------------------------------------*/
 static ATX_Result
 BsdSocketInputStream_Create(BsdSocketFdWrapper* socket_ref, 
-                            ATX_InputStream*    stream)
+                            ATX_InputStream**   stream)
 { 
     BsdSocketStream* socket_stream = NULL;
     ATX_Result       result;
@@ -291,13 +355,15 @@ BsdSocketInputStream_Create(BsdSocketFdWrapper* socket_ref,
     /* create the object */
     result = BsdSocketStream_Create(socket_ref, &socket_stream);
     if (ATX_FAILED(result)) {
-        ATX_CLEAR_OBJECT(stream);
+        *stream = NULL;
         return result;
     }
 
-    /* set the interface */
-    ATX_INSTANCE(stream) = (ATX_InputStreamInstance*)socket_stream;
-    ATX_INTERFACE(stream) = &BsdSocketStream_ATX_InputStreamInterface;
+    /* setup the interfaces */
+    ATX_SET_INTERFACE(socket_stream, BsdSocketStream, ATX_InputStream);
+    ATX_SET_INTERFACE(socket_stream, BsdSocketStream, ATX_OutputStream);
+    ATX_SET_INTERFACE(socket_stream, BsdSocketStream, ATX_Referenceable);
+    *stream = &ATX_BASE(socket_stream, ATX_InputStream);
 
     return ATX_SUCCESS;
 }
@@ -307,7 +373,7 @@ BsdSocketInputStream_Create(BsdSocketFdWrapper* socket_ref,
 +---------------------------------------------------------------------*/
 static ATX_Result
 BsdSocketOutputStream_Create(BsdSocketFdWrapper* socket_ref, 
-                             ATX_OutputStream*   stream)
+                             ATX_OutputStream**  stream)
 { 
     BsdSocketStream* socket_stream = NULL;
     ATX_Result       result;
@@ -315,13 +381,15 @@ BsdSocketOutputStream_Create(BsdSocketFdWrapper* socket_ref,
     /* create the object */
     result = BsdSocketStream_Create(socket_ref, &socket_stream);
     if (ATX_FAILED(result)) {
-        ATX_CLEAR_OBJECT(stream);
+        *stream = NULL;
         return result;
     }
 
     /* set the interface */
-    ATX_INSTANCE(stream) = (ATX_OutputStreamInstance*)socket_stream;
-    ATX_INTERFACE(stream) = &BsdSocketStream_ATX_OutputStreamInterface;
+    ATX_SET_INTERFACE(socket_stream, BsdSocketStream, ATX_InputStream);
+    ATX_SET_INTERFACE(socket_stream, BsdSocketStream, ATX_OutputStream);
+    ATX_SET_INTERFACE(socket_stream, BsdSocketStream, ATX_Referenceable);
+    *stream = &ATX_BASE(socket_stream, ATX_OutputStream);
 
     return ATX_SUCCESS;
 }
@@ -330,10 +398,10 @@ BsdSocketOutputStream_Create(BsdSocketFdWrapper* socket_ref,
 |       BsdSocketStream_Destroy
 +---------------------------------------------------------------------*/
 static ATX_Result
-BsdSocketStream_Destroy(BsdSocketStream* stream)
+BsdSocketStream_Destroy(BsdSocketStream* self)
 {
-    BsdSocketFdWrapper_Release(stream->socket_ref);
-    ATX_FreeMemory((void*)stream);
+    BsdSocketFdWrapper_Release(self->socket_ref);
+    ATX_FreeMemory((void*)self);
 
     return ATX_SUCCESS;
 }
@@ -342,17 +410,17 @@ BsdSocketStream_Destroy(BsdSocketStream* stream)
 |       BsdSocketStream_Read
 +---------------------------------------------------------------------*/
 ATX_METHOD
-BsdSocketStream_Read(ATX_InputStreamInstance* instance,
-                     ATX_Any                  buffer, 
-                     ATX_Size                 bytes_to_read, 
-                     ATX_Size*                bytes_read)
+BsdSocketStream_Read(ATX_InputStream* _self,
+                     ATX_Any          buffer, 
+                     ATX_Size         bytes_to_read, 
+                     ATX_Size*        bytes_read)
 {
-    BsdSocketStream* stream = (BsdSocketStream*)instance;
+    BsdSocketStream* self = ATX_SELF(BsdSocketStream, ATX_InputStream);
     ssize_t          nb_read;
     int              watchdog = 5000;
 
     do {
-        nb_read = recv(stream->socket_ref->fd, 
+        nb_read = recv(self->socket_ref->fd, 
                        buffer, 
                        (ssize_t)bytes_to_read, 
                        0);
@@ -364,15 +432,16 @@ BsdSocketStream_Read(ATX_InputStreamInstance* instance,
             if (nb_read == 0) {
                 return ATX_ERROR_EOS;
             } else {
+                int error = GetSocketError();
                 /* on linux, EAGAIN can be returned for UDP sockets */
                 /* when the checksum fails                          */
-                if (GetSocketError() == EAGAIN) {
-                    return ATX_SUCCESS;
+                if (error == EAGAIN) {
+                    continue;
                 }
 
                 /* dont return an error if we get interrupted */
-                if (GetSocketError() != EINTR) {
-                    return ATX_FAILURE;
+                if (error != EINTR) {
+                    return MapErrorCode(error);
                 } 
             }
         }
@@ -386,15 +455,15 @@ BsdSocketStream_Read(ATX_InputStreamInstance* instance,
 |       BsdSocketStream_Write
 +---------------------------------------------------------------------*/
 ATX_METHOD
-BsdSocketStream_Write(ATX_OutputStreamInstance* instance,
-                      ATX_AnyConst              buffer, 
-                      ATX_Size                  bytes_to_write, 
-                      ATX_Size*                 bytes_written)
+BsdSocketStream_Write(ATX_OutputStream* _self,
+                      ATX_AnyConst      buffer, 
+                      ATX_Size          bytes_to_write, 
+                      ATX_Size*         bytes_written)
 {
-    BsdSocketStream* stream = (BsdSocketStream*)instance;
+    BsdSocketStream* self = ATX_SELF(BsdSocketStream, ATX_OutputStream);
     ssize_t          nb_written;
 
-    nb_written = send(stream->socket_ref->fd, 
+    nb_written = send(self->socket_ref->fd, 
                       (SocketConstBuffer)buffer, 
                       (ssize_t)bytes_to_write, 
                       0);
@@ -416,11 +485,11 @@ BsdSocketStream_Write(ATX_OutputStreamInstance* instance,
 |       BsdSocketInputStream_Seek
 +---------------------------------------------------------------------*/
 ATX_METHOD
-BsdSocketInputStream_Seek(ATX_InputStreamInstance* instance, 
-                          ATX_Offset               where)
+BsdSocketInputStream_Seek(ATX_InputStream* self, 
+                          ATX_Offset       where)
 {
     /* can't seek in socket streams */
-    ATX_COMPILER_UNUSED(instance);
+    ATX_COMPILER_UNUSED(self);
     ATX_COMPILER_UNUSED(where);
     return ATX_FAILURE;
 }
@@ -429,10 +498,10 @@ BsdSocketInputStream_Seek(ATX_InputStreamInstance* instance,
 |       BsdSocketInputStream_Tell
 +---------------------------------------------------------------------*/
 ATX_METHOD
-BsdSocketInputStream_Tell(ATX_InputStreamInstance* instance, 
-                          ATX_Offset*              where)
+BsdSocketInputStream_Tell(ATX_InputStream* self, 
+                          ATX_Offset*      where)
 {
-    ATX_COMPILER_UNUSED(instance);
+    ATX_COMPILER_UNUSED(self);
 
     if (where) *where = 0;
     return ATX_SUCCESS;
@@ -442,10 +511,10 @@ BsdSocketInputStream_Tell(ATX_InputStreamInstance* instance,
 |       BsdSocketInputStream_GetSize
 +---------------------------------------------------------------------*/
 ATX_METHOD
-BsdSocketInputStream_GetSize(ATX_InputStreamInstance* instance, 
-                             ATX_Size*                size)
+BsdSocketInputStream_GetSize(ATX_InputStream* self, 
+                             ATX_Size*        size)
 {
-    ATX_COMPILER_UNUSED(instance);
+    ATX_COMPILER_UNUSED(self);
 
     if (size) *size = 0;
     return ATX_SUCCESS;
@@ -455,12 +524,12 @@ BsdSocketInputStream_GetSize(ATX_InputStreamInstance* instance,
 |       BsdSocketInputStream_GetAvailable
 +---------------------------------------------------------------------*/
 ATX_METHOD
-BsdSocketInputStream_GetAvailable(ATX_InputStreamInstance* instance, 
-                                  ATX_Size*                available)
+BsdSocketInputStream_GetAvailable(ATX_InputStream* _self, 
+                                  ATX_Size*        available)
 {
-    BsdSocketStream* stream = (BsdSocketStream*)instance;
-    unsigned long ready = 0;
-    int io_result = ioctlsocket(stream->socket_ref->fd, FIONREAD, &ready); 
+    BsdSocketStream* self = ATX_SELF(BsdSocketStream, ATX_InputStream);
+    unsigned long    ready = 0;
+    int io_result = ioctlsocket(self->socket_ref->fd, FIONREAD, &ready); 
     if (io_result == ATX_BSD_SOCKET_ERROR) {
         *available = 0;
         return ATX_FAILURE;
@@ -474,10 +543,10 @@ BsdSocketInputStream_GetAvailable(ATX_InputStreamInstance* instance,
 |       BsdSocketOutputStream_Seek
 +---------------------------------------------------------------------*/
 ATX_METHOD
-BsdSocketOutputStream_Seek(ATX_OutputStreamInstance* instance, 
-                           ATX_Offset                where)
+BsdSocketOutputStream_Seek(ATX_OutputStream* self, 
+                           ATX_Offset        where)
 {
-    ATX_COMPILER_UNUSED(instance);
+    ATX_COMPILER_UNUSED(self);
     ATX_COMPILER_UNUSED(where);
 
     /* can't seek in socket streams */
@@ -488,10 +557,10 @@ BsdSocketOutputStream_Seek(ATX_OutputStreamInstance* instance,
 |       BsdSocketOutputStream_Tell
 +---------------------------------------------------------------------*/
 ATX_METHOD
-BsdSocketOutputStream_Tell(ATX_OutputStreamInstance* instance, 
-                           ATX_Offset*               where)
+BsdSocketOutputStream_Tell(ATX_OutputStream* self, 
+                           ATX_Offset*       where)
 {
-    ATX_COMPILER_UNUSED(instance);
+    ATX_COMPILER_UNUSED(self);
 
     if (where) *where = 0;
     return ATX_SUCCESS;
@@ -501,71 +570,73 @@ BsdSocketOutputStream_Tell(ATX_OutputStreamInstance* instance,
 |       BsdSocketOutputStream_Flush
 +---------------------------------------------------------------------*/
 ATX_METHOD
-BsdSocketOutputStream_Flush(ATX_OutputStreamInstance* instance)
+BsdSocketOutputStream_Flush(ATX_OutputStream* self)
 {
-    ATX_COMPILER_UNUSED(instance);
+    ATX_COMPILER_UNUSED(self);
 
     return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
+|   BsdSocketStream_GetInterface
++---------------------------------------------------------------------*/
+ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(BsdSocketStream)
+    ATX_GET_INTERFACE_ACCEPT(BsdSocketStream, ATX_InputStream)
+    ATX_GET_INTERFACE_ACCEPT(BsdSocketStream, ATX_OutputStream)
+    ATX_GET_INTERFACE_ACCEPT(BsdSocketStream, ATX_Referenceable)
+ATX_END_GET_INTERFACE_IMPLEMENTATION(BsdSocketStream)
+
+/*----------------------------------------------------------------------
 |       ATX_InputStream interface
 +---------------------------------------------------------------------*/
-static const ATX_InputStreamInterface
-BsdSocketStream_ATX_InputStreamInterface = {
-    BsdSocketStream_GetInterface,
+ATX_BEGIN_INTERFACE_MAP(BsdSocketStream, ATX_InputStream)
     BsdSocketStream_Read,
     BsdSocketInputStream_Seek,
     BsdSocketInputStream_Tell,
     BsdSocketInputStream_GetSize,
     BsdSocketInputStream_GetAvailable
-};
+ATX_END_INTERFACE_MAP(BsdSocketStream, ATX_InputStream)
 
 /*----------------------------------------------------------------------
 |       ATX_OutputStream interface
 +---------------------------------------------------------------------*/
-static const ATX_OutputStreamInterface
-BsdSocketStream_ATX_OutputStreamInterface = {
-    BsdSocketStream_GetInterface,
+ATX_BEGIN_INTERFACE_MAP(BsdSocketStream, ATX_OutputStream)
     BsdSocketStream_Write,
     BsdSocketOutputStream_Seek,
     BsdSocketOutputStream_Tell,
     BsdSocketOutputStream_Flush
-};
+ATX_END_INTERFACE_MAP(BsdSocketStream, ATX_OutputStream)
 
 /*----------------------------------------------------------------------
 |       ATX_Referenceable interface
 +---------------------------------------------------------------------*/
-ATX_IMPLEMENT_SIMPLE_REFERENCEABLE_INTERFACE(BsdSocketStream, reference_count)
-
-/*----------------------------------------------------------------------
-|       standard GetInterface implementation
-+---------------------------------------------------------------------*/
-ATX_BEGIN_SIMPLE_GET_INTERFACE_IMPLEMENTATION(BsdSocketStream) 
-ATX_INTERFACE_MAP_ADD(BsdSocketStream, ATX_InputStream)
-ATX_INTERFACE_MAP_ADD(BsdSocketStream, ATX_OutputStream)
-ATX_INTERFACE_MAP_ADD(BsdSocketStream, ATX_Referenceable)
-ATX_END_SIMPLE_GET_INTERFACE_IMPLEMENTATION(BsdSocketStream)
+ATX_IMPLEMENT_REFERENCEABLE_INTERFACE(BsdSocketStream, reference_count)
 
 /*----------------------------------------------------------------------
 |       forward declarations
 +---------------------------------------------------------------------*/
+ATX_DECLARE_INTERFACE_MAP(BsdSocket, ATX_Socket)
+ATX_DECLARE_INTERFACE_MAP(BsdSocket, ATX_Destroyable)
 static ATX_Result BsdSocket_RefreshInfo(BsdSocket* socket);
 
 /*----------------------------------------------------------------------
 |       BsdSocket_Construct
 +---------------------------------------------------------------------*/
 static ATX_Result
-BsdSocket_Construct(BsdSocket* socket, SocketFd fd)
+BsdSocket_Construct(BsdSocket* self, SocketFd fd)
 { 
     ATX_Result result;
 
     /* create a reference to the fd */
-    result = BsdSocketFdWrapper_Create(fd, &socket->socket_ref);
+    result = BsdSocketFdWrapper_Create(fd, &self->socket_ref);
     if (ATX_FAILED(result)) return result;
 
     /* get initial info */
-    BsdSocket_RefreshInfo(socket);
+    BsdSocket_RefreshInfo(self);
+
+    /* setup the interfaces */
+    ATX_SET_INTERFACE(self, BsdSocket, ATX_Socket);
+    ATX_SET_INTERFACE(self, BsdSocket, ATX_Destroyable);
 
     return ATX_SUCCESS;
 }
@@ -574,9 +645,9 @@ BsdSocket_Construct(BsdSocket* socket, SocketFd fd)
 |       BsdSocket_Destruct
 +---------------------------------------------------------------------*/
 static ATX_Result
-BsdSocket_Destruct(BsdSocket* socket)
+BsdSocket_Destruct(BsdSocket* self)
 {
-    BsdSocketFdWrapper_Release(socket->socket_ref);
+    BsdSocketFdWrapper_Release(self->socket_ref);
     return ATX_SUCCESS;
 }
 
@@ -584,23 +655,19 @@ BsdSocket_Destruct(BsdSocket* socket)
 |       BsdSocket_Create
 +---------------------------------------------------------------------*/
 static ATX_Result
-BsdSocket_Create(SocketFd fd, ATX_Socket* object)
+BsdSocket_Create(SocketFd fd, ATX_Socket** object)
 { 
     BsdSocket* socket;
 
     /* allocate new object */
     socket = (BsdSocket*)ATX_AllocateZeroMemory(sizeof(BsdSocket));
+    *object = (ATX_Socket*)socket;
     if (socket == NULL) {
-        ATX_CLEAR_OBJECT(object);
         return ATX_ERROR_OUT_OF_MEMORY;
     }
 
     /* construct object */
     BsdSocket_Construct(socket, fd);
-
-    /* return reference */
-    ATX_INSTANCE(object)  = (ATX_SocketInstance*)socket;
-    ATX_INTERFACE(object) = &BsdSocket_ATX_SocketInterface;
 
     return ATX_SUCCESS;
 }
@@ -609,11 +676,11 @@ BsdSocket_Create(SocketFd fd, ATX_Socket* object)
 |       BsdSocket_Destroy
 +---------------------------------------------------------------------*/
 static ATX_Result
-BsdSocket_Destroy(ATX_DestroyableInstance* instance)
+BsdSocket_Destroy(ATX_Destroyable* _self)
 {
-    BsdSocket* socket = (BsdSocket*)instance;
-    BsdSocket_Destruct(socket);
-    ATX_FreeMemory((void*)instance);
+    BsdSocket* self = ATX_SELF(BsdSocket, ATX_Destroyable);
+    BsdSocket_Destruct(self);
+    ATX_FreeMemory((void*)self);
 
     return ATX_SUCCESS;
 }
@@ -622,30 +689,30 @@ BsdSocket_Destroy(ATX_DestroyableInstance* instance)
 |       BsdSocket_RefreshInfo
 +---------------------------------------------------------------------*/
 static ATX_Result
-BsdSocket_RefreshInfo(BsdSocket* socket)
+BsdSocket_RefreshInfo(BsdSocket* self)
 {
     struct sockaddr_in inet_address;
     socklen_t          name_length = sizeof(inet_address);
 
     /* check that we have a socket */
-    if (socket->socket_ref == NULL) return ATX_ERROR_INVALID_STATE;
+    if (self->socket_ref == NULL) return ATX_ERROR_INVALID_STATE;
 
     /* get the local socket addr */
-    if (getsockname(socket->socket_ref->fd, 
+    if (getsockname(self->socket_ref->fd, 
                     (struct sockaddr*)&inet_address, 
                     &name_length) == 0) {
-        ATX_IpAddress_SetFromLong(&socket->info.local_address.ip_address,
+        ATX_IpAddress_SetFromLong(&self->info.local_address.ip_address,
                                   ntohl(inet_address.sin_addr.s_addr));
-        socket->info.local_address.port = ntohs(inet_address.sin_port);
+        self->info.local_address.port = ntohs(inet_address.sin_port);
     }   
 
     /* get the peer socket addr */
-    if (getpeername(socket->socket_ref->fd,
+    if (getpeername(self->socket_ref->fd,
                     (struct sockaddr*)&inet_address, 
                     &name_length) == 0) {
-        ATX_IpAddress_SetFromLong(&socket->info.remote_address.ip_address,
+        ATX_IpAddress_SetFromLong(&self->info.remote_address.ip_address,
                                   ntohl(inet_address.sin_addr.s_addr));
-        socket->info.remote_address.port = ntohs(inet_address.sin_port);
+        self->info.remote_address.port = ntohs(inet_address.sin_port);
     }   
 
     return ATX_SUCCESS;
@@ -656,10 +723,10 @@ BsdSocket_RefreshInfo(BsdSocket* socket)
 |       BsdSocketFd_SetBlockingMode
 +---------------------------------------------------------------------*/
 static ATX_Result
-BsdSocket_SetBlockingMode(BsdSocket* socket, ATX_Boolean blocking)
+BsdSocket_SetBlockingMode(BsdSocket* self, ATX_Boolean blocking)
 {
     unsigned long args = (blocking == ATX_TRUE) ? 0 : 1;
-    if (ioctlsocket(socket->socket_ref->fd, FIONBIO, &args)) {
+    if (ioctlsocket(self->socket_ref->fd, FIONBIO, &args)) {
         return ATX_FAILURE;
     }
     return ATX_SUCCESS;
@@ -669,15 +736,15 @@ BsdSocket_SetBlockingMode(BsdSocket* socket, ATX_Boolean blocking)
 |       BsdSocketFd_SetBlockingMode
 +---------------------------------------------------------------------*/
 static ATX_Result
-BsdSocket_SetBlockingMode(BsdSocket* socket, ATX_Boolean blocking)
+BsdSocket_SetBlockingMode(BsdSocket* self, ATX_Boolean blocking)
 {
-    int flags = fcntl(socket->socket_ref->fd, F_GETFL, 0);
+    int flags = fcntl(self->socket_ref->fd, F_GETFL, 0);
     if (blocking == ATX_TRUE) {
         flags ^= O_NONBLOCK;
     } else {
         flags |= O_NONBLOCK;
     }
-    if (fcntl(socket->socket_ref->fd, F_SETFL, flags)) {
+    if (fcntl(self->socket_ref->fd, F_SETFL, flags)) {
         return ATX_FAILURE;
     }
     return ATX_SUCCESS;
@@ -688,23 +755,23 @@ BsdSocket_SetBlockingMode(BsdSocket* socket, ATX_Boolean blocking)
 |       BsdSocket_Bind
 +---------------------------------------------------------------------*/
 ATX_METHOD
-BsdSocket_Bind(ATX_SocketInstance* instance, const ATX_SocketAddress* address)
+BsdSocket_Bind(ATX_Socket* _self, const ATX_SocketAddress* address)
 {
-    BsdSocket* socket = (BsdSocket*)instance;
+    BsdSocket* self = ATX_SELF(BsdSocket, ATX_Socket);
 
     /* convert the address */
     struct sockaddr_in inet_address;
     SocketAddressToInetAddress(address, &inet_address);
     
     /* bind the socket */
-    if (bind(socket->socket_ref->fd, 
+    if (bind(self->socket_ref->fd, 
              (struct sockaddr*)&inet_address, 
              sizeof(inet_address)) < 0) {
         return ATX_ERROR_BIND_FAILED;
     }
 
     /* refresh socket info */
-    BsdSocket_RefreshInfo(socket);
+    BsdSocket_RefreshInfo(self);
 
     return ATX_SUCCESS;
 }
@@ -713,11 +780,11 @@ BsdSocket_Bind(ATX_SocketInstance* instance, const ATX_SocketAddress* address)
 |       BsdSocket_Connect
 +---------------------------------------------------------------------*/
 ATX_METHOD 
-BsdSocket_Connect(ATX_SocketInstance*      instance, 
+BsdSocket_Connect(ATX_Socket*              self, 
                   const ATX_SocketAddress* address, 
                   ATX_Timeout              timeout)
 {
-    ATX_COMPILER_UNUSED(instance);
+    ATX_COMPILER_UNUSED(self);
     ATX_COMPILER_UNUSED(address);
     ATX_COMPILER_UNUSED(timeout);
 
@@ -729,106 +796,113 @@ BsdSocket_Connect(ATX_SocketInstance*      instance,
 |       BsdSocket_GetInputStream
 +---------------------------------------------------------------------*/
 ATX_METHOD
-BsdSocket_GetInputStream(ATX_SocketInstance* instance, ATX_InputStream* stream)
+BsdSocket_GetInputStream(ATX_Socket* _self, ATX_InputStream** stream)
 {
-    BsdSocket* socket = (BsdSocket*)instance;
+    BsdSocket* self = ATX_SELF(BsdSocket, ATX_Socket);
 
     /* check that we have a socket */
-    if (socket->socket_ref == NULL) return ATX_ERROR_INVALID_STATE;
+    if (self->socket_ref == NULL) return ATX_ERROR_INVALID_STATE;
 
     /* create a stream */
-    return BsdSocketInputStream_Create(socket->socket_ref, stream);
+    return BsdSocketInputStream_Create(self->socket_ref, stream);
 }
 
 /*----------------------------------------------------------------------
 |       BsdSocket_GetOutputStream
 +---------------------------------------------------------------------*/
 ATX_METHOD
-BsdSocket_GetOutputStream(ATX_SocketInstance* instance, ATX_OutputStream* stream)
+BsdSocket_GetOutputStream(ATX_Socket* _self, ATX_OutputStream** stream)
 {
-    BsdSocket* socket = (BsdSocket*)instance;
+    BsdSocket* self = ATX_SELF(BsdSocket, ATX_Socket);
 
     /* check that we have a socket */
-    if (socket->socket_ref == NULL) return ATX_ERROR_INVALID_STATE;
+    if (self->socket_ref == NULL) return ATX_ERROR_INVALID_STATE;
 
     /* create a stream */
-    return BsdSocketOutputStream_Create(socket->socket_ref, stream);
+    return BsdSocketOutputStream_Create(self->socket_ref, stream);
 }
 
 /*----------------------------------------------------------------------
 |       BsdSocket_GetInfo
 +---------------------------------------------------------------------*/
 ATX_METHOD
-BsdSocket_GetInfo(ATX_SocketInstance* instance, ATX_SocketInfo* info)
+BsdSocket_GetInfo(ATX_Socket* _self, ATX_SocketInfo* info)
 {
-    BsdSocket* socket = (BsdSocket*)instance;
+    BsdSocket* self = ATX_SELF(BsdSocket, ATX_Socket);
 
     /* return the cached info */
-    *info = socket->info;
+    *info = self->info;
     
     return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
+|   BsdSocket_GetInterface
++---------------------------------------------------------------------*/
+ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(BsdSocket)
+    ATX_GET_INTERFACE_ACCEPT(BsdSocket, ATX_Socket)
+    ATX_GET_INTERFACE_ACCEPT(BsdSocket, ATX_Destroyable)
+ATX_END_GET_INTERFACE_IMPLEMENTATION(BsdSocket)
+
+/*----------------------------------------------------------------------
 |       ATX_Socket interface
 +---------------------------------------------------------------------*/
-static const ATX_SocketInterface
-BsdSocket_ATX_SocketInterface = {
-    BsdSocket_GetInterface,
+ATX_BEGIN_INTERFACE_MAP(BsdSocket, ATX_Socket)
     BsdSocket_Bind,
     BsdSocket_Connect,
     BsdSocket_GetInputStream,
     BsdSocket_GetOutputStream,
     BsdSocket_GetInfo
-};
+ATX_END_INTERFACE_MAP(BsdSocket, ATX_Socket)
 
 /*----------------------------------------------------------------------
 |       ATX_Destroyable interface
 +---------------------------------------------------------------------*/
-ATX_IMPLEMENT_SIMPLE_DESTROYABLE_INTERFACE(BsdSocket)
+ATX_IMPLEMENT_DESTROYABLE_INTERFACE(BsdSocket)
 
 /*----------------------------------------------------------------------
-|       standard GetInterface implementation
+|       forward declarations
 +---------------------------------------------------------------------*/
-ATX_BEGIN_SIMPLE_GET_INTERFACE_IMPLEMENTATION(BsdSocket) 
-ATX_INTERFACE_MAP_ADD(BsdSocket, ATX_Socket)
-ATX_INTERFACE_MAP_ADD(BsdSocket, ATX_Destroyable)
-ATX_END_SIMPLE_GET_INTERFACE_IMPLEMENTATION(BsdSocket)
+ATX_DECLARE_INTERFACE_MAP(BsdUdpSocket, ATX_DatagramSocket)
+ATX_DECLARE_INTERFACE_MAP(BsdUdpSocket, ATX_Socket)
+ATX_DECLARE_INTERFACE_MAP(BsdUdpSocket, ATX_Destroyable)
 
 /*----------------------------------------------------------------------
 |       ATX_UdpSocket_Create
 +---------------------------------------------------------------------*/
 ATX_Result
-ATX_UdpSocket_Create(ATX_DatagramSocket* object)
+ATX_UdpSocket_Create(ATX_DatagramSocket** object)
 { 
-    BsdSocket* sock;
+    BsdUdpSocket* udp_socket;
 
     /* make sure the TCP/IP stack is initialized */
     ATX_CHECK(BsdSockets_Init());
 
     /* allocate new object */
-    sock = (BsdSocket*)ATX_AllocateZeroMemory(sizeof(BsdSocket));
-    if (socket == NULL) {
-        ATX_CLEAR_OBJECT(object);
+    udp_socket = (BsdUdpSocket*)ATX_AllocateZeroMemory(sizeof(BsdUdpSocket));
+    if (udp_socket == NULL) {
+        *object = NULL;
         return ATX_ERROR_OUT_OF_MEMORY;
     }
 
     /* construct object */
-    BsdSocket_Construct(sock, socket(AF_INET, SOCK_DGRAM, 0));
+    BsdSocket_Construct(&ATX_BASE(udp_socket, BsdSocket), socket(AF_INET, SOCK_DGRAM, 0));
 
     /* set default socket options */
     {
         int option = 1;
-        setsockopt(sock->socket_ref->fd, 
+        setsockopt(ATX_BASE(udp_socket, BsdSocket).socket_ref->fd, 
                    SOL_SOCKET, 
                    SO_REUSEADDR, 
                    (SocketOption)&option, 
                    sizeof(option));
     }
 
-    /* return reference */
-    ATX_INSTANCE(object)  = (ATX_DatagramSocketInstance*)sock;
-    ATX_INTERFACE(object) = &BsdUdpSocket_ATX_DatagramSocketInterface;
+    /* setup the interfaces */
+    ATX_SET_INTERFACE(udp_socket, BsdUdpSocket, ATX_DatagramSocket);
+    ATX_SET_INTERFACE_EX(udp_socket, BsdUdpSocket, BsdSocket, ATX_Socket);
+    ATX_SET_INTERFACE_EX(udp_socket, BsdUdpSocket, BsdSocket, ATX_Destroyable);
+    *object = &ATX_BASE(udp_socket, ATX_DatagramSocket);
 
     return ATX_SUCCESS;
 }
@@ -837,12 +911,12 @@ ATX_UdpSocket_Create(ATX_DatagramSocket* object)
 |       BsdUdpSocket_Destroy
 +---------------------------------------------------------------------*/
 ATX_METHOD
-BsdUdpSocket_Destroy(ATX_DestroyableInstance* instance)
+BsdUdpSocket_Destroy(ATX_Destroyable* _self)
 {
-    BsdSocket* socket = (BsdSocket*)instance;
+    BsdSocket* self = ATX_SELF(BsdSocket, ATX_Destroyable);
 
-    BsdSocket_Destruct(socket);
-    ATX_FreeMemory((void*)socket);
+    BsdSocket_Destruct(self);
+    ATX_FreeMemory((void*)self);
     return ATX_SUCCESS;
 }
 
@@ -850,11 +924,11 @@ BsdUdpSocket_Destroy(ATX_DestroyableInstance* instance)
 |       BsdUdpSocket_Connect
 +---------------------------------------------------------------------*/
 ATX_METHOD
-BsdUdpSocket_Connect(ATX_SocketInstance*      instance,
+BsdUdpSocket_Connect(ATX_Socket*              _self,
                      const ATX_SocketAddress* address,
                      ATX_Timeout              timeout)
 {
-    BsdSocket*         socket = (BsdSocket*)instance;
+    BsdUdpSocket*      self = ATX_SELF_EX(BsdUdpSocket, BsdSocket, ATX_Socket);
     struct sockaddr_in inet_address;
     int                io_result;
     
@@ -865,7 +939,7 @@ BsdUdpSocket_Connect(ATX_SocketInstance*      instance,
     SocketAddressToInetAddress(address, &inet_address);
 
     /* connect so that we can have some addr bound to the socket */
-    io_result = connect(socket->socket_ref->fd, 
+    io_result = connect(ATX_BASE(self, BsdSocket).socket_ref->fd, 
                         (struct sockaddr *)&inet_address, 
                         sizeof(inet_address));
     if (io_result == ATX_BSD_SOCKET_ERROR) { 
@@ -875,7 +949,7 @@ BsdUdpSocket_Connect(ATX_SocketInstance*      instance,
     /* set default socket options */
     {
         int option = 1;
-        setsockopt(socket->socket_ref->fd, 
+        setsockopt(ATX_BASE(self, BsdSocket).socket_ref->fd, 
                 SOL_SOCKET, 
                 SO_BROADCAST, 
                 (SocketOption)&option, 
@@ -883,7 +957,7 @@ BsdUdpSocket_Connect(ATX_SocketInstance*      instance,
     }
 
     /* refresh socket info */
-    BsdSocket_RefreshInfo(socket);
+    BsdSocket_RefreshInfo(&ATX_BASE(self, BsdSocket));
 
     return ATX_SUCCESS;
 }
@@ -892,12 +966,12 @@ BsdUdpSocket_Connect(ATX_SocketInstance*      instance,
 |       BsdUdpSocket_Send
 +---------------------------------------------------------------------*/
 ATX_METHOD 
-BsdUdpSocket_Send(ATX_DatagramSocketInstance* instance,
-                  const ATX_DataBuffer*       packet, 
-                  const ATX_SocketAddress*    address) 
+BsdUdpSocket_Send(ATX_DatagramSocket*      _self,
+                  const ATX_DataBuffer*    packet, 
+                  const ATX_SocketAddress* address) 
 {
-    BsdSocket* socket = (BsdSocket*)instance;
-    int        io_result;
+    BsdUdpSocket* self = ATX_SELF(BsdUdpSocket, ATX_DatagramSocket);
+    int           io_result;
 
     /* get the packet buffer */
     const ATX_Byte* buffer        = ATX_DataBuffer_GetData(packet);
@@ -910,7 +984,7 @@ BsdUdpSocket_Send(ATX_DatagramSocketInstance* instance,
         /* setup an address structure */
         struct sockaddr_in inet_address;
         SocketAddressToInetAddress(address, &inet_address);
-        io_result = sendto(socket->socket_ref->fd, 
+        io_result = sendto(ATX_BASE(self, BsdSocket).socket_ref->fd, 
                            (SocketConstBuffer)buffer, 
                            buffer_length, 
                            0, 
@@ -918,7 +992,7 @@ BsdUdpSocket_Send(ATX_DatagramSocketInstance* instance,
                            sizeof(inet_address));
     } else {
         /* send to whichever addr the socket is connected */
-        io_result = send(socket->socket_ref->fd, 
+        io_result = send(ATX_BASE(self, BsdSocket).socket_ref->fd, 
                          (SocketConstBuffer)buffer, 
                          buffer_length,
                          0);
@@ -936,12 +1010,12 @@ BsdUdpSocket_Send(ATX_DatagramSocketInstance* instance,
 |       BsdUdpSocket_Receive
 +---------------------------------------------------------------------*/
 ATX_METHOD 
-BsdUdpSocket_Receive(ATX_DatagramSocketInstance* instance,
-                     ATX_DataBuffer*             packet, 
-                     ATX_SocketAddress*          address)
+BsdUdpSocket_Receive(ATX_DatagramSocket* _self,
+                     ATX_DataBuffer*     packet, 
+                     ATX_SocketAddress*  address)
 {
-    BsdSocket* socket = (BsdSocket*)instance;
-    int        io_result;
+    BsdUdpSocket* self = ATX_SELF(BsdUdpSocket, ATX_DatagramSocket);
+    int           io_result;
 
     /* get the packet buffer */
     ATX_Byte* buffer        = ATX_DataBuffer_UseData(packet);
@@ -956,7 +1030,7 @@ BsdUdpSocket_Receive(ATX_DatagramSocketInstance* instance,
     if (address != NULL) {
         struct sockaddr_in inet_address;
         socklen_t          inet_address_length = sizeof(inet_address);
-        io_result = recvfrom(socket->socket_ref->fd, 
+        io_result = recvfrom(ATX_BASE(self, BsdSocket).socket_ref->fd, 
                              (SocketBuffer)buffer, 
                              buffer_length, 
                              0, 
@@ -973,7 +1047,7 @@ BsdUdpSocket_Receive(ATX_DatagramSocketInstance* instance,
             ATX_DataBuffer_SetDataSize(packet, 0);
         }
     } else {
-        io_result = recv(socket->socket_ref->fd,
+        io_result = recv(ATX_BASE(self, BsdSocket).socket_ref->fd,
                          (SocketBuffer)buffer,
                          buffer_length,
                          0);
@@ -988,11 +1062,20 @@ BsdUdpSocket_Receive(ATX_DatagramSocketInstance* instance,
 }
 
 /*----------------------------------------------------------------------
+|   BsdUdpSocket_GetInterface
++---------------------------------------------------------------------*/
+ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(BsdUdpSocket)
+    ATX_GET_INTERFACE_ACCEPT_EX(BsdUdpSocket, BsdSocket, ATX_Socket)
+    ATX_GET_INTERFACE_ACCEPT_EX(BsdUdpSocket, BsdSocket, ATX_Destroyable)
+    ATX_GET_INTERFACE_ACCEPT(BsdUdpSocket, ATX_DatagramSocket)
+ATX_END_GET_INTERFACE_IMPLEMENTATION(BsdUdpSocket)
+
+/*----------------------------------------------------------------------
 |       ATX_Socket interface
 +---------------------------------------------------------------------*/
-static const ATX_SocketInterface
-BsdUdpSocket_ATX_SocketInterface = {
-    BsdUdpSocket_GetInterface,
+ATX_IMPLEMENT_GET_INTERFACE_ADAPTER_EX(BsdUdpSocket, BsdSocket, ATX_Socket)
+ATX_INTERFACE_MAP(BsdUdpSocket, ATX_Socket) = {
+    BsdUdpSocket_ATX_Socket_GetInterface,
     BsdSocket_Bind,
     BsdUdpSocket_Connect,
     BsdSocket_GetInputStream,
@@ -1003,83 +1086,73 @@ BsdUdpSocket_ATX_SocketInterface = {
 /*----------------------------------------------------------------------
 |       ATX_DatagramSocket interface
 +---------------------------------------------------------------------*/
-static const ATX_DatagramSocketInterface
-BsdUdpSocket_ATX_DatagramSocketInterface = {
-    BsdUdpSocket_GetInterface,
+ATX_BEGIN_INTERFACE_MAP(BsdUdpSocket, ATX_DatagramSocket)
     BsdUdpSocket_Send,
     BsdUdpSocket_Receive
-};
+ATX_END_INTERFACE_MAP(BsdUdpSocket, ATX_DatagramSocket)
 
 /*----------------------------------------------------------------------
 |       ATX_Destroyable interface
 +---------------------------------------------------------------------*/
-ATX_IMPLEMENT_SIMPLE_DESTROYABLE_INTERFACE(BsdUdpSocket)
+ATX_IMPLEMENT_GET_INTERFACE_ADAPTER_EX(BsdUdpSocket, BsdSocket, ATX_Destroyable)
+ATX_INTERFACE_MAP(BsdUdpSocket, ATX_Destroyable) = {
+    BsdUdpSocket_ATX_Destroyable_GetInterface,
+    BsdUdpSocket_Destroy
+};
 
 /*----------------------------------------------------------------------
-|       standard GetInterface implementation
+|       forward declarations
 +---------------------------------------------------------------------*/
-ATX_BEGIN_SIMPLE_GET_INTERFACE_IMPLEMENTATION(BsdUdpSocket) 
-ATX_INTERFACE_MAP_ADD(BsdUdpSocket, ATX_Socket)
-ATX_INTERFACE_MAP_ADD(BsdUdpSocket, ATX_DatagramSocket)
-ATX_INTERFACE_MAP_ADD(BsdUdpSocket, ATX_Destroyable)
-ATX_END_SIMPLE_GET_INTERFACE_IMPLEMENTATION(BsdUdpSocket)
+ATX_DECLARE_INTERFACE_MAP(BsdTcpClientSocket, ATX_Socket)
+ATX_DECLARE_INTERFACE_MAP(BsdTcpClientSocket, ATX_Destroyable)
 
 /*----------------------------------------------------------------------
 |       ATX_TcpClientSocket_Create
 +---------------------------------------------------------------------*/
 ATX_Result
-ATX_TcpClientSocket_Create(ATX_Socket* object)
+ATX_TcpClientSocket_Create(ATX_Socket** object)
 { 
-    BsdSocket* sock;
+    BsdSocket* client;
 
     /* make sure the TCP/IP stack is initialized */
     ATX_CHECK(BsdSockets_Init());
 
     /* allocate new object */
-    sock = (BsdSocket*)ATX_AllocateZeroMemory(sizeof(BsdSocket));
-    if (sock == NULL) {
-        ATX_CLEAR_OBJECT(object);
+    client = (BsdSocket*)ATX_AllocateZeroMemory(sizeof(BsdSocket));
+    *object = (ATX_Socket*)client;
+    if (client == NULL) {
         return ATX_ERROR_OUT_OF_MEMORY;
     }
 
-    /* construct object */
-    BsdSocket_Construct(sock, socket(AF_INET, SOCK_STREAM, 0));
+    /* construct the object */
+    BsdSocket_Construct(client, socket(AF_INET, SOCK_STREAM, 0));
 
-    /* return reference */
-    ATX_INSTANCE(object)  = (ATX_SocketInstance*)sock;
-    ATX_INTERFACE(object) = &BsdTcpClientSocket_ATX_SocketInterface;
+    /* setup the interfaces */
+    ATX_SET_INTERFACE(client, BsdTcpClientSocket, ATX_Socket);
+    *object = &ATX_BASE(client, ATX_Socket);
 
     return ATX_SUCCESS;
-}
-
-/*----------------------------------------------------------------------
-|       TcpClientSocket_Destroy
-+---------------------------------------------------------------------*/
-ATX_METHOD
-BsdTcpClientSocket_Destroy(ATX_DestroyableInstance* instance)
-{
-    return BsdSocket_Destroy(instance); 
 }
 
 /*----------------------------------------------------------------------
 |       BsdTcpClientSocket_Connect
 +---------------------------------------------------------------------*/
 ATX_METHOD
-BsdTcpClientSocket_Connect(ATX_SocketInstance*      instance,
+BsdTcpClientSocket_Connect(ATX_Socket*              _self,
                            const ATX_SocketAddress* address,
                            ATX_Timeout              timeout)
 {
-    BsdSocket*          socket = (BsdSocket*)instance;
-    struct sockaddr_in  inet_address;
-    SocketFd            socket_fd = socket->socket_ref->fd;
-    int                 io_result;
-    fd_set              read_set;
-    fd_set              write_set;
-    fd_set              except_set;
-    struct timeval      timeout_value;
+    BsdSocket*         self = ATX_SELF(BsdSocket, ATX_Socket);
+    struct sockaddr_in inet_address;
+    SocketFd           socket_fd = self->socket_ref->fd;
+    int                io_result;
+    fd_set             read_set;
+    fd_set             write_set;
+    fd_set             except_set;
+    struct timeval     timeout_value;
 
     /* set the socket to nonblocking so that we can timeout on connect */
-    if (BsdSocket_SetBlockingMode(socket, ATX_FALSE)) {
+    if (BsdSocket_SetBlockingMode(self, ATX_FALSE)) {
         return ATX_FAILURE;
     }
 
@@ -1092,16 +1165,16 @@ BsdTcpClientSocket_Connect(ATX_SocketInstance*      instance,
                         sizeof(inet_address));
     if (io_result == 0) {
         /* immediate connection */
-        BsdSocket_SetBlockingMode(socket, ATX_TRUE);
+        BsdSocket_SetBlockingMode(self, ATX_TRUE);
 
         /* get socket info */
-        BsdSocket_RefreshInfo(socket);
+        BsdSocket_RefreshInfo(self);
 
         return ATX_SUCCESS;
     }
     if (io_result == ATX_BSD_SOCKET_ERROR && GetSocketError() != EINPROGRESS) {
         /* error */
-        return ATX_FAILURE;
+        return MapErrorCode(GetSocketError());
     }
 
     /* wait for connection to succeed or fail */
@@ -1153,46 +1226,46 @@ BsdTcpClientSocket_Connect(ATX_SocketInstance*      instance,
     }
     
     /* put the socket back in blocking mode */
-    BsdSocket_SetBlockingMode(socket, ATX_TRUE);
+    BsdSocket_SetBlockingMode(self, ATX_TRUE);
 
     /* get socket info */
-    BsdSocket_RefreshInfo(socket);
+    BsdSocket_RefreshInfo(self);
 
     /* done */
     return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
+|   BsdTcpClientSocket_GetInterface
++---------------------------------------------------------------------*/
+ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(BsdTcpClientSocket)
+    ATX_GET_INTERFACE_ACCEPT(BsdTcpClientSocket, ATX_Socket)
+    ATX_GET_INTERFACE_ACCEPT(BsdTcpClientSocket, ATX_Destroyable)
+ATX_END_GET_INTERFACE_IMPLEMENTATION(BsdTcpClientSocket)
+
+/*----------------------------------------------------------------------
 |       ATX_Socket interface
 +---------------------------------------------------------------------*/
-static const ATX_SocketInterface
-BsdTcpClientSocket_ATX_SocketInterface = {
-    BsdTcpClientSocket_GetInterface,
+ATX_BEGIN_INTERFACE_MAP(BsdTcpClientSocket, ATX_Socket)
     BsdSocket_Bind,
     BsdTcpClientSocket_Connect,
     BsdSocket_GetInputStream,
     BsdSocket_GetOutputStream,
     BsdSocket_GetInfo
-};
+ATX_END_INTERFACE_MAP(BsdTcpClientSocket, ATX_Socket)
 
 /*----------------------------------------------------------------------
-|       ATX_Destroyable interface
+|       forward declarations
 +---------------------------------------------------------------------*/
-ATX_IMPLEMENT_SIMPLE_DESTROYABLE_INTERFACE(BsdTcpClientSocket)
-
-/*----------------------------------------------------------------------
-|       standard GetInterface implementation
-+---------------------------------------------------------------------*/
-ATX_BEGIN_SIMPLE_GET_INTERFACE_IMPLEMENTATION(BsdTcpClientSocket) 
-ATX_INTERFACE_MAP_ADD(BsdTcpClientSocket, ATX_Socket)
-ATX_INTERFACE_MAP_ADD(BsdTcpClientSocket, ATX_Destroyable)
-ATX_END_SIMPLE_GET_INTERFACE_IMPLEMENTATION(BsdTcpClientSocket)
+ATX_DECLARE_INTERFACE_MAP(BsdTcpServerSocket, ATX_ServerSocket)
+ATX_DECLARE_INTERFACE_MAP(BsdTcpServerSocket, ATX_Socket)
+ATX_DECLARE_INTERFACE_MAP(BsdTcpServerSocket, ATX_Destroyable)
 
 /*----------------------------------------------------------------------
 |       ATX_TcpServerSocket_Create
 +---------------------------------------------------------------------*/
 ATX_Result
-ATX_TcpServerSocket_Create(ATX_ServerSocket* object)
+ATX_TcpServerSocket_Create(ATX_ServerSocket** object)
 { 
     BsdTcpServerSocket* server;
 
@@ -1202,54 +1275,47 @@ ATX_TcpServerSocket_Create(ATX_ServerSocket* object)
     /* allocate new object */
     server = (BsdTcpServerSocket*)ATX_AllocateZeroMemory(sizeof(BsdTcpServerSocket));
     if (server == NULL) {
-        ATX_CLEAR_OBJECT(object);
+        *object = NULL;
         return ATX_ERROR_OUT_OF_MEMORY;
     }
 
     /* construct object */
-    BsdSocket_Construct(&server->base, socket(AF_INET, SOCK_STREAM, 0));
+    BsdSocket_Construct(&ATX_BASE(server,BsdSocket), socket(AF_INET, SOCK_STREAM, 0));
     server->max_clients = 0;
 
     /* set socket options */
     { 
         int option = 1;
-        setsockopt(server->base.socket_ref->fd, 
+        setsockopt(ATX_BASE(server,BsdSocket).socket_ref->fd, 
                 SOL_SOCKET, 
                 SO_REUSEADDR, 
                 (SocketOption)&option, 
                 sizeof(option));
     }
 
-    /* return reference */
-    ATX_INSTANCE(object)  = (ATX_ServerSocketInstance*)server;
-    ATX_INTERFACE(object) = &BsdTcpServerSocket_ATX_ServerSocketInterface;
+    /* setup the interfaces */
+    ATX_SET_INTERFACE(server, BsdTcpServerSocket, ATX_ServerSocket);
+    ATX_SET_INTERFACE_EX(server, BsdTcpServerSocket, BsdSocket, ATX_Socket);
+    ATX_SET_INTERFACE_EX(server, BsdTcpServerSocket, BsdSocket, ATX_Destroyable);
+    *object = &ATX_BASE(server, ATX_ServerSocket);
 
     return ATX_SUCCESS;
-}
-
-/*----------------------------------------------------------------------
-|       TcpServerSocket_Destroy
-+---------------------------------------------------------------------*/
-ATX_METHOD
-BsdTcpServerSocket_Destroy(ATX_DestroyableInstance* instance)
-{
-    return BsdSocket_Destroy(instance); 
 }
 
 /*----------------------------------------------------------------------
 |       BsdTcpServerSocket_Listen
 +---------------------------------------------------------------------*/
 ATX_METHOD
-BsdTcpServerSocket_Listen(ATX_ServerSocketInstance* instance, unsigned int max_clients)
+BsdTcpServerSocket_Listen(ATX_ServerSocket* _self, unsigned int max_clients)
 {
-    BsdTcpServerSocket* socket = (BsdTcpServerSocket*)instance;
+    BsdTcpServerSocket* self = ATX_SELF(BsdTcpServerSocket, ATX_ServerSocket);
 
     /* listen for connections */
-    if (listen(socket->base.socket_ref->fd, max_clients) < 0) {
-        socket->max_clients = 0;
+    if (listen(ATX_BASE(self, BsdSocket).socket_ref->fd, max_clients) < 0) {
+        self->max_clients = 0;
         return ATX_ERROR_LISTEN_FAILED;
     }   
-    socket->max_clients = max_clients;
+    self->max_clients = max_clients;
 
     return ATX_SUCCESS;
 }
@@ -1258,31 +1324,31 @@ BsdTcpServerSocket_Listen(ATX_ServerSocketInstance* instance, unsigned int max_c
 |       BsdTcpServerSocket_WaitForNewClient
 +---------------------------------------------------------------------*/
 ATX_METHOD
-BsdTcpServerSocket_WaitForNewClient(ATX_ServerSocketInstance* instance,
-                                    ATX_Socket*               client)
+BsdTcpServerSocket_WaitForNewClient(ATX_ServerSocket* _self,
+                                    ATX_Socket**      client)
 {
-    BsdTcpServerSocket* server = (BsdTcpServerSocket*)instance;
+    BsdTcpServerSocket* self = ATX_SELF(BsdTcpServerSocket, ATX_ServerSocket);
     struct sockaddr_in  inet_address;
     socklen_t           namelen = sizeof(inet_address);
     SocketFd            socket_fd;
     ATX_Result          result;
 
     /* check that we are listening for clients */
-    if (server->max_clients == 0) {
-        BsdTcpServerSocket_Listen(instance, ATX_TCP_SERVER_SOCKET_DEFAULT_LISTEN_COUNT);
+    if (self->max_clients == 0) {
+        BsdTcpServerSocket_Listen(_self, ATX_TCP_SERVER_SOCKET_DEFAULT_LISTEN_COUNT);
     }
 
     /* wait for incoming connection */
-    socket_fd = accept(server->base.socket_ref->fd, 
+    socket_fd = accept(ATX_BASE(self, BsdSocket).socket_ref->fd, 
                        (struct sockaddr*)&inet_address, 
                        &namelen); 
     if (socket_fd == ATX_BSD_INVALID_SOCKET) {
-        ATX_CLEAR_OBJECT(client);
+        client = NULL;
         return ATX_ERROR_ACCEPT_FAILED;
     }
 
     /* create a new client socket to wrap this file descriptor */
-    result = BsdSocket_Create(server->base.socket_ref->fd, client);
+    result = BsdSocket_Create(socket_fd, client);
     if (result != ATX_SUCCESS) return result;
     
     /* done */
@@ -1290,11 +1356,20 @@ BsdTcpServerSocket_WaitForNewClient(ATX_ServerSocketInstance* instance,
 }
 
 /*----------------------------------------------------------------------
+|   BsdTcpServerSocket_GetInterface
++---------------------------------------------------------------------*/
+ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(BsdTcpServerSocket)
+    ATX_GET_INTERFACE_ACCEPT_EX(BsdTcpServerSocket, BsdSocket, ATX_Socket)
+    ATX_GET_INTERFACE_ACCEPT_EX(BsdTcpServerSocket, BsdSocket, ATX_Destroyable)
+    ATX_GET_INTERFACE_ACCEPT(BsdTcpServerSocket, ATX_ServerSocket)
+ATX_END_GET_INTERFACE_IMPLEMENTATION(BsdTcpServerSocket)
+
+/*----------------------------------------------------------------------
 |       ATX_Socket interface
 +---------------------------------------------------------------------*/
-static const ATX_SocketInterface
-BsdTcpServerSocket_ATX_SocketInterface = {
-    BsdTcpServerSocket_GetInterface,
+ATX_IMPLEMENT_GET_INTERFACE_ADAPTER_EX(BsdTcpServerSocket, BsdSocket, ATX_Socket)
+ATX_INTERFACE_MAP(BsdTcpServerSocket, ATX_Socket) = {
+    BsdTcpServerSocket_ATX_Socket_GetInterface,
     BsdSocket_Bind,
     BsdSocket_Connect,
     BsdSocket_GetInputStream,
@@ -1305,26 +1380,19 @@ BsdTcpServerSocket_ATX_SocketInterface = {
 /*----------------------------------------------------------------------
 |       ATX_ServerSocket interface
 +---------------------------------------------------------------------*/
-static const ATX_ServerSocketInterface
-BsdTcpServerSocket_ATX_ServerSocketInterface = {
-    BsdTcpServerSocket_GetInterface,
+ATX_BEGIN_INTERFACE_MAP(BsdTcpServerSocket, ATX_ServerSocket)
     BsdTcpServerSocket_Listen,
     BsdTcpServerSocket_WaitForNewClient
-};
+ATX_END_INTERFACE_MAP(BsdTcpServerSocket, ATX_ServerSocket)
 
 /*----------------------------------------------------------------------
 |       ATX_Destroyable interface
 +---------------------------------------------------------------------*/
-ATX_IMPLEMENT_SIMPLE_DESTROYABLE_INTERFACE(BsdTcpServerSocket)
-
-/*----------------------------------------------------------------------
-|       standard GetInterface implementation
-+---------------------------------------------------------------------*/
-ATX_BEGIN_SIMPLE_GET_INTERFACE_IMPLEMENTATION(BsdTcpServerSocket) 
-ATX_INTERFACE_MAP_ADD(BsdTcpServerSocket, ATX_Socket)
-ATX_INTERFACE_MAP_ADD(BsdTcpServerSocket, ATX_ServerSocket)
-ATX_INTERFACE_MAP_ADD(BsdTcpServerSocket, ATX_Destroyable)
-ATX_END_SIMPLE_GET_INTERFACE_IMPLEMENTATION(BsdTcpServerSocket)
+ATX_IMPLEMENT_GET_INTERFACE_ADAPTER_EX(BsdTcpServerSocket, BsdSocket, ATX_Destroyable)
+ATX_INTERFACE_MAP(BsdTcpServerSocket, ATX_Destroyable) = {
+    BsdTcpServerSocket_ATX_Destroyable_GetInterface,
+    BsdSocket_Destroy
+};
 
 
 

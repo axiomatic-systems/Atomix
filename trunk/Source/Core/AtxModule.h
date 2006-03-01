@@ -4,7 +4,7 @@
 |
 |      Atomix - Module Interface
 |
-|      (c) 2002-2003 Gilles Boccon-Gibod
+|      (c) 2002-2006 Gilles Boccon-Gibod
 |      Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
@@ -36,15 +36,14 @@ ATX_DECLARE_INTERFACE(ATX_Module)
  */
 ATX_BEGIN_INTERFACE_DEFINITION(ATX_Module)
     /** create an instance of the module that implements a given interface
-     * @param instance Instance pointer of the object on which the method 
-     * is called 
+     * @param self Pointer to the object on which the method is called 
      * @param parameters Generic parameters used for constructing the object
      * @param interface_id Interface ID that the object needs to implement
      * @param object address of an object reference where the created object
      * will be returned if the call succeeds
      * @atx_method_result
      */
-    ATX_Result (*CreateInstance)(ATX_ModuleInstance*    instance,
+    ATX_Result (*CreateInstance)(ATX_Module*            self,
                                  ATX_String             parameters,
                                  const ATX_InterfaceId* interface_id,
                                  ATX_Object*            object);
@@ -55,10 +54,10 @@ ATX_END_INTERFACE_DEFINITION(ATX_Module)
 +---------------------------------------------------------------------*/
 /** 
  * Convenience macro for calling the CreateObject method of the 
- * ATX_Clas interface.
+ * ATX_Module interface.
  */
-#define ATX_Module_CreateObject(object, parameters, interface_id, result) \
-ATX_INTERFACE(object)->CreateObject(ATX_INSTANCE(object),                 \
+#define ATX_Module_CreateObject(self, parameters, interface_id, result)   \
+ATX_INTERFACE(object)->CreateObject(self,                                 \
                                     parameters,                           \
                                     interface_id,                         \
                                     result)

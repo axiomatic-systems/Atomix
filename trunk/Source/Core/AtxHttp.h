@@ -17,7 +17,7 @@
 +---------------------------------------------------------------------*/
 #include "AtxTypes.h"
 #include "AtxDefs.h"
-#include "AtxErrors.h"
+#include "AtxResults.h"
 #include "AtxUtils.h"
 #include "AtxInterfaces.h"
 #include "AtxProperties.h"

@@ -14,7 +14,6 @@ ATX_COMPILE_C   = gcc
 ATX_FLAGS_C     = -pedantic
 ATX_DEFINES_C   = -D_REENTRANT -D_BSD_SOURCE
 ATX_WARNINGS_C  = -Werror -Wall -W -Wundef -Wmissing-prototypes -Wmissing-declarations -Wno-long-long
-ATX_OPTIMIZE_C  = -O3
 ATX_AUTODEP_C   = gcc -MM
 ATX_LINK_C      = gcc
 

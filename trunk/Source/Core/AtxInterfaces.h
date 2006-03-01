@@ -50,24 +50,6 @@ typedef struct {
     unsigned long version;  /**< version integer        */
 } ATX_InterfaceId;
 
-/**
- * Generic opaque instance data structure
- */
-typedef struct ATX_Instance ATX_Instance;
-
-/**
- * Generic interface function table structure
- */
-typedef struct ATX_Interface ATX_Interface;
-
-/**
- * Generic untyped object reference
- */
-typedef struct {
-    ATX_Instance*        instance;  /**< object instance pointer  */
-    const ATX_Interface* interface; /**< object interface pointer */
-} ATX_Object;
-
 /*----------------------------------------------------------------------
 |       macros
 +---------------------------------------------------------------------*/
@@ -77,154 +59,143 @@ typedef struct {
 #define ATX_INTERFACE_ID_TYPE_MOD extern const
 #endif /* __cplusplus */
 
+#define ATX_OFFSET_OF(_member,_type) (ATX_POINTER_TO_LONG(&( ((_type *)0)->_member)))
 
-#define ATX_DECLARE_INTERFACE(name)                                 \
-ATX_INTERFACE_ID_TYPE_MOD ATX_InterfaceId ATX_INTERFACE_ID__##name; \
-typedef struct name##Instance name##Instance;                       \
-typedef struct name##Interface name##Interface;                     \
-typedef struct {                                                    \
-    name##Instance*        instance;                                \
-    const name##Interface* interface;                               \
-} name##Object, name;
+#define ATX_SELF(_self_type, _interface_type) \
+( (_self_type *)( ((ATX_Byte*)(_self)) - ATX_OFFSET_OF(_interface_type##_Base, _self_type)) )
 
-#define ATX_BEGIN_INTERFACE_DEFINITION(name) struct name##Interface {   \
-    ATX_Result (*GetInterface)(ATX_Instance*          instance,         \
-                               const ATX_InterfaceId* id,               \
-                               const ATX_Interface**  interface);     
-#define ATX_END_INTERFACE_DEFINITION(name) };
+#define ATX_SELF_EX(_self_type, _base_type, _interface_type) \
+( (_self_type *)( ((ATX_Byte*)(_self)) - ATX_OFFSET_OF(_base_type##_Base._interface_type##_Base, _self_type)) )
 
-/**
- * Returns the instance pointer of an object reference.
- */
-#define ATX_INSTANCE(object) ((object)->instance)
+#define ATX_BASE(_object, _base) (_object)->_base##_Base
+
+#define ATX_DECLARE_INTERFACE(_iface)                                   \
+ATX_INTERFACE_ID_TYPE_MOD ATX_InterfaceId ATX_INTERFACE_ID__##_iface;   \
+typedef struct _iface##Interface _iface##Interface;                     \
+typedef struct {                                                        \
+    const _iface##Interface* interface;                                 \
+} _iface;
+
+#define ATX_BEGIN_INTERFACE_DEFINITION(_iface) struct _iface##Interface { \
+    ATX_Object* (*GetInterface)(_iface*                instance,       \
+                                const ATX_InterfaceId* id);     
+#define ATX_END_INTERFACE_DEFINITION(_iface) };
+
+#define ATX_BEGIN_INTERFACE_IMPLEMENTATION(_iface,_class)       \
+static const _iface##Interface _class##_##_class##Interface = { \
+    _class##_GetInterface,                                      
+#define ATX_END_INTERFACE_IMPLEMENTATION(_iface,_class) };
+
+#define ATX_IMPLEMENTS(_iface) _iface _iface##_Base
+#define ATX_EXTENDS(_class)    _class _class##_Base
 
 /**
  * Returns the interface pointer of an object reference.
  */
-#define ATX_INTERFACE(object) ((object)->interface)
+#define ATX_INTERFACE(_object) ((_object)->interface)
 
 /**
- * Calls the GetInterface() method of an object to get an interface pointer
- *
- * Call the GetInterface() method of and object for a given interface ID. 
- * This macro returns the return value of the GetInterface() method call.
+ * Returns the interface pointer of a class that implements
+ * multiple interfaces.
  */
-#define ATX_GET_INTERFACE(_object, _if_name, _interface) \
-ATX_INTERFACE(_object)->GetInterface(                    \
-    (ATX_Instance*)ATX_INSTANCE(_object),                \
-    &ATX_INTERFACE_ID__##_if_name,                       \
-    (const ATX_Interface**)(_interface))
-
-/** 
- * Casts an object reference into a reference to the same object with a
- * different interface.
- *
- * If the cast succeeds (i.e the object reference we are casting from is
- * a reference to an object that implements the interface we are requesting),
- * this macro evaluates to ATX_SUCCESS, else it evaluates to a negative
- * error code (typically ATX_ERROR_NO_SUCH_INTERFACE)
- */
-#define ATX_CAST_OBJECT(_from_object, _to_object, _if_name)                \
-ATX_INTERFACE(_from_object)->GetInterface(                                 \
-        (ATX_Instance*)                                                    \
-        (ATX_INSTANCE(_to_object) =                                        \
-        ((_if_name##Instance*)ATX_INSTANCE(_from_object))),                \
-        &ATX_INTERFACE_ID__##_if_name,                                     \
-        (const ATX_Interface**)&ATX_INTERFACE(_to_object)) 
+#define ATX_INTERFACE_C(_object,_iface) ((_object)->_iface##_Base.interface)
 
 /**
- * Static initializer for NULL object references.
  */
-#define ATX_NULL_OBJECT {0,0}
-
-/**
- * Clear an object reference.
- * Clearing an object reference sets the instance and interface pointers
- * to NULL. When a reference has been cleared, ATX_INSTANCE_IS_NULL(ref)
- * evaluates to 'true'
- */
-#define ATX_CLEAR_OBJECT(object) do {   \
-    (object)->instance  = NULL;         \
-    (object)->interface = NULL;         \
-} while(0)
-
-/**
- * Test if an object reference has a NULL instance pointer
- */
-#define ATX_INSTANCE_IS_NULL(object) ((object)->instance == NULL)
-
-/**
- * Test if an object reference has a NULL interface pointer
- */
-#define ATX_INTERFACE_IS_NULL(object) ((object)->interface == NULL)
-
-/**
- * Test if an object reference is a NULL reference
- */
-#define ATX_OBJECT_IS_NULL(object) ATX_INTERFACE_IS_NULL(object)
+#define ATX_CAST(_object, _iface)                   \
+(_iface*)ATX_INTERFACE(_object)->GetInterface(      \
+    _object,                                        \
+    &ATX_INTERFACE_ID__##_iface)
 
 /**
  * Returns a reference to an interface ID constant
  */
-#define ATX_INTERFACE_ID(i) ATX_INTERFACE_ID__##i
+#define ATX_INTERFACE_ID(_iface) ATX_INTERFACE_ID__##_iface
 
 /**
  * Tests if two interface ID constants (ATX_InterfaceId type) are equal
  */
-#define ATX_INTERFACE_IDS_EQUAL(ia,ib) \
-(((ia)->type == (ib)->type) && ((ia)->version == (ib)->version))
+#define ATX_INTERFACE_IDS_EQUAL(_iface_a,_iface_b) \
+(((_iface_a)->type == (_iface_b)->type) && ((_iface_a)->version == (_iface_b)->version))
 
-#define ATX_DECLARE_SIMPLE_GET_INTERFACE_IMPLEMENTATION(_prefix)            \
-ATX_METHOD _prefix##_GetInterface(ATX_Instance*         instance,           \
-                                  const ATX_InterfaceId* id,                \
-                                  const ATX_Interface**  interface);     
+#define ATX_DECLARE_GET_INTERFACE_IMPLEMENTATION(_class)                     \
+static ATX_Object* _class##_GetInterface(_class*                self,        \
+                                         const ATX_InterfaceId* id);
 
-#define ATX_BEGIN_SIMPLE_GET_INTERFACE_IMPLEMENTATION(_prefix)               \
-static const ATX_PolymorphicInterface _prefix##_ATX_PolymorphicInterface = { \
-    _prefix##_GetInterface                                                   \
-};                                                                           \
-ATX_METHOD _prefix##_GetInterface(ATX_Instance*          instance,           \
-                                  const ATX_InterfaceId* id,                 \
-                                  const ATX_Interface**  interface)          \
+#define ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(_class)                       \
+static ATX_Object* _class##_GetInterface(_class*                self,        \
+                                  const ATX_InterfaceId* id)                 \
 {                                                                            \
-    (void)instance;                                                          \
-    if (ATX_INTERFACE_IDS_EQUAL(id, &ATX_INTERFACE_ID__ATX_Polymorphic)) {   \
-        if (interface) {                                                     \
-            *interface = (const ATX_Interface*)(void*)                       \
-                         &(_prefix##_ATX_PolymorphicInterface);              \
-        }                                                                    \
-        return ATX_SUCCESS;                                                  \
+    if (ATX_INTERFACE_IDS_EQUAL(id, &ATX_INTERFACE_ID__ATX_Object)) {        \
+        return (ATX_Object*)self;                                            \
     }
 
-#define ATX_INTERFACE_MAP_ADD(_name_pfx, _interface_pfx)                     \
-else if (ATX_INTERFACE_IDS_EQUAL(id, &ATX_INTERFACE_ID__##_interface_pfx)) { \
-    if (interface) {                                                         \
-        *interface = (const ATX_Interface*)(void*)                           \
-                     &(_name_pfx##_##_interface_pfx##Interface);             \
-    }                                                                        \
-    return ATX_SUCCESS;                                                      \
-}
+#define ATX_GET_INTERFACE_ACCEPT(_class, _iface)                             \
+    else if (ATX_INTERFACE_IDS_EQUAL(id, &ATX_INTERFACE_ID__##_iface)) {     \
+        return (ATX_Object*)&(self->_iface##_Base);                          \
+    }
 
-#define ATX_END_SIMPLE_GET_INTERFACE_IMPLEMENTATION(_prefix)                 \
+#define ATX_GET_INTERFACE_ACCEPT_EX(_class, _base, _iface)                   \
+    else if (ATX_INTERFACE_IDS_EQUAL(id, &ATX_INTERFACE_ID__##_iface)) {     \
+        return (ATX_Object*)&(self->_base##_Base._iface##_Base);             \
+    }
+
+#define ATX_END_GET_INTERFACE_IMPLEMENTATION(_class)                         \
     else {                                                                   \
-        return ATX_ERROR_NO_SUCH_INTERFACE;                                  \
+        return NULL;                                                         \
     }                                                                        \
 }                                                                            \
 
+#define ATX_IMPLEMENT_GET_INTERFACE_ADAPTER(_class,_iface)                   \
+static ATX_Object*                                                           \
+_class##_##_iface##_GetInterface(_iface* _self, const ATX_InterfaceId* id)   \
+{                                                                            \
+    return _class##_GetInterface(ATX_SELF(_class,_iface), id);               \
+}
+
+#define ATX_IMPLEMENT_GET_INTERFACE_ADAPTER_EX(_class,_base,_iface)          \
+static ATX_Object*                                                           \
+_class##_##_iface##_GetInterface(_iface* _self, const ATX_InterfaceId* id)   \
+{                                                                            \
+    return _class##_GetInterface(ATX_SELF_EX(_class,_base,_iface), id);      \
+}
+
+#define ATX_GET_INTERFACE_ADAPTER(_class, _iface) \
+_class##_##_iface##_GetInterface
+
+#define ATX_INTERFACE_MAP(_class, _iface) \
+static const _iface##Interface _class##_##_iface##Interface
+
+#define ATX_DECLARE_INTERFACE_MAP(_class, _iface) \
+ATX_INTERFACE_MAP(_class, _iface);
+
+#define ATX_BEGIN_INTERFACE_MAP(_class,_iface)      \
+ATX_IMPLEMENT_GET_INTERFACE_ADAPTER(_class,_iface)  \
+ATX_INTERFACE_MAP(_class,_iface) = {                \
+    ATX_GET_INTERFACE_ADAPTER(_class,_iface), 
+
+#define ATX_END_INTERFACE_MAP(_class,_iface) };
+
+#define ATX_SET_INTERFACE(_object, _class, _iface) \
+(_object)->_iface##_Base.interface = & _class##_##_iface##Interface
+
+#define ATX_SET_INTERFACE_EX(_object, _class, _base, _iface) \
+(_object)->_base##_Base._iface##_Base.interface = & _class##_##_iface##Interface
+
 /*----------------------------------------------------------------------
-|       ATX_Polymorphic interface
+|       ATX_Object interface
 +---------------------------------------------------------------------*/
 /**
- * Basic interface implicitely implemented by all objects in the framework.
- *
- * The ATX_Polymorphic interface is implicitely implemented by all objects
- * in the framework, and allows the client of an object to query the object
- * and obtain an interface pointer to any interface implemented by that 
- * object. This interface has a single method called GetInterface().
- */
-ATX_DECLARE_INTERFACE(ATX_Polymorphic)
-ATX_BEGIN_INTERFACE_DEFINITION(ATX_Polymorphic)
-ATX_END_INTERFACE_DEFINITION(ATX_Polymorphic)
+* Basic interface implemented by all objects in the framework.
+*
+* The ATX_Object interface is implemented by all objects
+* in the framework and allows the client of an object to query the object
+* and obtain an interface pointer to any interface implemented by that 
+* object. This interface has a single method called GetInterface().
+*/
+ATX_DECLARE_INTERFACE(ATX_Object)
+ATX_BEGIN_INTERFACE_DEFINITION(ATX_Object)
+ATX_END_INTERFACE_DEFINITION(ATX_Object)
 
 #endif /* _ATX_INTERFACES_H_ */
 

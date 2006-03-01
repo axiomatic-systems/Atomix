@@ -1,26 +1,26 @@
 /*****************************************************************
 |
-|      File: AtxProperties.c
+|   File: AtxProperties.c
 |
-|      Atomix - Properties Interface
+|   Atomix - Properties Interface
 |
-|      (c) 2002-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2002-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "AtxInterfaces.h"
 #include "AtxTypes.h"
 #include "AtxUtils.h"
-#include "AtxErrors.h"
+#include "AtxResults.h"
 #include "AtxDestroyable.h"
 #include "AtxProperties.h"
 
 /*----------------------------------------------------------------------
-|       types
+|   types
 +---------------------------------------------------------------------*/
 typedef struct PropertyNode {
     ATX_Property         property;
@@ -29,34 +29,44 @@ typedef struct PropertyNode {
 
 typedef struct PropertyListenerNode {
     ATX_CString                  name;
-    ATX_PropertyListener         listener;
+    ATX_PropertyListener*        listener;
     struct PropertyListenerNode* next;
 } PropertyListenerNode;
 
 typedef struct {
+    /* interfaces */
+    ATX_IMPLEMENTS(ATX_Properties);
+    ATX_IMPLEMENTS(ATX_Destroyable);
+
+    /* members */
     PropertyNode*         property_nodes;
     PropertyListenerNode* listener_nodes;
 } Properties;
 
 typedef struct {
+    /* interfaces */
+    ATX_IMPLEMENTS(ATX_Iterator);
+    ATX_IMPLEMENTS(ATX_Destroyable);
+
+    /* members */
     Properties*   properties;
     PropertyNode* node;
 } PropertiesIterator;
 
 /*----------------------------------------------------------------------
-|      forward declarations
+|  forward declarations
 +---------------------------------------------------------------------*/
-static const ATX_PropertiesInterface Properties_ATX_PropertiesInterface;
-ATX_DECLARE_SIMPLE_GET_INTERFACE_IMPLEMENTATION(Properties)
-static const ATX_IteratorInterface PropertiesIterator_ATX_IteratorInterface;
-ATX_DECLARE_SIMPLE_GET_INTERFACE_IMPLEMENTATION(PropertiesIterator)
+ATX_INTERFACE_MAP(Properties, ATX_Properties);
+ATX_INTERFACE_MAP(Properties, ATX_Destroyable);
+ATX_INTERFACE_MAP(PropertiesIterator, ATX_Iterator);
+ATX_INTERFACE_MAP(PropertiesIterator, ATX_Destroyable);
 
 /*----------------------------------------------------------------------
-|       PropertiesIterator_Create
+|   PropertiesIterator_Create
 +---------------------------------------------------------------------*/
 static ATX_Result
-PropertiesIterator_Create(Properties*   properties,
-                          ATX_Iterator* object)
+PropertiesIterator_Create(Properties*    properties,
+                          ATX_Iterator** object)
 {
     PropertiesIterator* iterator;
 
@@ -64,7 +74,7 @@ PropertiesIterator_Create(Properties*   properties,
     iterator = (PropertiesIterator*)
         ATX_AllocateMemory(sizeof(PropertiesIterator));
     if (iterator == NULL) {
-        ATX_CLEAR_OBJECT(object);
+        *object = NULL;
         return ATX_ERROR_OUT_OF_MEMORY;
     }
     
@@ -72,35 +82,36 @@ PropertiesIterator_Create(Properties*   properties,
     iterator->properties = properties;
     iterator->node = properties->property_nodes;
 
-    /* return an object reference */
-    ATX_INSTANCE(object) = (ATX_IteratorInstance*)iterator;
-    ATX_INTERFACE(object) = &PropertiesIterator_ATX_IteratorInterface;
+    /* setup the interfaces */
+    ATX_SET_INTERFACE(iterator, PropertiesIterator, ATX_Iterator);
+    ATX_SET_INTERFACE(iterator, PropertiesIterator, ATX_Destroyable);
+    *object = &ATX_BASE(iterator, ATX_Iterator);
 
     return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|       PropertiesIterator_Destroy
+|   PropertiesIterator_Destroy
 +---------------------------------------------------------------------*/
 ATX_METHOD
-PropertiesIterator_Destroy(ATX_DestroyableInstance* instance)
+PropertiesIterator_Destroy(ATX_Destroyable* _self)
 {
-    ATX_FreeMemory(instance);
+    ATX_FreeMemory((void*)ATX_SELF(Properties, ATX_Destroyable));
 
     return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|       PropertiesIterator_GetNext
+|   PropertiesIterator_GetNext
 +---------------------------------------------------------------------*/
 ATX_METHOD
-PropertiesIterator_GetNext(ATX_IteratorInstance* instance,
-                           ATX_Any*              item)
+PropertiesIterator_GetNext(ATX_Iterator* _self,
+                           ATX_Any*      item)
 {
-    PropertiesIterator* iterator = (PropertiesIterator*)instance;
-    if (iterator->node) {
-        *item = (ATX_Any)iterator->node;
-        iterator->node = iterator->node->next;
+    PropertiesIterator* self = ATX_SELF(PropertiesIterator, ATX_Iterator);
+    if (self->node) {
+        *item = (ATX_Any)self->node;
+        self->node = self->node->next;
     } else {
         *item = (ATX_Any)NULL;
         return ATX_ERROR_END_OF_ITERATION;
@@ -112,37 +123,36 @@ PropertiesIterator_GetNext(ATX_IteratorInstance* instance,
 |       PropertiesIterator_Reset
 +---------------------------------------------------------------------*/
 ATX_METHOD
-PropertiesIterator_Reset(ATX_IteratorInstance* instance)
+PropertiesIterator_Reset(ATX_Iterator* _self)
 {
-    PropertiesIterator* iterator = (PropertiesIterator*)instance;
+    PropertiesIterator* self = ATX_SELF(PropertiesIterator, ATX_Iterator);
 
     /* reset to the first node */
-    iterator->node = iterator->properties->property_nodes;
+    self->node = self->properties->property_nodes;
 
     return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
+|       GetInterface implementation
++---------------------------------------------------------------------*/
+ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(PropertiesIterator) 
+    ATX_GET_INTERFACE_ACCEPT(PropertiesIterator, ATX_Iterator)
+    ATX_GET_INTERFACE_ACCEPT(PropertiesIterator, ATX_Destroyable)
+ATX_END_GET_INTERFACE_IMPLEMENTATION(PropertiesIterator)
+
+/*----------------------------------------------------------------------
 |      ATX_Destroyable interface
 +---------------------------------------------------------------------*/
-ATX_IMPLEMENT_SIMPLE_DESTROYABLE_INTERFACE(PropertiesIterator)
+ATX_IMPLEMENT_DESTROYABLE_INTERFACE(PropertiesIterator)
 
 /*----------------------------------------------------------------------
 |      ATX_Iterator interface
 +---------------------------------------------------------------------*/
-static const ATX_IteratorInterface PropertiesIterator_ATX_IteratorInterface = {
-    PropertiesIterator_GetInterface,
+ATX_BEGIN_INTERFACE_MAP(PropertiesIterator, ATX_Iterator)
     PropertiesIterator_GetNext,
     PropertiesIterator_Reset
-};
-
-/*----------------------------------------------------------------------
-|       standard GetInterface implementation
-+---------------------------------------------------------------------*/
-ATX_BEGIN_SIMPLE_GET_INTERFACE_IMPLEMENTATION(PropertiesIterator) 
-ATX_INTERFACE_MAP_ADD(PropertiesIterator, ATX_Iterator)
-ATX_INTERFACE_MAP_ADD(PropertiesIterator, ATX_Destroyable)
-ATX_END_SIMPLE_GET_INTERFACE_IMPLEMENTATION(PropertiesIterator)
+ATX_END_INTERFACE_MAP(PropertiesIterator, ATX_Iterator)
 
 /*----------------------------------------------------------------------
 |       PropertyNode_SetValue
@@ -262,7 +272,7 @@ PropertyListenerNode_Create(ATX_CString           name,
 
     /* construct the node */
     node->next     = NULL;
-    node->listener = *listener;
+    node->listener = listener;
     if (name != NULL) {
         node->name = ATX_DuplicateString(name);
     } else {
@@ -291,7 +301,7 @@ PropertyListenerNode_Destroy(PropertyListenerNode* node)
 |       Properties_NotifyListeners
 +---------------------------------------------------------------------*/
 static void
-Properties_NotifyListeners(Properties*              properties,
+Properties_NotifyListeners(Properties*              self,
                            ATX_CString              name,
                            ATX_PropertyType         type,
                            const ATX_PropertyValue* value)
@@ -299,10 +309,10 @@ Properties_NotifyListeners(Properties*              properties,
     PropertyListenerNode* node;
 
     /* look for listeners registered for this name */
-    node = properties->listener_nodes;
+    node = self->listener_nodes;
     while (node) {
         if (node->name == NULL || ATX_StringsEqual(node->name, name)) {
-            ATX_PropertyListener_OnPropertyChanged(&node->listener,
+            ATX_PropertyListener_OnPropertyChanged(node->listener,
                                                    name,
                                                    type,
                                                    value);
@@ -315,12 +325,12 @@ Properties_NotifyListeners(Properties*              properties,
 |       Properties_FindProperty
 +---------------------------------------------------------------------*/
 static PropertyNode*
-Properties_FindProperty(Properties* properties, ATX_CString name)
+Properties_FindProperty(Properties* self, ATX_CString name)
 {
     PropertyNode* node; 
 
     /* find the node with that name */
-    node = properties->property_nodes;
+    node = self->property_nodes;
     while (node) {
         if (ATX_StringsEqual(node->property.name, name)) {
             /* match */
@@ -337,15 +347,15 @@ Properties_FindProperty(Properties* properties, ATX_CString name)
 |       Properties_GetProperty
 +---------------------------------------------------------------------*/
 ATX_METHOD
-Properties_GetProperty(ATX_PropertiesInstance* instance,
-                       ATX_CString             name,
-                       ATX_Property*           property)
+Properties_GetProperty(ATX_Properties* _self,
+                       ATX_CString     name,
+                       ATX_Property*   property)
 {
-    Properties*   properties = (Properties*)instance;
+    Properties*   self = ATX_SELF(Properties, ATX_Properties);
     PropertyNode* node; 
 
     /* find the node with that name */
-    node = Properties_FindProperty(properties, name);
+    node = Properties_FindProperty(self, name);
     if (node) {
         *property = node->property;
         return ATX_SUCCESS;
@@ -358,12 +368,12 @@ Properties_GetProperty(ATX_PropertiesInstance* instance,
 |       Properties_SetProperty
 +---------------------------------------------------------------------*/
 ATX_METHOD
-Properties_SetProperty(ATX_PropertiesInstance*  instance,
+Properties_SetProperty(ATX_Properties*          _self,
                        ATX_CString              name,
                        ATX_PropertyType         type,
                        const ATX_PropertyValue* value)
 {
-    Properties*   properties = (Properties*)instance;
+    Properties*   self = ATX_SELF(Properties, ATX_Properties);
     PropertyNode* node;
 
     /* check parameters */
@@ -372,7 +382,7 @@ Properties_SetProperty(ATX_PropertiesInstance*  instance,
     }
 
     /* find the property with that name */
-    node = Properties_FindProperty(properties, name);
+    node = Properties_FindProperty(self, name);
     if (node) {
         /* a property with that name exists, check the type */
         if (node->property.type != type) {
@@ -386,12 +396,12 @@ Properties_SetProperty(ATX_PropertiesInstance*  instance,
         if (node == NULL) return ATX_ERROR_OUT_OF_MEMORY;
 
         /* add the node to the list */
-        node->next = properties->property_nodes;
-        properties->property_nodes = node;
+        node->next = self->property_nodes;
+        self->property_nodes = node;
     } 
 
     /* notify the listeners */
-    Properties_NotifyListeners(properties, name, type, value);
+    Properties_NotifyListeners(self, name, type, value);
 
     return ATX_SUCCESS;
 }
@@ -400,15 +410,14 @@ Properties_SetProperty(ATX_PropertiesInstance*  instance,
 |       Properties_UnsetProperty
 +---------------------------------------------------------------------*/
 ATX_METHOD
-Properties_UnsetProperty(ATX_PropertiesInstance* instance,
-                         ATX_CString             name)
+Properties_UnsetProperty(ATX_Properties* _self, ATX_CString name)
 {
-    Properties*   properties = (Properties*)instance;
+    Properties*   self = ATX_SELF(Properties, ATX_Properties);
     PropertyNode* node;
     PropertyNode* prev;
 
     /* find and remove the property */
-    node = properties->property_nodes;
+    node = self->property_nodes;
     prev = NULL;
     while (node) {
         if (ATX_StringsEqual(node->property.name, name)) {
@@ -416,11 +425,11 @@ Properties_UnsetProperty(ATX_PropertiesInstance* instance,
             if (prev) {
                 prev->next = node->next;
             } else {
-                properties->property_nodes = node->next;
+                self->property_nodes = node->next;
             }
     
             /* notify the listeners */
-            Properties_NotifyListeners(properties, 
+            Properties_NotifyListeners(self, 
                                        name, 
                                        ATX_PROPERTY_TYPE_NONE, 
                                        NULL);
@@ -440,15 +449,15 @@ Properties_UnsetProperty(ATX_PropertiesInstance* instance,
 |       Properties_Clear
 +---------------------------------------------------------------------*/
 ATX_METHOD
-Properties_Clear(ATX_PropertiesInstance* instance)
+Properties_Clear(ATX_Properties* _self)
 {
-    Properties*   properties = (Properties*)instance;
+    Properties*   self = ATX_SELF(Properties, ATX_Properties);
     PropertyNode* property_node;
 
     /* notify the listeners */
-    PropertyListenerNode* node = properties->listener_nodes;
+    PropertyListenerNode* node = self->listener_nodes;
     while (node) {
-        ATX_PropertyListener_OnPropertyChanged(&node->listener, 
+        ATX_PropertyListener_OnPropertyChanged(node->listener, 
                                                node->name, 
                                                ATX_PROPERTY_TYPE_NONE, 
                                                NULL);
@@ -456,7 +465,7 @@ Properties_Clear(ATX_PropertiesInstance* instance)
     }
 
     /* free property nodes */
-    property_node = properties->property_nodes;
+    property_node = self->property_nodes;
     while (property_node) {
         PropertyNode* next = property_node->next;
         PropertyNode_Destroy(property_node);
@@ -464,7 +473,7 @@ Properties_Clear(ATX_PropertiesInstance* instance)
     }
 
     /* clear the head */
-    properties->property_nodes = NULL;
+    self->property_nodes = NULL;
 
     return ATX_SUCCESS;
 }
@@ -473,24 +482,24 @@ Properties_Clear(ATX_PropertiesInstance* instance)
 |       Properties_GetIterator
 +---------------------------------------------------------------------*/
 ATX_METHOD
-Properties_GetIterator(ATX_PropertiesInstance* instance,
-                       ATX_Iterator*           iterator)
+Properties_GetIterator(ATX_Properties* _self,
+                       ATX_Iterator**  iterator)
 {
-    Properties* properties = (Properties*)instance;
+    Properties* self = ATX_SELF(Properties, ATX_Properties);
 
-    return PropertiesIterator_Create(properties, iterator);
+    return PropertiesIterator_Create(self, iterator);
 }
 
 /*----------------------------------------------------------------------
 |       Properties_AddListener
 +---------------------------------------------------------------------*/
 ATX_METHOD
-Properties_AddListener(ATX_PropertiesInstance*     instance,
+Properties_AddListener(ATX_Properties*             _self,
                        ATX_CString                 name,
                        ATX_PropertyListener*       listener, 
                        ATX_PropertyListenerHandle* handle)
 {
-    Properties*           properties = (Properties*)instance;
+    Properties*           self = ATX_SELF(Properties, ATX_Properties);
     PropertyListenerNode* node;
 
     /* create a new listener node */
@@ -498,8 +507,8 @@ Properties_AddListener(ATX_PropertiesInstance*     instance,
     if (node == NULL) return ATX_ERROR_OUT_OF_MEMORY;
 
     /* add the listener to the list */
-    node->next = properties->listener_nodes;
-    properties->listener_nodes = node;
+    node->next = self->listener_nodes;
+    self->listener_nodes = node;
 
     /* return a handle */
     if (handle) *handle = (ATX_PropertyListenerHandle*)node;
@@ -511,15 +520,15 @@ Properties_AddListener(ATX_PropertiesInstance*     instance,
 |       Properties_RemoveListener
 +---------------------------------------------------------------------*/
 ATX_METHOD
-Properties_RemoveListener(ATX_PropertiesInstance*    instance,
+Properties_RemoveListener(ATX_Properties*            _self,
                           ATX_PropertyListenerHandle handle)
 {
-    Properties*           properties = (Properties*)instance;
+    Properties*           self = ATX_SELF(Properties, ATX_Properties);
     PropertyListenerNode* node;
     PropertyListenerNode* prev;
 
     /* look for the node with this handle */
-    node = properties->listener_nodes;
+    node = self->listener_nodes;
     prev = NULL;
     while (node) {
         if (node == (PropertyListenerNode*)handle) {
@@ -527,7 +536,7 @@ Properties_RemoveListener(ATX_PropertiesInstance*    instance,
             if (prev) {
                 prev->next = node->next;
             } else {
-                properties->listener_nodes = node->next;
+                self->listener_nodes = node->next;
             }
             PropertyListenerNode_Destroy(node);
             return ATX_SUCCESS;
@@ -543,14 +552,14 @@ Properties_RemoveListener(ATX_PropertiesInstance*    instance,
 |       Properties_Create
 +---------------------------------------------------------------------*/
 ATX_Result 
-ATX_Properties_Create(ATX_Properties* object)
+ATX_Properties_Create(ATX_Properties** object)
 {
     Properties* properties;
 
     /* allocate the object */
     properties = (Properties*)ATX_AllocateMemory(sizeof(Properties));
     if (properties == NULL) {
-        ATX_CLEAR_OBJECT(object);
+        *object = NULL;
         return ATX_ERROR_OUT_OF_MEMORY;
     }
 
@@ -558,10 +567,11 @@ ATX_Properties_Create(ATX_Properties* object)
     properties->property_nodes = NULL;
     properties->listener_nodes = NULL;
 
-    /* return an object reference */
-    ATX_INSTANCE(object)  = (ATX_PropertiesInstance*)properties;
-    ATX_INTERFACE(object) = &Properties_ATX_PropertiesInterface;
-    
+    /* setup the interfaces */
+    ATX_SET_INTERFACE(properties, Properties, ATX_Properties);
+    ATX_SET_INTERFACE(properties, Properties, ATX_Destroyable);
+    *object = &ATX_BASE(properties, ATX_Properties);
+
     return ATX_SUCCESS;
 }
 
@@ -569,14 +579,14 @@ ATX_Properties_Create(ATX_Properties* object)
 |       Properties_Destroy
 +---------------------------------------------------------------------*/
 ATX_METHOD
-Properties_Destroy(ATX_DestroyableInstance* instance)
+Properties_Destroy(ATX_Destroyable* _self)
 {
-    Properties*           properties = (Properties*)instance;
+    Properties*           self = ATX_SELF(Properties, ATX_Destroyable);
     PropertyNode*         property_node;
     PropertyListenerNode* listener_node;
 
     /* free property nodes */
-    property_node = properties->property_nodes;
+    property_node = self->property_nodes;
     while (property_node) {
         PropertyNode* next = property_node->next;
         PropertyNode_Destroy(property_node);
@@ -584,7 +594,7 @@ Properties_Destroy(ATX_DestroyableInstance* instance)
     }
 
     /* free the listener nodes */
-    listener_node = properties->listener_nodes;
+    listener_node = self->listener_nodes;
     while (listener_node) {
         PropertyListenerNode* next = listener_node->next;
         PropertyListenerNode_Destroy(listener_node);
@@ -592,21 +602,28 @@ Properties_Destroy(ATX_DestroyableInstance* instance)
     } 
 
     /* free the object */
-    ATX_FreeMemory((void*)instance);
+    ATX_FreeMemory((void*)self);
 
     return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
+|       GetInterface implementation
++---------------------------------------------------------------------*/
+ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(Properties) 
+    ATX_GET_INTERFACE_ACCEPT(Properties, ATX_Properties)
+    ATX_GET_INTERFACE_ACCEPT(Properties, ATX_Destroyable)
+ATX_END_GET_INTERFACE_IMPLEMENTATION(Properties)
+
+/*----------------------------------------------------------------------
 |      ATX_Destroyable interface
 +---------------------------------------------------------------------*/
-ATX_IMPLEMENT_SIMPLE_DESTROYABLE_INTERFACE(Properties)
+ATX_IMPLEMENT_DESTROYABLE_INTERFACE(Properties)
 
 /*----------------------------------------------------------------------
 |      ATX_Properties interface
 +---------------------------------------------------------------------*/
-static const ATX_PropertiesInterface Properties_ATX_PropertiesInterface = {
-    Properties_GetInterface,
+ATX_BEGIN_INTERFACE_MAP(Properties, ATX_Properties)
     Properties_GetProperty,
     Properties_SetProperty,
     Properties_UnsetProperty,
@@ -614,15 +631,7 @@ static const ATX_PropertiesInterface Properties_ATX_PropertiesInterface = {
     Properties_GetIterator,
     Properties_AddListener,
     Properties_RemoveListener
-};
-
-/*----------------------------------------------------------------------
-|       standard GetInterface implementation
-+---------------------------------------------------------------------*/
-ATX_BEGIN_SIMPLE_GET_INTERFACE_IMPLEMENTATION(Properties) 
-ATX_INTERFACE_MAP_ADD(Properties, ATX_Properties)
-ATX_INTERFACE_MAP_ADD(Properties, ATX_Destroyable)
-ATX_END_SIMPLE_GET_INTERFACE_IMPLEMENTATION(Properties)
+ATX_END_INTERFACE_MAP(Properties, ATX_Properties)
 
 
 

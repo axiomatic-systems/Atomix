@@ -17,7 +17,7 @@
 +---------------------------------------------------------------------*/
 #include "AtxTypes.h"
 #include "AtxDefs.h"
-#include "AtxErrors.h"
+#include "AtxResults.h"
 #include "AtxUtils.h"
 #include "AtxInterfaces.h"
 
@@ -62,7 +62,7 @@ ATX_ListItem* ATX_List_FindObject(ATX_List* list, ATX_Object* object);
 ATX_Result    ATX_ListItem_Destroy(ATX_ListItem* item);
 ATX_Any       ATX_ListItem_GetData(ATX_ListItem* item);
 ATX_Result    ATX_ListItem_SetData(ATX_ListItem* item, ATX_Any data);
-ATX_Result    ATX_ListItem_GetObject(ATX_ListItem* item, ATX_Object* object);
+ATX_Result    ATX_ListItem_GetObject(ATX_ListItem* item, ATX_Object** object);
 ATX_Result    ATX_ListItem_SetObject(ATX_ListItem* item, ATX_Object* object);
 ATX_ListItem* ATX_ListItem_GetNext(ATX_ListItem* item);
 ATX_ListItem* ATX_ListItem_GetPrev(ATX_ListItem* item);

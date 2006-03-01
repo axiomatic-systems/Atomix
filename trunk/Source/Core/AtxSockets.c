@@ -13,7 +13,7 @@
 #include "AtxSockets.h"
 #include "AtxUtils.h"
 #include "AtxDefs.h"
-#include "AtxErrors.h"
+#include "AtxResults.h"
 
 /*----------------------------------------------------------------------
 |       ATX_IpAddress_Reset

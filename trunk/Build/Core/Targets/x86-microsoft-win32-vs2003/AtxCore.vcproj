@@ -148,7 +148,7 @@
 				RelativePath="..\..\..\..\Source\Core\AtxStreams.c">
 			</File>
 			<File
-				RelativePath="..\..\..\..\Source\Core\AtxStrings.c">
+				RelativePath="..\..\..\..\Source\Core\AtxString.c">
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\AtxUtils.c">
@@ -176,9 +176,6 @@
 				RelativePath="..\..\..\..\Source\Core\AtxDestroyable.h">
 			</File>
 			<File
-				RelativePath="..\..\..\..\Source\Core\AtxErrors.h">
-			</File>
-			<File
 				RelativePath="..\..\..\..\Source\Core\AtxFile.h">
 			</File>
 			<File
@@ -203,6 +200,9 @@
 				RelativePath="..\..\..\..\Source\Core\AtxReferenceable.h">
 			</File>
 			<File
+				RelativePath="..\..\..\..\Source\Core\AtxResults.h">
+			</File>
+			<File
 				RelativePath="..\..\..\..\Source\Core\AtxRingBuffer.h">
 			</File>
 			<File
@@ -212,7 +212,7 @@
 				RelativePath="..\..\..\..\Source\Core\AtxStreams.h">
 			</File>
 			<File
-				RelativePath="..\..\..\..\Source\Core\AtxStrings.h">
+				RelativePath="..\..\..\..\Source\Core\AtxString.h">
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\AtxTypes.h">

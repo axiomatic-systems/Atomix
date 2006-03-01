@@ -37,6 +37,17 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StringsTest", "..\..\..\Tes
 		{98A51FAD-DE1C-43F4-866F-04DF437879AC} = {98A51FAD-DE1C-43F4-866F-04DF437879AC}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PropertiesTest", "..\..\..\Tests\Properties\Targets\x86-microsoft-win32-vs2003\PropertiesTest.vcproj", "{9FED9964-E2E1-47BE-AC9C-FE4BA7F1C376}"
+	ProjectSection(ProjectDependencies) = postProject
+		{85759730-1E46-4C13-8FF7-42639FC8BB8E} = {85759730-1E46-4C13-8FF7-42639FC8BB8E}
+		{98A51FAD-DE1C-43F4-866F-04DF437879AC} = {98A51FAD-DE1C-43F4-866F-04DF437879AC}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InterfacesExample", "..\..\..\Examples\Interfaces\Targets\x86-microsoft-win32-vs2003\InterfacesExample.vcproj", "{2A97F5F9-1149-4C73-B6F8-4E415FF79E5F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{98A51FAD-DE1C-43F4-866F-04DF437879AC} = {98A51FAD-DE1C-43F4-866F-04DF437879AC}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -71,6 +82,14 @@ Global
 		{AEB323F2-E28D-4E00-89A3-B945136C76B4}.Debug.Build.0 = Debug|Win32
 		{AEB323F2-E28D-4E00-89A3-B945136C76B4}.Release.ActiveCfg = Release|Win32
 		{AEB323F2-E28D-4E00-89A3-B945136C76B4}.Release.Build.0 = Release|Win32
+		{9FED9964-E2E1-47BE-AC9C-FE4BA7F1C376}.Debug.ActiveCfg = Debug|Win32
+		{9FED9964-E2E1-47BE-AC9C-FE4BA7F1C376}.Debug.Build.0 = Debug|Win32
+		{9FED9964-E2E1-47BE-AC9C-FE4BA7F1C376}.Release.ActiveCfg = Release|Win32
+		{9FED9964-E2E1-47BE-AC9C-FE4BA7F1C376}.Release.Build.0 = Release|Win32
+		{2A97F5F9-1149-4C73-B6F8-4E415FF79E5F}.Debug.ActiveCfg = Debug|Win32
+		{2A97F5F9-1149-4C73-B6F8-4E415FF79E5F}.Debug.Build.0 = Debug|Win32
+		{2A97F5F9-1149-4C73-B6F8-4E415FF79E5F}.Release.ActiveCfg = Release|Win32
+		{2A97F5F9-1149-4C73-B6F8-4E415FF79E5F}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

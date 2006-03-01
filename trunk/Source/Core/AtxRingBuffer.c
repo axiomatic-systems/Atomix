@@ -14,7 +14,7 @@
 #include "AtxTypes.h"
 #include "AtxDefs.h"
 #include "AtxRingBuffer.h"
-#include "AtxErrors.h"
+#include "AtxResults.h"
 
 /*----------------------------------------------------------------------
 |       types
