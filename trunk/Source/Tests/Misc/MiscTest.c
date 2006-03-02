@@ -58,6 +58,9 @@ main(int argc, char** argv)
     float f;
     long  i;
 
+    ATX_COMPILER_UNUSED(argc);
+    ATX_COMPILER_UNUSED(argv);
+
     SHOULD_FAIL(ATX_ParseInteger("ssdfsdf", &i, ATX_FALSE), "test a1");
     SHOULD_FAIL(ATX_ParseInteger("", &i, ATX_FALSE), "test a2");
     SHOULD_FAIL(ATX_ParseInteger(NULL, &i, ATX_FALSE), "test a3");

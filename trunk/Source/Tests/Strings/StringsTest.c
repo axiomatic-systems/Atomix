@@ -42,7 +42,7 @@ CompareTest(const char* name, const char* a, const char* b, int result, int expe
 /*----------------------------------------------------------------------
 |       EqualTest
 +---------------------------------------------------------------------*/
-void
+static void
 EqualTest(const char* name, const char* a, ATX_String b, const char* expected)
 {
     printf("op %s on %s, result = %s ", name, a, ATX_CSTR(b));
@@ -57,7 +57,7 @@ EqualTest(const char* name, const char* a, ATX_String b, const char* expected)
 /*----------------------------------------------------------------------
 |       StringTest
 +---------------------------------------------------------------------*/
-void
+static void
 StringTest(const char* name, ATX_String a, const char* expected)
 {
     printf("%s: %s", name, ATX_CSTR(a));
@@ -72,7 +72,7 @@ StringTest(const char* name, ATX_String a, const char* expected)
 /*----------------------------------------------------------------------
 |       IntTest
 +---------------------------------------------------------------------*/
-void
+static void
 IntTest(const char* name, int a, int expected)
 {
     printf("%s: %d", name, a);
@@ -90,6 +90,9 @@ IntTest(const char* name, int a, int expected)
 int
 main(int argc, char** argv)
 {
+    ATX_COMPILER_UNUSED(argc);
+    ATX_COMPILER_UNUSED(argv);
+
     printf(":: testing empty string\n");
 
     {

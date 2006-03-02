@@ -6,14 +6,14 @@ from glob import glob
 # reusable functions and data structures
 #######################################################
 def GlobSources(dir, patterns):
-    root = GetBuildPath('#'+SOURCE_ROOT)+'/'+dir+'/'
+    root = GetBuildPath('#'+ROOT)+'/'+dir+'/'
     files = []
     for pattern in patterns:
         files += glob(root+pattern)
     return [dir+'/'+os.path.basename(x) for x in  files]
 
 def GetDirPath(dir):
-    return '#'+SOURCE_ROOT+'/'+dir
+    return '#'+ROOT+'/'+dir
     
 def DeclareBuildDir(dir):
     env.BuildDir(dir, GetDirPath(dir), duplicate=0)
@@ -31,7 +31,23 @@ def GetIncludeDirs(modules, exclude=None):
     return dirs
 
 def GetLibraries(modules):
-    return [GetModule(module).GetLibraries() for module in Split(modules)]
+    libs = []
+    for module in Split(modules):
+        if Modules.has_key(module):
+            libs += Modules[module].GetLibraries()
+        else:
+            libs += [module]
+    return libs
+
+def BuildApp(source_dir, name, deps):
+    DeclareBuildDir(source_dir)
+    libs = GetLibraries(deps)
+    cpp_path = GetIncludeDirs(deps)
+    prog = env.Program(target=name,
+                       source=GlobSources(source_dir, ['*c', '*.cpp']),
+                       LIBS=libs, CPPPATH=cpp_path)
+    Alias(name, prog)
+
 
 Modules = {}
 class Module:
@@ -49,15 +65,19 @@ class Module:
 class LibraryModule(Module):
     def __init__(self, name, 
                  build_source_dirs, 
+                 source_root = 'Source',
                  build_source_pattern=['*.c', '*.cpp'], 
                  build_include_dirs = [], 
                  included_modules = [], 
+                 include_dirs     = [],
                  linked_modules = []) :
-        Module.__init__(self, name, Split(included_modules)+Split(build_source_dirs), linked_modules)
+        build_source_dirs = [source_root+'/'+dir for dir in Split(build_source_dirs)]
+        include_dirs      = [source_root+'/'+dir for dir in Split(include_dirs)]
+        Module.__init__(self, name, Split(included_modules)+Split(include_dirs)+Split(build_source_dirs), linked_modules)
         self.env                = env.Copy()
         self.name               = name
         self.build_source_dirs  = build_source_dirs
-        self.build_include_dirs = build_include_dirs
+        self.build_include_dirs = [source_root+'/'+dir for dir in Split(build_include_dirs)]
         
         # store this new object in the module dictionary
         Modules[name] = self
@@ -71,8 +91,8 @@ class LibraryModule(Module):
             sources += GlobSources(dir, build_source_pattern)
             
         # calculate our build include path
-        cpp_path = GetIncludeDirs(Split(build_include_dirs) + Split(build_source_dirs) + Split(included_modules))
-
+        cpp_path = GetIncludeDirs(Split(self.build_include_dirs) + Split(self.build_source_dirs) + Split(self.included_modules))
+        
         # calculate our preprocessor defines for this module
         cpp_defines={}
         
@@ -84,8 +104,8 @@ class LibraryModule(Module):
         
 def Application(name, dir):
     DeclareBuildDir(dir)
-    sdk_libs = 'Atomix'
-    sdk_incs = 'Atomix'
+    sdk_libs = ['AtxCore', 'AtxSystem', 'AtxCore', 'AtxSystem']
+    sdk_incs = ['AtxSystem', 'AtxCore']
     libs = GetLibraries(sdk_libs)
     cpp_path = GetIncludeDirs(sdk_incs)
     
@@ -99,32 +119,25 @@ def Application(name, dir):
 #######################################################
 Import("env")
 
-### do not change directory to where the scripts are
-#env.SConscriptChdir(0)
-
-### set some global path variable
-SOURCE_ROOT='Source'
+ROOT = "."
 
 ### try to read in any target specific configuration
-#try:
-target_config = env['target']+'/Config.scons'
-if os.path.exists(target_config):
+target_config_file = env.GetBuildPath('#/Build/Targets/'+env['target']+'/Config.scons')
+if os.path.exists(target_config_file):
     # Load the target-specific config file    
-    execfile(target_config)
-    print '@@@ Loaded target configuration @@@'
+    execfile(target_config_file)
 
 #######################################################
 # modules
 #######################################################
 LibraryModule(name               = 'AtxCore', 
               build_source_dirs  = 'Core',
-              included_modules   = ['Config','Atomix'])
+              include_dirs       = ['Config','Atomix'])
            
 LibraryModule(name               = 'AtxSystem', 
               build_source_dirs  = ['System/StdC','System/Bsd'],
               included_modules   = 'AtxCore')
  
-env.Library('Atomix', GetLibraries(['AtxCore','AtxSystem']))
-
-Application('NetPump', 'Apps/NetPump')
-Application('StringsTest', 'Tests/Strings')
+Application('NetPump', 'Source/Apps/NetPump')
+for test in ['Strings', 'Misc', 'Properties', 'RingBuffer', 'Http']:
+    Application(test+'Test', 'Source/Tests/'+test)
