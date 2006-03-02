@@ -167,6 +167,11 @@ extern unsigned long ATX_StringLength(const char* s);
 extern int ATX_IsSpace(int c);
 #endif
 
+#if defined(ATX_CONFIG_HAVE_MEMCMP)
+#define ATX_MemoryEqual(s1, s2, n) (memcmp((s1), (s2), (n)) == 0) 
+#else 
+extern int ATX_MemoryEqual(const void* s1, const void* s2, unsigned long n); 
+#endif
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
