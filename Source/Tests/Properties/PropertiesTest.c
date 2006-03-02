@@ -170,7 +170,7 @@ DumpProperties(ATX_Properties* properties)
         return;
     }
     while (ATX_SUCCEEDED(ATX_Iterator_GetNext(iterator, 
-                                              (ATX_Any*)&property))) {
+                                              (ATX_Any*)(void*)&property))) {
         PrintProperty(property->name, property->type, &property->value);
     }
     ATX_Debug("--------------------------------------------\n");

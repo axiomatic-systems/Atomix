@@ -87,6 +87,9 @@ main(int argc, char** argv)
     ATX_Size          response_body_size = 0;
     ATX_Result        result;
 
+    ATX_COMPILER_UNUSED(argc);
+    ATX_COMPILER_UNUSED(argv);
+
     /* create a request */
     result = ATX_HttpRequest_Create(ATX_HTTP_METHOD_GET, "http://zebulon.bok.net/tmp/redirect", &request);
     CHECK_RESULT(result, "ATX_HttpRequest_Create failed");

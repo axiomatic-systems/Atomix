@@ -14,7 +14,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#if defined(_DEBUG) && defined(WIN32)
 #include <crtdbg.h>
+#endif
 
 #define BUFFER_SIZE 17
 
@@ -33,11 +35,11 @@ ReadChunk(ATX_RingBuffer* buffer)
     if (chunk > can_read) chunk = can_read;
     if (chunk == 0) return ATX_SUCCESS;
 
-    // read a chunk
+    /* read a chunk */
     result = ATX_RingBuffer_Read(buffer, bytes, chunk);
     if (ATX_FAILED(result)) return result;
 
-    // check values
+    /* check values */
     for (i=0; i<chunk; i++) {
         unsigned int index = total_read+i;
         unsigned char expected = index & 0xFF;
@@ -67,13 +69,13 @@ WriteChunk(ATX_RingBuffer* buffer)
     if (chunk > can_write) chunk = can_write;
     if (chunk == 0) return ATX_SUCCESS;
 
-    // generate buffer
+    /* generate buffer */
     for (i=0; i<chunk; i++) {
         unsigned int index = total_written+i;
         bytes[i] = index&0xFF;
     }
 
-    // write chunk
+    /* write chunk */
     result = ATX_RingBuffer_Write(buffer, bytes, chunk);
     if (ATX_FAILED(result)) return result;
     total_written += chunk;
@@ -91,16 +93,19 @@ main(int argc, char** argv)
     ATX_RingBuffer* buffer;
     int             i;
 
-    // setup debugging
-#if defined(_DEBUG)
+    ATX_COMPILER_UNUSED(argc);
+    ATX_COMPILER_UNUSED(argv);
+
+    /* setup debugging */
+#if defined(_DEBUG) && defined(WIN32)
     int flags = _crtDbgFlag       | 
         _CRTDBG_ALLOC_MEM_DF      |
         _CRTDBG_DELAY_FREE_MEM_DF |
         _CRTDBG_CHECK_ALWAYS_DF;
 
     _CrtSetDbgFlag(flags);
-    //AllocConsole();
-    //freopen("CONOUT$", "w", stdout);
+    /*AllocConsole();
+     freopen("CONOUT$", "w", stdout);*/
 #endif 
 
     result = ATX_RingBuffer_Create(BUFFER_SIZE, &buffer);
@@ -109,8 +114,8 @@ main(int argc, char** argv)
         return 1;
     }
 
-    // test a few basic functions
-    ATX_RingBuffer_Write(buffer, "ab", 2);
+    /* test a few basic functions */
+    ATX_RingBuffer_Write(buffer, (ATX_ByteBuffer)"ab", 2);
     {
         ATX_ByteBuffer bb = ATX_RingBuffer_GetIn(buffer);
         *bb = 'c';
