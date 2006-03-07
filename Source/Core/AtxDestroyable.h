@@ -40,7 +40,7 @@ ATX_BEGIN_INTERFACE_DEFINITION(ATX_Destroyable)
      * @atx_method_result
      */
     ATX_Result (*Destroy)(ATX_Destroyable* self);
-ATX_END_INTERFACE_DEFINITION(ATX_Destroyable)
+ATX_END_INTERFACE_DEFINITION
 
 /*----------------------------------------------------------------------
 |   convenience macros

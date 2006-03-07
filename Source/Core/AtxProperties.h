@@ -83,7 +83,7 @@ ATX_BEGIN_INTERFACE_DEFINITION(ATX_PropertyListener)
                               ATX_CString              name,
                               ATX_PropertyType         type,
                               const ATX_PropertyValue* value);
-ATX_END_INTERFACE_DEFINITION(ATX_PropertyListener)
+ATX_END_INTERFACE_DEFINITION
 
 /*----------------------------------------------------------------------
 |       ATX_Properties interface
@@ -174,7 +174,7 @@ ATX_BEGIN_INTERFACE_DEFINITION(ATX_Properties)
     ATX_Result (*RemoveListener)(ATX_Properties*            self,
                                  ATX_PropertyListenerHandle handle);
 
-ATX_END_INTERFACE_DEFINITION(ATX_Properties)
+ATX_END_INTERFACE_DEFINITION
 
 /*----------------------------------------------------------------------
 |       convenience macros
@@ -210,7 +210,7 @@ ATX_INTERFACE(object)->UnsetProperty(object, name)
  * implement the ATX_Properties interface 
  */
 #define ATX_Properties_Clear(object)                            \
-ATX_INTERFACE(object)->Clear(object))
+ATX_INTERFACE(object)->Clear(object)
 
 /**
  * Convenience macro used to call the GetIterator() method on objects that 

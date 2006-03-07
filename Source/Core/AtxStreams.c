@@ -175,11 +175,12 @@ ATX_InputStream_Skip(ATX_InputStream* self, ATX_Size count)
 |   ATX_InputStream_Load
 +---------------------------------------------------------------------*/
 ATX_Result
-ATX_InputStream_Load(ATX_InputStream* self, ATX_DataBuffer** buffer)
+ATX_InputStream_Load(ATX_InputStream* self, ATX_Size max_read, ATX_DataBuffer** buffer)
 {
     ATX_Result  result;
     ATX_Size    total_bytes_read;
     ATX_Boolean buffer_is_external = ATX_TRUE;
+    ATX_Size    size = 0;
 
     /* create a buffer if none was given */
     if (*buffer == NULL) {
@@ -189,6 +190,16 @@ ATX_InputStream_Load(ATX_InputStream* self, ATX_DataBuffer** buffer)
 
     /* reset the buffer */
     ATX_DataBuffer_SetDataSize(*buffer, 0);
+
+    /* try to get the stream size */
+    if (ATX_FAILED(ATX_InputStream_GetSize(self, &size))) {
+        size = max_read;
+    }  else {
+        if (max_read && max_read < size) size = max_read;
+    }
+
+    /* pre-allocate the buffer */
+    if (size) ATX_CHECK(ATX_DataBuffer_GrowBuffer(*buffer, size));
 
     /* read the data from the file */
     total_bytes_read = 0;
@@ -200,25 +211,27 @@ ATX_InputStream_Load(ATX_InputStream* self, ATX_DataBuffer** buffer)
 
         /* check if we know how much data is available */
         result = ATX_InputStream_GetAvailable(self, &available);
-        if (ATX_SUCCEEDED(result) && available != 0) {
+        if (ATX_SUCCEEDED(result)) {
             /* we know how much is available */
             bytes_to_read = available;
         } else {
             bytes_to_read = ATX_INPUT_STREAM_LOAD_DEFAULT_READ_CHUNK;
         }
 
+        /* stop if we've read everything */
+        if (bytes_to_read == 0) break;
+
         /* allocate space in the buffer */
-        result = ATX_DataBuffer_SetBufferSize(*buffer, total_bytes_read+bytes_to_read);
-        if (ATX_FAILED(result)) break;
+        ATX_CHECK(ATX_DataBuffer_GrowBuffer(*buffer, total_bytes_read+bytes_to_read));
 
         /* read the data */
-        data = ATX_DataBuffer_UseData(*buffer);
+        data = ATX_DataBuffer_UseData(*buffer)+total_bytes_read;
         result = ATX_InputStream_Read(self, (void*)data, bytes_to_read, &bytes_read);
         if (ATX_SUCCEEDED(result) && bytes_read != 0) {
             total_bytes_read += bytes_read;
             ATX_DataBuffer_SetDataSize(*buffer, total_bytes_read);
         }
-    } while(ATX_SUCCEEDED(result));
+    } while(ATX_SUCCEEDED(result) && (size==0 || total_bytes_read < size));
 
     if (result == ATX_ERROR_EOS) {
         return ATX_SUCCESS;
@@ -489,7 +502,7 @@ ATX_SubInputStream_GetAvailable(ATX_InputStream* _self,
 ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(ATX_SubInputStream)
     ATX_GET_INTERFACE_ACCEPT(ATX_SubInputStream, ATX_InputStream)
     ATX_GET_INTERFACE_ACCEPT(ATX_SubInputStream, ATX_Referenceable)
-ATX_END_GET_INTERFACE_IMPLEMENTATION(ATX_SubInputStream)
+ATX_END_GET_INTERFACE_IMPLEMENTATION
 
 /*----------------------------------------------------------------------
 |   ATX_InputStream interface

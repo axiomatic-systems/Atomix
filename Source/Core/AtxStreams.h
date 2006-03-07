@@ -40,7 +40,7 @@ ATX_BEGIN_INTERFACE_DEFINITION(ATX_InputStream)
     ATX_Result (*GetSize)(ATX_InputStream* self, ATX_Size* size);
     ATX_Result (*GetAvailable)(ATX_InputStream* self, 
                                ATX_Size*        available);
-ATX_END_INTERFACE_DEFINITION(ATX_InputStream)
+ATX_END_INTERFACE_DEFINITION
 
 /*----------------------------------------------------------------------
 |       ATX_OutputStream
@@ -54,7 +54,7 @@ ATX_BEGIN_INTERFACE_DEFINITION(ATX_OutputStream)
     ATX_Result (*Seek)(ATX_OutputStream* self, ATX_Offset  offset);
     ATX_Result (*Tell)(ATX_OutputStream* self, ATX_Offset* offset);
     ATX_Result (*Flush)(ATX_OutputStream* self);
-ATX_END_INTERFACE_DEFINITION(ATX_OutputStream)
+ATX_END_INTERFACE_DEFINITION
 
 /*----------------------------------------------------------------------
 |       base class implementations
@@ -80,6 +80,7 @@ ATX_Result ATX_InputStream_Skip(ATX_InputStream* stream,
                                 ATX_Size         count);
 
 ATX_Result ATX_InputStream_Load(ATX_InputStream* stream, 
+                                ATX_Size         max_read, /* = 0 if no limit */
                                 ATX_DataBuffer** buffer);
 
 /*----------------------------------------------------------------------
@@ -126,7 +127,7 @@ ATX_BEGIN_INTERFACE_DEFINITION(ATX_StreamTransformer)
     ATX_Result (*Transform)(ATX_StreamTransformer* self,
                             ATX_AnyConst              buffer,
                             ATX_Size                  size);
-ATX_END_INTERFACE_DEFINITION(ATX_StreamTransformer)
+ATX_END_INTERFACE_DEFINITION
 
 #define ATX_StreamTransformer_Transform(object, buffer, size) \
 ATX_INTERFACE(object)->Transform(object, buffer, size)

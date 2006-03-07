@@ -90,7 +90,7 @@ ATX_BEGIN_INTERFACE_DEFINITION(ATX_Socket)
                                   ATX_OutputStream**  stream);
     ATX_Result (*GetInfo)(ATX_Socket*         self, 
                           ATX_SocketInfo*     info);
-ATX_END_INTERFACE_DEFINITION(ATX_Socket)
+ATX_END_INTERFACE_DEFINITION
 
 /*----------------------------------------------------------------------
 |   convenience macros
@@ -131,7 +131,7 @@ ATX_BEGIN_INTERFACE_DEFINITION(ATX_DatagramSocket)
     ATX_Result (*Receive)(ATX_DatagramSocket*         self,
                           ATX_DataBuffer*             packet, 
                           ATX_SocketAddress*          address);
-ATX_END_INTERFACE_DEFINITION(ATX_DatagramSocket)
+ATX_END_INTERFACE_DEFINITION
 
 /*----------------------------------------------------------------------
 |   convenience macros
@@ -151,7 +151,7 @@ ATX_BEGIN_INTERFACE_DEFINITION(ATX_ServerSocket)
                          unsigned int      max_clients);
     ATX_Result (*WaitForNewClient)(ATX_ServerSocket* self,
                                    ATX_Socket**      client);
-ATX_END_INTERFACE_DEFINITION(ATX_ServerSocket)
+ATX_END_INTERFACE_DEFINITION
 
 /*----------------------------------------------------------------------
 |   convenience macros

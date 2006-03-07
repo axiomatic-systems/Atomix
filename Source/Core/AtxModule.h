@@ -47,7 +47,7 @@ ATX_BEGIN_INTERFACE_DEFINITION(ATX_Module)
                                  ATX_String             parameters,
                                  const ATX_InterfaceId* interface_id,
                                  ATX_Object*            object);
-ATX_END_INTERFACE_DEFINITION(ATX_Module)
+ATX_END_INTERFACE_DEFINITION
 
 /*----------------------------------------------------------------------
 |       convenience macros

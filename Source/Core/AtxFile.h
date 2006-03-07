@@ -49,7 +49,7 @@ ATX_BEGIN_INTERFACE_DEFINITION(ATX_File)
     ATX_Result (*GetSize)(ATX_File* self, ATX_Size* size);
     ATX_Result (*GetInputStream)(ATX_File* self, ATX_InputStream** stream);
     ATX_Result (*GetOutputStream)(ATX_File* self, ATX_OutputStream**  stream);
-ATX_END_INTERFACE_DEFINITION(ATX_File)
+ATX_END_INTERFACE_DEFINITION
 
 /*----------------------------------------------------------------------
 |   convenience macros

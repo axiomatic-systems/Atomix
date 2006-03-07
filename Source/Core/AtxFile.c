@@ -31,7 +31,7 @@ ATX_File_Load(ATX_File* file, ATX_DataBuffer** buffer)
     ATX_CHECK(ATX_File_GetInputStream(file, &input));
 
     /* read the stream */
-    result = ATX_InputStream_Load(input, buffer);
+    result = ATX_InputStream_Load(input, 0, buffer);
 
     /* release the stream */
     ATX_RELEASE_OBJECT(input);
