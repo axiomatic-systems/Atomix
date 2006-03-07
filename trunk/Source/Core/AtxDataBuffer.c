@@ -131,6 +131,23 @@ ATX_DataBuffer_SetBufferSize(ATX_DataBuffer* self,
 }
 
 /*----------------------------------------------------------------------
+|       ATX_DataBuffer_GowBuffer
++---------------------------------------------------------------------*/
+ATX_Result 
+ATX_DataBuffer_GrowBuffer(ATX_DataBuffer* self,
+                          ATX_Size        size)
+{
+    if (self->buffer_size >= size) return ATX_SUCCESS;
+    
+    /* try doubling the size */
+    {
+        ATX_Size new_size = self->buffer_size*2;
+        if (new_size < size) new_size = size;
+        return ATX_DataBuffer_SetBufferSize(self, new_size);
+    }
+}
+
+/*----------------------------------------------------------------------
 |       ATX_DataBuffer_GetBufferSize
 +---------------------------------------------------------------------*/
 ATX_Size   

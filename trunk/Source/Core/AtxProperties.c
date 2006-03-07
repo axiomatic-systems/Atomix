@@ -139,7 +139,7 @@ PropertiesIterator_Reset(ATX_Iterator* _self)
 ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(PropertiesIterator) 
     ATX_GET_INTERFACE_ACCEPT(PropertiesIterator, ATX_Iterator)
     ATX_GET_INTERFACE_ACCEPT(PropertiesIterator, ATX_Destroyable)
-ATX_END_GET_INTERFACE_IMPLEMENTATION(PropertiesIterator)
+ATX_END_GET_INTERFACE_IMPLEMENTATION
 
 /*----------------------------------------------------------------------
 |      ATX_Destroyable interface
@@ -152,7 +152,7 @@ ATX_IMPLEMENT_DESTROYABLE_INTERFACE(PropertiesIterator)
 ATX_BEGIN_INTERFACE_MAP(PropertiesIterator, ATX_Iterator)
     PropertiesIterator_GetNext,
     PropertiesIterator_Reset
-ATX_END_INTERFACE_MAP(PropertiesIterator, ATX_Iterator)
+ATX_END_INTERFACE_MAP
 
 /*----------------------------------------------------------------------
 |       PropertyNode_SetValue
@@ -613,7 +613,7 @@ Properties_Destroy(ATX_Destroyable* _self)
 ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(Properties) 
     ATX_GET_INTERFACE_ACCEPT(Properties, ATX_Properties)
     ATX_GET_INTERFACE_ACCEPT(Properties, ATX_Destroyable)
-ATX_END_GET_INTERFACE_IMPLEMENTATION(Properties)
+ATX_END_GET_INTERFACE_IMPLEMENTATION
 
 /*----------------------------------------------------------------------
 |      ATX_Destroyable interface
@@ -631,7 +631,7 @@ ATX_BEGIN_INTERFACE_MAP(Properties, ATX_Properties)
     Properties_GetIterator,
     Properties_AddListener,
     Properties_RemoveListener
-ATX_END_INTERFACE_MAP(Properties, ATX_Properties)
+ATX_END_INTERFACE_MAP
 
 
 

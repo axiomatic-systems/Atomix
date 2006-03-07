@@ -47,7 +47,7 @@ ATX_BEGIN_INTERFACE_DEFINITION(ATX_Referenceable)
      * @atx_method_result
      */
     ATX_Result (*Release)(ATX_Referenceable* self);
-ATX_END_INTERFACE_DEFINITION(ATX_Referenceable)
+ATX_END_INTERFACE_DEFINITION
 
 /*----------------------------------------------------------------------
 |       convenience macros
@@ -128,7 +128,27 @@ ATX_BEGIN_INTERFACE_MAP(_class, ATX_Referenceable)                 \
     _class##_AddReference,                                         \
     _class##_Release                                               \
 };         
- 
+
+#define ATX_IMPLEMENT_REFERENCEABLE_INTERFACE_EX(_class, _base, _counter) \
+ATX_METHOD _class##_AddReference(ATX_Referenceable* _self)                \
+{                                                                         \
+    _class* self = ATX_SELF_EX(_class, _base, ATX_Referenceable);         \
+    ATX_BASE(self, _base)._counter++;                                     \
+    return ATX_SUCCESS;                                                   \
+}                                                                         \
+ATX_METHOD _class##_Release(ATX_Referenceable* _self)                     \
+{                                                                         \
+    _class* self = ATX_SELF_EX(_class, _base, ATX_Referenceable);         \
+    if (--ATX_BASE(self, _base)._counter == 0) {                          \
+        _class##_Destroy(self);                                           \
+    }                                                                     \
+    return ATX_SUCCESS;                                                   \
+}                                                                         \
+ATX_BEGIN_INTERFACE_MAP_EX(_class, _base, ATX_Referenceable)              \
+    _class##_AddReference,                                                \
+    _class##_Release                                                      \
+};         
+
 #endif /* _ATX_REFERENCEABLE_H_ */
 
 

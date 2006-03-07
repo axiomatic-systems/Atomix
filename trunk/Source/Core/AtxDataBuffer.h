@@ -32,6 +32,8 @@ ATX_Result ATX_DataBuffer_SetBuffer(ATX_DataBuffer* buffer,
 ATX_Result ATX_DataBuffer_SetBufferSize(ATX_DataBuffer* buffer,
                                         ATX_Size        buffer_size);
 ATX_Size   ATX_DataBuffer_GetBufferSize(const ATX_DataBuffer* buffer);
+ATX_Result ATX_DataBuffer_GrowBuffer(ATX_DataBuffer* buffer,
+                                     ATX_Size        buffer_size);
 const ATX_Byte*  ATX_DataBuffer_GetData(const ATX_DataBuffer* buffer);
 ATX_Byte*  ATX_DataBuffer_UseData(ATX_DataBuffer* buffer);
 ATX_Size   ATX_DataBuffer_GetDataSize(const ATX_DataBuffer* buffer);

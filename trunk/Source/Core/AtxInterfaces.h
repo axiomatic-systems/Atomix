@@ -67,7 +67,15 @@ typedef struct {
 #define ATX_SELF_EX(_self_type, _base_type, _interface_type) \
 ( (_self_type *)( ((ATX_Byte*)(_self)) - ATX_OFFSET_OF(_base_type##_Base._interface_type##_Base, _self_type)) )
 
+#define ATX_SELF_M(_member, _member_type, _self_type, _interface_type) \
+( (_self_type *)( ((ATX_Byte*)(_self)) -                               \
+    ATX_OFFSET_OF(_interface_type##_Base, _member_type)) -             \
+    ATX_OFFSET_OF(_member, _self_type))
+
 #define ATX_BASE(_object, _base) (_object)->_base##_Base
+
+#define ATX_BASE_EX(_object, _parent_base, _base) \
+    (_object)->_parent_base##_Base._base##_Base
 
 #define ATX_DECLARE_INTERFACE(_iface)                                   \
 ATX_INTERFACE_ID_TYPE_MOD ATX_InterfaceId ATX_INTERFACE_ID__##_iface;   \
@@ -79,7 +87,7 @@ typedef struct {                                                        \
 #define ATX_BEGIN_INTERFACE_DEFINITION(_iface) struct _iface##Interface { \
     ATX_Object* (*GetInterface)(_iface*                instance,       \
                                 const ATX_InterfaceId* id);     
-#define ATX_END_INTERFACE_DEFINITION(_iface) };
+#define ATX_END_INTERFACE_DEFINITION };
 
 #define ATX_BEGIN_INTERFACE_IMPLEMENTATION(_iface,_class)       \
 static const _iface##Interface _class##_##_class##Interface = { \
@@ -140,7 +148,7 @@ static ATX_Object* _class##_GetInterface(_class*                self,        \
         return (ATX_Object*)&(self->_base##_Base._iface##_Base);             \
     }
 
-#define ATX_END_GET_INTERFACE_IMPLEMENTATION(_class)                         \
+#define ATX_END_GET_INTERFACE_IMPLEMENTATION                                 \
     else {                                                                   \
         return NULL;                                                         \
     }                                                                        \
@@ -174,7 +182,13 @@ ATX_IMPLEMENT_GET_INTERFACE_ADAPTER(_class,_iface)  \
 ATX_INTERFACE_MAP(_class,_iface) = {                \
     ATX_GET_INTERFACE_ADAPTER(_class,_iface), 
 
-#define ATX_END_INTERFACE_MAP(_class,_iface) };
+#define ATX_BEGIN_INTERFACE_MAP_EX(_class, _base, _iface)   \
+ATX_IMPLEMENT_GET_INTERFACE_ADAPTER_EX(_class,_base,_iface) \
+ATX_INTERFACE_MAP(_class,_iface) = {                        \
+    ATX_GET_INTERFACE_ADAPTER(_class,_iface), 
+
+#define ATX_END_INTERFACE_MAP    };
+#define ATX_END_INTERFACE_MAP_EX };
 
 #define ATX_SET_INTERFACE(_object, _class, _iface) \
 (_object)->_iface##_Base.interface = & _class##_##_iface##Interface
@@ -195,7 +209,7 @@ ATX_INTERFACE_MAP(_class,_iface) = {                \
 */
 ATX_DECLARE_INTERFACE(ATX_Object)
 ATX_BEGIN_INTERFACE_DEFINITION(ATX_Object)
-ATX_END_INTERFACE_DEFINITION(ATX_Object)
+ATX_END_INTERFACE_DEFINITION
 
 #endif /* _ATX_INTERFACES_H_ */
 

@@ -62,7 +62,7 @@ ATX_BEGIN_INTERFACE_DEFINITION(ATX_Iterator)
      * @atx_method_result
      */
     ATX_Result (*Reset)(ATX_Iterator* self);
-ATX_END_INTERFACE_DEFINITION(ATX_Iterator)
+ATX_END_INTERFACE_DEFINITION
 
 /*----------------------------------------------------------------------
 |   convenience macros

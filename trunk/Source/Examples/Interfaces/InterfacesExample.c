@@ -27,7 +27,7 @@ ATX_BEGIN_INTERFACE_DEFINITION(Foo)
     ATX_Result (*FooMethod1)(Foo* self, int x);
     ATX_Result (*FooMethod2)(Foo* self, int x, int y);
     ATX_Result (*DoSomething)(Foo* self);
-ATX_END_INTERFACE_DEFINITION(Foo)
+ATX_END_INTERFACE_DEFINITION
 
 ATX_INTERFACE_ID_TYPE_MOD ATX_InterfaceId ATX_INTERFACE_ID__Foo = {1,2};
 
@@ -43,7 +43,7 @@ ATX_BEGIN_INTERFACE_DEFINITION(Bar)
     ATX_Result (*BarMethod1)(Bar* self, int x);
     ATX_Result (*BarMethod2)(Bar* self, int x, int y);
     ATX_Result (*DoSomething)(Bar* self);
-ATX_END_INTERFACE_DEFINITION(Bar)
+ATX_END_INTERFACE_DEFINITION
 
 ATX_INTERFACE_ID_TYPE_MOD ATX_InterfaceId ATX_INTERFACE_ID__Bar = {1,3};
 
@@ -57,7 +57,7 @@ ATX_INTERFACE_ID_TYPE_MOD ATX_InterfaceId ATX_INTERFACE_ID__Bar = {1,3};
 ATX_DECLARE_INTERFACE(Yop)
 ATX_BEGIN_INTERFACE_DEFINITION(Yop)
 ATX_Result (*YopMethod1)(Yop* self);
-ATX_END_INTERFACE_DEFINITION(Yop)
+ATX_END_INTERFACE_DEFINITION
 
 ATX_INTERFACE_ID_TYPE_MOD ATX_InterfaceId ATX_INTERFACE_ID__Yop = {1,4};
 
@@ -128,7 +128,7 @@ MyFooBar_Foo_DoSomething(Foo* _self)
 ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(MyFooBar)
     ATX_GET_INTERFACE_ACCEPT(MyFooBar, Foo)
     ATX_GET_INTERFACE_ACCEPT(MyFooBar, Bar)
-ATX_END_GET_INTERFACE_IMPLEMENTATION(MyFooBar)
+ATX_END_GET_INTERFACE_IMPLEMENTATION
 
 /*----------------------------------------------------------------------
 |   MyFooBar_FooInterface
@@ -137,7 +137,7 @@ ATX_BEGIN_INTERFACE_MAP(MyFooBar, Foo)
     MyFooBar_FooMethod1,
     MyFooBar_FooMethod2,
     MyFooBar_Foo_DoSomething
-ATX_END_INTERFACE_MAP(MyFooBar, Foo)
+ATX_END_INTERFACE_MAP
 
 /*----------------------------------------------------------------------
 |   MyFooBar_BarMethod1
@@ -179,7 +179,7 @@ ATX_BEGIN_INTERFACE_MAP(MyFooBar, Bar)
     MyFooBar_BarMethod1,
     MyFooBar_BarMethod2,
     MyFooBar_Bar_DoSomething
-ATX_END_INTERFACE_MAP(MyFooBar, Bar)
+ATX_END_INTERFACE_MAP
 
 /*----------------------------------------------------------------------
 |   MyFooBar_Construct
@@ -272,7 +272,7 @@ ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(MyYop)
     ATX_GET_INTERFACE_ACCEPT_EX(MyYop, MyFooBar, Foo)
     ATX_GET_INTERFACE_ACCEPT_EX(MyYop, MyFooBar, Bar)
     ATX_GET_INTERFACE_ACCEPT(MyYop, Yop)
-ATX_END_GET_INTERFACE_IMPLEMENTATION(MyYop)
+ATX_END_GET_INTERFACE_IMPLEMENTATION
 
 /*----------------------------------------------------------------------
 |   MyYop_FooInterface
@@ -301,7 +301,7 @@ ATX_INTERFACE_MAP(MyYop, Bar) = {
 +---------------------------------------------------------------------*/
 ATX_BEGIN_INTERFACE_MAP(MyYop, Yop)
     MyYop_YopMethod1
-ATX_END_INTERFACE_MAP(MyYop, Yop)
+ATX_END_INTERFACE_MAP
 
 /*----------------------------------------------------------------------
 |   MyYop_Create

@@ -370,7 +370,7 @@ ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(Win32FileStream)
     ATX_GET_INTERFACE_ACCEPT(Win32FileStream, ATX_InputStream)
     ATX_GET_INTERFACE_ACCEPT(Win32FileStream, ATX_OutputStream)
     ATX_GET_INTERFACE_ACCEPT(Win32FileStream, ATX_Referenceable)
-ATX_END_GET_INTERFACE_IMPLEMENTATION(Win32FileStream)
+ATX_END_GET_INTERFACE_IMPLEMENTATION
 
 /*----------------------------------------------------------------------
 |   ATX_InputStream interface
@@ -381,7 +381,7 @@ ATX_BEGIN_INTERFACE_MAP(Win32FileStream, ATX_InputStream)
     Win32FileInputStream_Tell,
     Win32FileInputStream_GetSize,
     Win32FileInputStream_GetAvailable
-ATX_END_INTERFACE_MAP(Win32FileStream, ATX_InputStream)
+ATX_END_INTERFACE_MAP
 
 /*----------------------------------------------------------------------
 |   ATX_OutputStream interface
@@ -391,7 +391,7 @@ ATX_BEGIN_INTERFACE_MAP(Win32FileStream, ATX_OutputStream)
     Win32FileOutputStream_Seek,
     Win32FileOutputStream_Tell,
     Win32FileOutputStream_Flush
-ATX_END_INTERFACE_MAP(Win32FileStream, ATX_OutputStream)
+ATX_END_INTERFACE_MAP
 
 /*----------------------------------------------------------------------
 |   ATX_Referenceable interface
@@ -612,7 +612,7 @@ Win32File_GetOutputStream(ATX_File*          _self,
 ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(Win32File)
     ATX_GET_INTERFACE_ACCEPT(Win32File, ATX_File)
     ATX_GET_INTERFACE_ACCEPT(Win32File, ATX_Destroyable)
-ATX_END_GET_INTERFACE_IMPLEMENTATION(Win32File)
+ATX_END_GET_INTERFACE_IMPLEMENTATION
 
 /*----------------------------------------------------------------------
 |   ATX_File interface
@@ -623,7 +623,7 @@ ATX_BEGIN_INTERFACE_MAP(Win32File, ATX_File)
     Win32File_GetSize,
     Win32File_GetInputStream,
     Win32File_GetOutputStream
-ATX_END_INTERFACE_MAP(Win32File, ATX_File)
+ATX_END_INTERFACE_MAP
 
 /*----------------------------------------------------------------------
 |   ATX_Destroyable interface

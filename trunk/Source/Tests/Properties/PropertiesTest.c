@@ -148,11 +148,11 @@ Listener_OnPropertyChanged(ATX_PropertyListener*    _self,
 ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(Listener)
     ATX_GET_INTERFACE_ACCEPT(Listener, ATX_PropertyListener)
     ATX_GET_INTERFACE_ACCEPT(Listener, ATX_Destroyable)
-ATX_END_GET_INTERFACE_IMPLEMENTATION(Listener)
+ATX_END_GET_INTERFACE_IMPLEMENTATION
 
 ATX_BEGIN_INTERFACE_MAP(Listener, ATX_PropertyListener)
     Listener_OnPropertyChanged
-ATX_END_INTERFACE_MAP(Listener, ATX_PropertyListener)
+ATX_END_INTERFACE_MAP
 
 ATX_IMPLEMENT_DESTROYABLE_INTERFACE(Listener)
 

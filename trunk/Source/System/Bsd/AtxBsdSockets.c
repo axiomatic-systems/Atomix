@@ -584,7 +584,7 @@ ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(BsdSocketStream)
     ATX_GET_INTERFACE_ACCEPT(BsdSocketStream, ATX_InputStream)
     ATX_GET_INTERFACE_ACCEPT(BsdSocketStream, ATX_OutputStream)
     ATX_GET_INTERFACE_ACCEPT(BsdSocketStream, ATX_Referenceable)
-ATX_END_GET_INTERFACE_IMPLEMENTATION(BsdSocketStream)
+ATX_END_GET_INTERFACE_IMPLEMENTATION
 
 /*----------------------------------------------------------------------
 |       ATX_InputStream interface
@@ -595,7 +595,7 @@ ATX_BEGIN_INTERFACE_MAP(BsdSocketStream, ATX_InputStream)
     BsdSocketInputStream_Tell,
     BsdSocketInputStream_GetSize,
     BsdSocketInputStream_GetAvailable
-ATX_END_INTERFACE_MAP(BsdSocketStream, ATX_InputStream)
+ATX_END_INTERFACE_MAP
 
 /*----------------------------------------------------------------------
 |       ATX_OutputStream interface
@@ -605,7 +605,7 @@ ATX_BEGIN_INTERFACE_MAP(BsdSocketStream, ATX_OutputStream)
     BsdSocketOutputStream_Seek,
     BsdSocketOutputStream_Tell,
     BsdSocketOutputStream_Flush
-ATX_END_INTERFACE_MAP(BsdSocketStream, ATX_OutputStream)
+ATX_END_INTERFACE_MAP
 
 /*----------------------------------------------------------------------
 |       ATX_Referenceable interface
@@ -842,7 +842,7 @@ BsdSocket_GetInfo(ATX_Socket* _self, ATX_SocketInfo* info)
 ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(BsdSocket)
     ATX_GET_INTERFACE_ACCEPT(BsdSocket, ATX_Socket)
     ATX_GET_INTERFACE_ACCEPT(BsdSocket, ATX_Destroyable)
-ATX_END_GET_INTERFACE_IMPLEMENTATION(BsdSocket)
+ATX_END_GET_INTERFACE_IMPLEMENTATION
 
 /*----------------------------------------------------------------------
 |       ATX_Socket interface
@@ -853,7 +853,7 @@ ATX_BEGIN_INTERFACE_MAP(BsdSocket, ATX_Socket)
     BsdSocket_GetInputStream,
     BsdSocket_GetOutputStream,
     BsdSocket_GetInfo
-ATX_END_INTERFACE_MAP(BsdSocket, ATX_Socket)
+ATX_END_INTERFACE_MAP
 
 /*----------------------------------------------------------------------
 |       ATX_Destroyable interface
@@ -1068,7 +1068,7 @@ ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(BsdUdpSocket)
     ATX_GET_INTERFACE_ACCEPT_EX(BsdUdpSocket, BsdSocket, ATX_Socket)
     ATX_GET_INTERFACE_ACCEPT_EX(BsdUdpSocket, BsdSocket, ATX_Destroyable)
     ATX_GET_INTERFACE_ACCEPT(BsdUdpSocket, ATX_DatagramSocket)
-ATX_END_GET_INTERFACE_IMPLEMENTATION(BsdUdpSocket)
+ATX_END_GET_INTERFACE_IMPLEMENTATION
 
 /*----------------------------------------------------------------------
 |       ATX_Socket interface
@@ -1089,7 +1089,7 @@ ATX_INTERFACE_MAP(BsdUdpSocket, ATX_Socket) = {
 ATX_BEGIN_INTERFACE_MAP(BsdUdpSocket, ATX_DatagramSocket)
     BsdUdpSocket_Send,
     BsdUdpSocket_Receive
-ATX_END_INTERFACE_MAP(BsdUdpSocket, ATX_DatagramSocket)
+ATX_END_INTERFACE_MAP
 
 /*----------------------------------------------------------------------
 |       ATX_Destroyable interface
@@ -1241,7 +1241,7 @@ BsdTcpClientSocket_Connect(ATX_Socket*              _self,
 ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(BsdTcpClientSocket)
     ATX_GET_INTERFACE_ACCEPT(BsdTcpClientSocket, ATX_Socket)
     ATX_GET_INTERFACE_ACCEPT(BsdTcpClientSocket, ATX_Destroyable)
-ATX_END_GET_INTERFACE_IMPLEMENTATION(BsdTcpClientSocket)
+ATX_END_GET_INTERFACE_IMPLEMENTATION
 
 /*----------------------------------------------------------------------
 |       ATX_Socket interface
@@ -1252,7 +1252,7 @@ ATX_BEGIN_INTERFACE_MAP(BsdTcpClientSocket, ATX_Socket)
     BsdSocket_GetInputStream,
     BsdSocket_GetOutputStream,
     BsdSocket_GetInfo
-ATX_END_INTERFACE_MAP(BsdTcpClientSocket, ATX_Socket)
+ATX_END_INTERFACE_MAP
 
 /*----------------------------------------------------------------------
 |       forward declarations
@@ -1362,7 +1362,7 @@ ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(BsdTcpServerSocket)
     ATX_GET_INTERFACE_ACCEPT_EX(BsdTcpServerSocket, BsdSocket, ATX_Socket)
     ATX_GET_INTERFACE_ACCEPT_EX(BsdTcpServerSocket, BsdSocket, ATX_Destroyable)
     ATX_GET_INTERFACE_ACCEPT(BsdTcpServerSocket, ATX_ServerSocket)
-ATX_END_GET_INTERFACE_IMPLEMENTATION(BsdTcpServerSocket)
+ATX_END_GET_INTERFACE_IMPLEMENTATION
 
 /*----------------------------------------------------------------------
 |       ATX_Socket interface
@@ -1383,7 +1383,7 @@ ATX_INTERFACE_MAP(BsdTcpServerSocket, ATX_Socket) = {
 ATX_BEGIN_INTERFACE_MAP(BsdTcpServerSocket, ATX_ServerSocket)
     BsdTcpServerSocket_Listen,
     BsdTcpServerSocket_WaitForNewClient
-ATX_END_INTERFACE_MAP(BsdTcpServerSocket, ATX_ServerSocket)
+ATX_END_INTERFACE_MAP
 
 /*----------------------------------------------------------------------
 |       ATX_Destroyable interface

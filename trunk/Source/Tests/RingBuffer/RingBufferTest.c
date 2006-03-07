@@ -93,9 +93,6 @@ main(int argc, char** argv)
     ATX_RingBuffer* buffer;
     int             i;
 
-    ATX_COMPILER_UNUSED(argc);
-    ATX_COMPILER_UNUSED(argv);
-
     /* setup debugging */
 #if defined(_DEBUG) && defined(WIN32)
     int flags = _crtDbgFlag       | 
@@ -107,6 +104,9 @@ main(int argc, char** argv)
     /*AllocConsole();
      freopen("CONOUT$", "w", stdout);*/
 #endif 
+
+    ATX_COMPILER_UNUSED(argc);
+    ATX_COMPILER_UNUSED(argv);
 
     result = ATX_RingBuffer_Create(BUFFER_SIZE, &buffer);
     if (ATX_FAILED(result)) {
