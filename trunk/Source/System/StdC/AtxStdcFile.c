@@ -375,7 +375,7 @@ ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(StdcFileStream)
     ATX_GET_INTERFACE_ACCEPT(StdcFileStream, ATX_InputStream)
     ATX_GET_INTERFACE_ACCEPT(StdcFileStream, ATX_OutputStream)
     ATX_GET_INTERFACE_ACCEPT(StdcFileStream, ATX_Referenceable)
-ATX_END_GET_INTERFACE_IMPLEMENTATION(StdcFileStream)
+ATX_END_GET_INTERFACE_IMPLEMENTATION
 
 /*----------------------------------------------------------------------
 |       ATX_InputStream interface
@@ -386,7 +386,7 @@ ATX_BEGIN_INTERFACE_MAP(StdcFileStream, ATX_InputStream)
     StdcFileInputStream_Tell,
     StdcFileInputStream_GetSize,
     StdcFileInputStream_GetAvailable
-ATX_END_INTERFACE_MAP(StdcFileStream, ATX_InputStream)
+ATX_END_INTERFACE_MAP
 
 /*----------------------------------------------------------------------
 |       ATX_OutputStream interface
@@ -396,7 +396,7 @@ ATX_BEGIN_INTERFACE_MAP(StdcFileStream, ATX_OutputStream)
     StdcFileOutputStream_Seek,
     StdcFileOutputStream_Tell,
     StdcFileOutputStream_Flush
-ATX_END_INTERFACE_MAP(StdcFileStream, ATX_OutputStream)
+ATX_END_INTERFACE_MAP
 
 /*----------------------------------------------------------------------
 |       ATX_Referenceable interface
@@ -623,7 +623,7 @@ StdcFile_GetOutputStream(ATX_File*          _self,
 ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(StdcFile)
     ATX_GET_INTERFACE_ACCEPT(StdcFile, ATX_File)
     ATX_GET_INTERFACE_ACCEPT(StdcFile, ATX_Destroyable)
-ATX_END_GET_INTERFACE_IMPLEMENTATION(StdcFile)
+ATX_END_GET_INTERFACE_IMPLEMENTATION
 
 /*----------------------------------------------------------------------
 |       ATX_File interface
@@ -634,7 +634,7 @@ ATX_BEGIN_INTERFACE_MAP(StdcFile, ATX_File)
     StdcFile_GetSize,
     StdcFile_GetInputStream,
     StdcFile_GetOutputStream
-ATX_END_INTERFACE_MAP(StdcFile, ATX_File)
+ATX_END_INTERFACE_MAP
 
 /*----------------------------------------------------------------------
 |       ATX_Destroyable interface
