@@ -617,7 +617,7 @@ ATX_IMPLEMENT_REFERENCEABLE_INTERFACE(BsdSocketStream, reference_count)
 +---------------------------------------------------------------------*/
 ATX_DECLARE_INTERFACE_MAP(BsdSocket, ATX_Socket)
 ATX_DECLARE_INTERFACE_MAP(BsdSocket, ATX_Destroyable)
-static ATX_Result BsdSocket_RefreshInfo(BsdSocket* socket);
+static ATX_Result BsdSocket_RefreshInfo(BsdSocket* self);
 
 /*----------------------------------------------------------------------
 |       BsdSocket_Construct
@@ -657,17 +657,17 @@ BsdSocket_Destruct(BsdSocket* self)
 static ATX_Result
 BsdSocket_Create(SocketFd fd, ATX_Socket** object)
 { 
-    BsdSocket* socket;
+    BsdSocket* bsd_socket;
 
     /* allocate new object */
-    socket = (BsdSocket*)ATX_AllocateZeroMemory(sizeof(BsdSocket));
-    *object = (ATX_Socket*)socket;
-    if (socket == NULL) {
+    bsd_socket = (BsdSocket*)ATX_AllocateZeroMemory(sizeof(BsdSocket));
+    *object = (ATX_Socket*)bsd_socket;
+    if (bsd_socket == NULL) {
         return ATX_ERROR_OUT_OF_MEMORY;
     }
 
     /* construct object */
-    BsdSocket_Construct(socket, fd);
+    BsdSocket_Construct(bsd_socket, fd);
 
     return ATX_SUCCESS;
 }
