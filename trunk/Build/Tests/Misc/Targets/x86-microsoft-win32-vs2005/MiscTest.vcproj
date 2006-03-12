@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="MiscTest"
 	ProjectGUID="{23771193-5B30-4CDD-9BE6-F11CCCD8C45A}"
+	RootNamespace="MiscTest"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -143,6 +144,7 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="1"
 				TargetMachine="1"
 			/>
 			<Tool

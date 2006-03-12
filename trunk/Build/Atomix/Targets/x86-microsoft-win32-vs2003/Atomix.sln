@@ -1,51 +1,41 @@
 Microsoft Visual Studio Solution File, Format Version 8.00
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AtxCore", "..\..\..\Core\Targets\x86-microsoft-win32-vs2003\AtxCore.vcproj", "{98A51FAD-DE1C-43F4-866F-04DF437879AC}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AtxSystem", "..\..\..\System\Targets\x86-microsoft-win32-vs2003\AtxSystem.vcproj", "{85759730-1E46-4C13-8FF7-42639FC8BB8E}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NetPump", "..\..\..\Apps\NetPump\Targets\x86-microsoft-win32-vs2003\NetPump.vcproj", "{8CF441A9-1D5A-471C-9118-9308D8DD3696}"
 	ProjectSection(ProjectDependencies) = postProject
-		{85759730-1E46-4C13-8FF7-42639FC8BB8E} = {85759730-1E46-4C13-8FF7-42639FC8BB8E}
-		{98A51FAD-DE1C-43F4-866F-04DF437879AC} = {98A51FAD-DE1C-43F4-866F-04DF437879AC}
+		{AB4D6E4D-790B-4851-8E5F-129AA6D7E56F} = {AB4D6E4D-790B-4851-8E5F-129AA6D7E56F}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HttpTest", "..\..\..\Tests\Http\Targets\x86-microsoft-win32-vs2003\HttpTest.vcproj", "{729FD1B3-6CF5-4CD4-BD62-D3B8137622CD}"
 	ProjectSection(ProjectDependencies) = postProject
-		{85759730-1E46-4C13-8FF7-42639FC8BB8E} = {85759730-1E46-4C13-8FF7-42639FC8BB8E}
-		{98A51FAD-DE1C-43F4-866F-04DF437879AC} = {98A51FAD-DE1C-43F4-866F-04DF437879AC}
+		{AB4D6E4D-790B-4851-8E5F-129AA6D7E56F} = {AB4D6E4D-790B-4851-8E5F-129AA6D7E56F}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MiscTest", "..\..\..\Tests\Misc\Targets\x86-microsoft-win32-vs2003\MiscTest.vcproj", "{23771193-5B30-4CDD-9BE6-F11CCCD8C45A}"
 	ProjectSection(ProjectDependencies) = postProject
-		{85759730-1E46-4C13-8FF7-42639FC8BB8E} = {85759730-1E46-4C13-8FF7-42639FC8BB8E}
-		{98A51FAD-DE1C-43F4-866F-04DF437879AC} = {98A51FAD-DE1C-43F4-866F-04DF437879AC}
+		{AB4D6E4D-790B-4851-8E5F-129AA6D7E56F} = {AB4D6E4D-790B-4851-8E5F-129AA6D7E56F}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RingBufferTest", "..\..\..\Tests\RingBuffer\Targets\x86-microsoft-win32-vs2003\RingBufferTest.vcproj", "{DDCA82F7-4EE0-4E63-AB45-1B4A79665EB8}"
 	ProjectSection(ProjectDependencies) = postProject
-		{85759730-1E46-4C13-8FF7-42639FC8BB8E} = {85759730-1E46-4C13-8FF7-42639FC8BB8E}
-		{98A51FAD-DE1C-43F4-866F-04DF437879AC} = {98A51FAD-DE1C-43F4-866F-04DF437879AC}
+		{AB4D6E4D-790B-4851-8E5F-129AA6D7E56F} = {AB4D6E4D-790B-4851-8E5F-129AA6D7E56F}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StringsTest", "..\..\..\Tests\Strings\Targets\x86-microsoft-win32-vs2003\StringsTest.vcproj", "{AEB323F2-E28D-4E00-89A3-B945136C76B4}"
 	ProjectSection(ProjectDependencies) = postProject
-		{85759730-1E46-4C13-8FF7-42639FC8BB8E} = {85759730-1E46-4C13-8FF7-42639FC8BB8E}
-		{98A51FAD-DE1C-43F4-866F-04DF437879AC} = {98A51FAD-DE1C-43F4-866F-04DF437879AC}
+		{AB4D6E4D-790B-4851-8E5F-129AA6D7E56F} = {AB4D6E4D-790B-4851-8E5F-129AA6D7E56F}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PropertiesTest", "..\..\..\Tests\Properties\Targets\x86-microsoft-win32-vs2003\PropertiesTest.vcproj", "{9FED9964-E2E1-47BE-AC9C-FE4BA7F1C376}"
 	ProjectSection(ProjectDependencies) = postProject
-		{85759730-1E46-4C13-8FF7-42639FC8BB8E} = {85759730-1E46-4C13-8FF7-42639FC8BB8E}
-		{98A51FAD-DE1C-43F4-866F-04DF437879AC} = {98A51FAD-DE1C-43F4-866F-04DF437879AC}
+		{AB4D6E4D-790B-4851-8E5F-129AA6D7E56F} = {AB4D6E4D-790B-4851-8E5F-129AA6D7E56F}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InterfacesExample", "..\..\..\Examples\Interfaces\Targets\x86-microsoft-win32-vs2003\InterfacesExample.vcproj", "{2A97F5F9-1149-4C73-B6F8-4E415FF79E5F}"
 	ProjectSection(ProjectDependencies) = postProject
-		{98A51FAD-DE1C-43F4-866F-04DF437879AC} = {98A51FAD-DE1C-43F4-866F-04DF437879AC}
+		{AB4D6E4D-790B-4851-8E5F-129AA6D7E56F} = {AB4D6E4D-790B-4851-8E5F-129AA6D7E56F}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Atomix", "Atomix.vcproj", "{AB4D6E4D-790B-4851-8E5F-129AA6D7E56F}"
+	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
 Global
@@ -54,14 +44,6 @@ Global
 		Release = Release
 	EndGlobalSection
 	GlobalSection(ProjectConfiguration) = postSolution
-		{98A51FAD-DE1C-43F4-866F-04DF437879AC}.Debug.ActiveCfg = Debug|Win32
-		{98A51FAD-DE1C-43F4-866F-04DF437879AC}.Debug.Build.0 = Debug|Win32
-		{98A51FAD-DE1C-43F4-866F-04DF437879AC}.Release.ActiveCfg = Release|Win32
-		{98A51FAD-DE1C-43F4-866F-04DF437879AC}.Release.Build.0 = Release|Win32
-		{85759730-1E46-4C13-8FF7-42639FC8BB8E}.Debug.ActiveCfg = Debug|Win32
-		{85759730-1E46-4C13-8FF7-42639FC8BB8E}.Debug.Build.0 = Debug|Win32
-		{85759730-1E46-4C13-8FF7-42639FC8BB8E}.Release.ActiveCfg = Release|Win32
-		{85759730-1E46-4C13-8FF7-42639FC8BB8E}.Release.Build.0 = Release|Win32
 		{8CF441A9-1D5A-471C-9118-9308D8DD3696}.Debug.ActiveCfg = Debug|Win32
 		{8CF441A9-1D5A-471C-9118-9308D8DD3696}.Debug.Build.0 = Debug|Win32
 		{8CF441A9-1D5A-471C-9118-9308D8DD3696}.Release.ActiveCfg = Release|Win32
@@ -90,6 +72,10 @@ Global
 		{2A97F5F9-1149-4C73-B6F8-4E415FF79E5F}.Debug.Build.0 = Debug|Win32
 		{2A97F5F9-1149-4C73-B6F8-4E415FF79E5F}.Release.ActiveCfg = Release|Win32
 		{2A97F5F9-1149-4C73-B6F8-4E415FF79E5F}.Release.Build.0 = Release|Win32
+		{AB4D6E4D-790B-4851-8E5F-129AA6D7E56F}.Debug.ActiveCfg = Debug|Win32
+		{AB4D6E4D-790B-4851-8E5F-129AA6D7E56F}.Debug.Build.0 = Debug|Win32
+		{AB4D6E4D-790B-4851-8E5F-129AA6D7E56F}.Release.ActiveCfg = Release|Win32
+		{AB4D6E4D-790B-4851-8E5F-129AA6D7E56F}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

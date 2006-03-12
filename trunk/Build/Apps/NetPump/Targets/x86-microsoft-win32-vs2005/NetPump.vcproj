@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="NetPump"
 	ProjectGUID="{8CF441A9-1D5A-471C-9118-9308D8DD3696}"
+	RootNamespace="NetPump"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -125,7 +126,7 @@
 				AdditionalIncludeDirectories="..\..\..\..\..\Source\Core;..\..\..\..\..\Source\Config;..\..\..\..\..\Source\Atomix"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				StringPooling="true"
-				RuntimeLibrary="0"
+				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -150,6 +151,7 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="1"
 				TargetMachine="1"
 			/>
 			<Tool

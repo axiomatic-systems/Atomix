@@ -422,7 +422,7 @@ ATX_StringStartsWith(const char* str, const char* sub)
 ATX_Boolean 
 ATX_String_StartsWith(const ATX_String* self, const char *s)
 {
-    return ATX_StringStartsWith(ATX_String_GetChars(self), s) == 1;
+    return (ATX_StringStartsWith(ATX_String_GetChars(self), s) == 1)?ATX_TRUE:ATX_FALSE;
 }
 
 /*----------------------------------------------------------------------
