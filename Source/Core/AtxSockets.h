@@ -115,7 +115,7 @@ ATX_INTERFACE(object)->GetInfo(object, info)
 /*----------------------------------------------------------------------
 |   functions
 +---------------------------------------------------------------------*/
-ATX_Result ATX_Socket_ConnectToHost(ATX_Socket* socket,
+ATX_Result ATX_Socket_ConnectToHost(ATX_Socket* self,
                                     ATX_CString host,
                                     ATX_IpPort  port,
                                     ATX_Timeout timeout);
@@ -169,9 +169,9 @@ ATX_INTERFACE(object)->WaitForNewClient(object, client)
 extern "C" {
 #endif /* __cplusplus */
 
-extern ATX_Result ATX_TcpClientSocket_Create(ATX_Socket** socket);
-extern ATX_Result ATX_TcpServerSocket_Create(ATX_ServerSocket** socket);
-extern ATX_Result ATX_UdpSocket_Create(ATX_DatagramSocket** socket);
+extern ATX_Result ATX_TcpClientSocket_Create(ATX_Socket** bsd_socket);
+extern ATX_Result ATX_TcpServerSocket_Create(ATX_ServerSocket** bsd_socket);
+extern ATX_Result ATX_UdpSocket_Create(ATX_DatagramSocket** bsd_socket);
 
 #ifdef __cplusplus
 }

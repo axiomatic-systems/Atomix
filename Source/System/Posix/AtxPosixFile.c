@@ -1,6 +1,6 @@
 /*****************************************************************
 |
-|      File: AtxStdcFileByteStream.c
+|      File: AtxPosixFile.c
 |
 |      Atomix - File ByteStream: StdC Implementation
 |
@@ -23,7 +23,7 @@
 
 #include "AtxConfig.h"
 #include "AtxTypes.h"
-#include "AtxErrors.h"
+#include "AtxResults.h"
 #include "AtxUtils.h"
 #include "AtxByteStream.h"
 #include "AtxFileByteStream.h"
