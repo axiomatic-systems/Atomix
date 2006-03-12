@@ -104,10 +104,8 @@ class LibraryModule(Module):
         
 def Application(name, dir):
     DeclareBuildDir(dir)
-    sdk_libs = ['AtxCore', 'AtxSystem', 'AtxCore', 'AtxSystem']
-    sdk_incs = ['AtxSystem', 'AtxCore']
-    libs = GetLibraries(sdk_libs)
-    cpp_path = GetIncludeDirs(sdk_incs)
+    libs = GetLibraries('Atomix')
+    cpp_path = GetIncludeDirs('Atomix')
     
     prog = env.Program(name, 
                        GlobSources(dir, ['*.c']), 
@@ -130,14 +128,10 @@ if os.path.exists(target_config_file):
 #######################################################
 # modules
 #######################################################
-LibraryModule(name               = 'AtxCore', 
-              build_source_dirs  = 'Core',
+LibraryModule(name               = 'Atomix', 
+              build_source_dirs  = ['Core', 'System/StdC','System/Bsd'],
               include_dirs       = ['Config','Atomix'])
-           
-LibraryModule(name               = 'AtxSystem', 
-              build_source_dirs  = ['System/StdC','System/Bsd'],
-              included_modules   = 'AtxCore')
- 
+            
 Application('NetPump', 'Source/Apps/NetPump')
 for test in ['Strings', 'Misc', 'Properties', 'RingBuffer', 'Http']:
     Application(test+'Test', 'Source/Tests/'+test)

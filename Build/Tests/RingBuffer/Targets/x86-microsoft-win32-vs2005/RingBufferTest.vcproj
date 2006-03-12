@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="RingBufferTest"
 	ProjectGUID="{DDCA82F7-4EE0-4E63-AB45-1B4A79665EB8}"
+	RootNamespace="RingBufferTest"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -143,6 +144,7 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="1"
 				TargetMachine="1"
 			/>
 			<Tool

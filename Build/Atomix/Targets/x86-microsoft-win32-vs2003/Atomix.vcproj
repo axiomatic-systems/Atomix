@@ -2,9 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="AtxCore"
-	ProjectGUID="{98A51FAD-DE1C-43F4-866F-04DF437879AC}"
-	RootNamespace="AtxCore"
+	Name="Atomix"
+	ProjectGUID="{AB4D6E4D-790B-4851-8E5F-129AA6D7E56F}"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -20,14 +19,13 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..\Source\Config;..\..\..\..\Source\Atomix"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;ATX_DEBUG"
+				AdditionalIncludeDirectories="..\..\..\..\Source\Atomix;..\..\..\..\Source\Config;..\..\..\..\Source\Core"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="TRUE"
+				ExceptionHandling="FALSE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				BufferSecurityCheck="TRUE"
 				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile=""
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="4"/>
@@ -35,7 +33,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/AtxCore.lib"/>
+				OutputFile="$(OutDir)/Atomix.lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -65,23 +63,23 @@
 				Name="VCCLCompilerTool"
 				Optimization="3"
 				GlobalOptimizations="TRUE"
-				InlineFunctionExpansion="0"
 				OmitFramePointers="TRUE"
-				AdditionalIncludeDirectories="..\..\..\..\Source\Config;..\..\..\..\Source\Atomix"
+				AdditionalIncludeDirectories="..\..\..\..\Source\Atomix;..\..\..\..\Source\Config;..\..\..\..\Source\Core"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
-				StringPooling="TRUE"
+				ExceptionHandling="FALSE"
 				RuntimeLibrary="2"
+				BufferSecurityCheck="FALSE"
 				EnableFunctionLevelLinking="TRUE"
 				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile=""
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="3"/>
+				DebugInformationFormat="3"
+				CompileAs="0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/AtxCore.lib"/>
+				OutputFile="$(OutDir)/Atomix.lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -107,7 +105,11 @@
 	<Files>
 		<Filter
 			Name="Source Files"
-			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm">
+			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
+			<File
+				RelativePath="..\..\..\..\Source\System\Bsd\AtxBsdSockets.c">
+			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\AtxDataBuffer.c">
 			</File>
@@ -153,10 +155,17 @@
 			<File
 				RelativePath="..\..\..\..\Source\Core\AtxUtils.c">
 			</File>
+			<File
+				RelativePath="..\..\..\..\Source\System\Win32\AtxWin32Debug.c">
+			</File>
+			<File
+				RelativePath="..\..\..\..\Source\System\Win32\AtxWin32File.c">
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc">
+			Filter="h;hpp;hxx;hm;inl;inc;xsd"
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
 				RelativePath="..\..\..\..\Source\Atomix\Atomix.h">
 			</File>
@@ -223,6 +232,11 @@
 			<File
 				RelativePath="..\..\..\..\Source\Atomix\AtxVersion.h">
 			</File>
+		</Filter>
+		<Filter
+			Name="Resource Files"
+			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
+			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
 		</Filter>
 	</Files>
 	<Globals>

@@ -74,7 +74,7 @@
 				AdditionalIncludeDirectories="..\..\..\..\..\Source\Core;..\..\..\..\..\Source\Atomix;..\..\..\..\..\Source\Config"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				StringPooling="TRUE"
-				RuntimeLibrary="4"
+				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -84,6 +84,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="wsock32.lib"
 				OutputFile="$(OutDir)/HttpTest.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
