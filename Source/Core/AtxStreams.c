@@ -177,15 +177,13 @@ ATX_InputStream_Skip(ATX_InputStream* self, ATX_Size count)
 ATX_Result
 ATX_InputStream_Load(ATX_InputStream* self, ATX_Size max_read, ATX_DataBuffer** buffer)
 {
-    ATX_Result  result;
-    ATX_Size    total_bytes_read;
-    ATX_Boolean buffer_is_external = ATX_TRUE;
-    ATX_Size    size = 0;
+    ATX_Result result;
+    ATX_Size   total_bytes_read;
+    ATX_Size   size = 0;
 
     /* create a buffer if none was given */
     if (*buffer == NULL) {
         ATX_CHECK(ATX_DataBuffer_Create(0, buffer));
-        buffer_is_external = ATX_FALSE;
     }
 
     /* reset the buffer */
@@ -236,10 +234,6 @@ ATX_InputStream_Load(ATX_InputStream* self, ATX_Size max_read, ATX_DataBuffer** 
     if (result == ATX_ERROR_EOS) {
         return ATX_SUCCESS;
     } else {
-        if (!buffer_is_external) {
-            ATX_DataBuffer_Destroy(*buffer);
-            *buffer = NULL;
-        }
         return result;
     }
 }

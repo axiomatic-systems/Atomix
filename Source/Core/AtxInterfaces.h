@@ -65,12 +65,12 @@ typedef struct {
 ( (_self_type *)( ((ATX_Byte*)(_self)) - ATX_OFFSET_OF(_interface_type##_Base, _self_type)) )
 
 #define ATX_SELF_EX(_self_type, _base_type, _interface_type) \
-( (_self_type *)( ((ATX_Byte*)(_self)) - ATX_OFFSET_OF(_base_type##_Base._interface_type##_Base, _self_type)) )
+( (_self_type *)( ((ATX_Byte*)(_self)) -                     \
+    ATX_OFFSET_OF(_base_type##_Base._interface_type##_Base, _self_type)) )
 
-#define ATX_SELF_M(_member, _member_type, _self_type, _interface_type) \
-( (_self_type *)( ((ATX_Byte*)(_self)) -                               \
-    ATX_OFFSET_OF(_interface_type##_Base, _member_type)) -             \
-    ATX_OFFSET_OF(_member, _self_type))
+#define ATX_SELF_M(_member, _self_type, _interface_type) \
+( (_self_type *)( ((ATX_Byte*)(_self)) -                 \
+    ATX_OFFSET_OF(_member._interface_type##_Base, _self_type)) )
 
 #define ATX_BASE(_object, _base) (_object)->_base##_Base
 
