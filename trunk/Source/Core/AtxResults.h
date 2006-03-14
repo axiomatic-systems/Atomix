@@ -18,12 +18,23 @@
 /*----------------------------------------------------------------------
 |    macros      
 +---------------------------------------------------------------------*/
+#if defined(ATX_DEBUG)
+#include "AtxDebug.h"
+#define ATX_CHECK(_x) do {          \
+    ATX_Result _result = (_x);      \
+    if (_result != ATX_SUCCESS) {   \
+        ATX_Debug("@@@ ATX_CHECK failed file %s line %d, result=%d\n", __FILE__, __LINE__, _result); \
+        return _result;             \
+    }                               \
+} while(0)
+#else
 #define ATX_CHECK(_x) do {          \
     ATX_Result _result = (_x);      \
     if (_result != ATX_SUCCESS) {   \
         return _result;             \
     }                               \
 } while(0)
+#endif
 
 #define ATX_FAILED(result)              ((result) != ATX_SUCCESS)
 #define ATX_SUCCEEDED(result)           ((result) == ATX_SUCCESS)

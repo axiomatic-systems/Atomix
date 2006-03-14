@@ -20,7 +20,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\..\..\Source\Atomix;..\..\..\..\Source\Config;..\..\..\..\Source\Core"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB,ATX_DEBUG"
 				MinimalRebuild="TRUE"
 				ExceptionHandling="FALSE"
 				BasicRuntimeChecks="3"
@@ -198,6 +198,9 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\AtxList.h">
+			</File>
+			<File
+				RelativePath="..\..\..\..\Source\Core\AtxLogging.h">
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\AtxModule.h">
