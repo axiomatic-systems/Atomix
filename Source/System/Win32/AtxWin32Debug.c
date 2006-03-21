@@ -52,11 +52,12 @@ ATX_Debug(const char* format, ...)
     va_start(args, format);
 
 #if (_MSC_VER >= 1400)
-	// use the secure function for VC 8 and above
+	/* use the secure function for VC 8 and above */
 	_vsnprintf_s(buffer, sizeof(buffer), sizeof(buffer)-1, format, args);
 #else
     _vsnprintf(buffer, sizeof(buffer)-1, format, args);
 #endif
+    buffer[ATX_DEBUG_MAX_BUFFER-1] = 0;
     ATX_Print(buffer);
 
     va_end(args);

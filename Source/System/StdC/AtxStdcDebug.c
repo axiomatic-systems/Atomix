@@ -50,6 +50,7 @@ ATX_Debug(const char* format, ...)
     va_start(args, format);
 
     vsnprintf(buffer, sizeof(buffer), format, args);
+    buffer[ATX_DEBUG_MAX_BUFFER-1] = 0;
     ATX_Print(buffer);
 
     va_end(args);

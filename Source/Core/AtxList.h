@@ -41,6 +41,7 @@ extern "C" {
 
 ATX_Result    ATX_List_Create(ATX_List** list);
 ATX_Result    ATX_List_Destroy(ATX_List* list);
+ATX_Result    ATX_List_Clear(ATX_List* list);
 ATX_ListItem* ATX_List_CreateItem(ATX_List* list);
 ATX_Result    ATX_List_AddData(ATX_List* list, ATX_Any data);
 ATX_Result    ATX_List_AddObject(ATX_List* list, ATX_Object* object);

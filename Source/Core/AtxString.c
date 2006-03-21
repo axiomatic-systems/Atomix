@@ -30,7 +30,7 @@
 #define ATX_STRING_BUFFER_CHARS(b) ((char*)((b)+1))
 
 /*----------------------------------------------------------------------
-|       ATX_String::EmptyString
+|       ATX_String_EmptyString
 +---------------------------------------------------------------------*/
 const char* const ATX_String_EmptyString = "";
 
@@ -417,13 +417,27 @@ ATX_StringStartsWith(const char* str, const char* sub)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String::StartsWith
+|       ATX_String_StartsWith
 +---------------------------------------------------------------------*/
 ATX_Boolean 
 ATX_String_StartsWith(const ATX_String* self, const char *s)
 {
     return (ATX_StringStartsWith(ATX_String_GetChars(self), s) == 1)?ATX_TRUE:ATX_FALSE;
 }
+
+/*----------------------------------------------------------------------
+|       ATX_String_EndsWith
++---------------------------------------------------------------------*/
+ATX_Boolean 
+ATX_String_EndsWith(const ATX_String* self, const char *s)
+{
+    ATX_Size str_length;
+    if (s == NULL || *s == '\0') return ATX_FALSE;
+    str_length = ATX_StringLength(s);
+    if (str_length > ATX_String_GetLength(self)) return ATX_FALSE;
+    return (ATX_StringStartsWith(self->chars+ATX_String_GetLength(self)-str_length, s) == 1)?ATX_TRUE:ATX_FALSE;
+}
+
 
 /*----------------------------------------------------------------------
 |       ATX_String_FindStringFrom
@@ -468,7 +482,7 @@ ATX_String_FindString(const ATX_String* self, const char* str)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String::FindCharFrom
+|       ATX_String_FindCharFrom
 +---------------------------------------------------------------------*/
 int
 ATX_String_FindCharFrom(const ATX_String* self, char c, ATX_Ordinal start)
@@ -491,7 +505,7 @@ ATX_String_FindCharFrom(const ATX_String* self, char c, ATX_Ordinal start)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String::FindChar
+|       ATX_String_FindChar
 +---------------------------------------------------------------------*/
 int
 ATX_String_FindChar(const ATX_String* self, char c)
@@ -500,7 +514,37 @@ ATX_String_FindChar(const ATX_String* self, char c)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String::MakeLowercase
+|       ATX_String_ReverseFindCharFrom
++---------------------------------------------------------------------*/
+int
+ATX_String_ReverseFindCharFrom(const ATX_String* self, char c, ATX_Ordinal start)
+{
+    const char* src = ATX_String_GetChars(self);
+
+    /* check args */
+    ATX_Size length = ATX_String_GetLength(self);
+    int i = length-start-1;
+    if (i < 0) return -1;
+
+    /* look for the character */
+    for (;i>=0;i--) {
+        if (src[i] == c) return i;
+    }
+
+    return -1;
+}
+
+/*----------------------------------------------------------------------
+|       ATX_String_ReverseFindChar
++---------------------------------------------------------------------*/
+int
+ATX_String_ReverseFindChar(const ATX_String* self, char c)
+{
+    return ATX_String_ReverseFindCharFrom(self, c, 0);
+}
+
+/*----------------------------------------------------------------------
+|       ATX_String_MakeLowercase
 +---------------------------------------------------------------------*/
 void
 ATX_String_MakeLowercase(ATX_String* self)
@@ -545,7 +589,7 @@ ATX_String_ToLowercase(const ATX_String* self)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String::ToUppercase
+|       ATX_String_ToUppercase
 +---------------------------------------------------------------------*/
 ATX_String
 ATX_String_ToUppercase(const ATX_String* self)
@@ -577,7 +621,7 @@ ATX_String_Replace(ATX_String* self, char a, char b)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String::Insert
+|       ATX_String_Insert
 +---------------------------------------------------------------------*/
 void
 ATX_String_Insert(ATX_String* self, const char* str, ATX_Ordinal where)
