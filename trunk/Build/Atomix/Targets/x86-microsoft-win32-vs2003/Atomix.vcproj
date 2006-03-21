@@ -20,7 +20,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\..\..\Source\Atomix;..\..\..\..\Source\Config;..\..\..\..\Source\Core"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB,ATX_DEBUG"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB,ATX_DEBUG,ATX_CONFIG_ENABLE_LOGGING"
 				MinimalRebuild="TRUE"
 				ExceptionHandling="FALSE"
 				BasicRuntimeChecks="3"
@@ -126,6 +126,9 @@
 				RelativePath="..\..\..\..\Source\Core\AtxList.c">
 			</File>
 			<File
+				RelativePath="..\..\..\..\Source\Core\AtxLogging.c">
+			</File>
+			<File
 				RelativePath="..\..\..\..\Source\Core\AtxProperties.c">
 			</File>
 			<File
@@ -160,6 +163,9 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\System\Win32\AtxWin32File.c">
+			</File>
+			<File
+				RelativePath="..\..\..\..\Source\System\Win32\AtxWin32System.c">
 			</File>
 		</Filter>
 		<Filter
@@ -225,6 +231,12 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\AtxString.h">
+			</File>
+			<File
+				RelativePath="..\..\..\..\Source\Core\AtxSystem.h">
+			</File>
+			<File
+				RelativePath="..\..\..\..\Source\Core\AtxTime.h">
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\AtxTypes.h">

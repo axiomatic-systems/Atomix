@@ -26,6 +26,10 @@
 #include <string.h>
 #endif /* ATX_CONFIG_HAVE_STRING_H */
 
+#if defined(ATX_CONFIG_HAVE_STDIO_H)
+#include <stdio.h>
+#endif /* ATX_CONFIG_HAVE_STDIO_H */
+
 #if defined(ATX_CONFIG_HAVE_CTYPE_H)
 #include <ctype.h>
 #endif
@@ -161,6 +165,12 @@ extern char* ATX_DuplicateString(const char* s);
 extern unsigned long ATX_StringLength(const char* s);
 #endif
 
+#if defined(ATX_CONFIG_HAVE_VSNPRINTF)
+#define ATX_FormatStringVN(s,c,f,a) ATX_vsnprintf(s,c,f,a)
+#else
+extern int ATX_FormatStringVN(char *buffer, size_t count, const char *format, va_list argptr);
+#endif
+
 #if defined(ATX_CONFIG_HAVE_IS_SPACE)
 #define ATX_IsSpace(c) isspace(c)
 #else
@@ -172,6 +182,19 @@ extern int ATX_IsSpace(int c);
 #else 
 extern int ATX_MemoryEqual(const void* s1, const void* s2, unsigned long n); 
 #endif
+
+#if defined(ATX_CONFIG_HAVE_ATEXIT)
+#define ATX_AtExit(_fun) atexit(_fun)
+#else
+extern int atexit(void (*func )( void ));
+#endif
+
+#if defined(ATX_CONFIG_HAVE_GETENV)
+#define ATX_GetEnvironment(name) getenv(name)
+#else
+extern char* ATX_GetEnvironment(const char* name);
+#endif
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

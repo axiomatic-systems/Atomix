@@ -167,7 +167,7 @@ extern ATX_Boolean
 ATX_String_StartsWith(const ATX_String* str, const char* s);
 
 extern ATX_Boolean 
-ATX_String_EndsWidth(const ATX_String* str, const char* s);
+ATX_String_EndsWith(const ATX_String* str, const char* s);
 
 extern void
 ATX_String_TrimWhitespaceLeft(ATX_String* str);

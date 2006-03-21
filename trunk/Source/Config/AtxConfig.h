@@ -21,6 +21,7 @@
 #define ATX_CONFIG_HAVE_STD_C
 #define ATX_CONFIG_HAVE_STDLIB_H
 #define ATX_CONFIG_HAVE_STRING_H
+#define ATX_CONFIG_HAVE_STDIO_H
 #define ATX_CONFIG_HAVE_CTYPE_H
 #define ATX_CONFIG_HAVE_MATH_H
 #define ATX_CONFIG_HAVE_ASSERT_H
@@ -43,6 +44,8 @@
 #define ATX_CONFIG_HAVE_MEMMOVE
 #define ATX_CONFIG_HAVE_MEMSET
 #define ATX_CONFIG_HAVE_MEMCMP
+#define ATX_CONFIG_HAVE_ATEXIT
+#define ATX_CONFIG_HAVE_GETENV
 #endif /* ATX_CONFIG_HAS_STD_C */
 
 #if defined(ATX_CONFIG_HAVE_STRING_H)
@@ -53,6 +56,10 @@
 #define ATX_CONFIG_HAVE_STRCPY
 #define ATX_CONFIG_HAVE_STRNCPY
 #endif /* ATX_CONFIG_HAVE_STRING_H */
+
+#if defined(ATX_CONFIG_HAVE_STDIO_H)
+#define ATX_CONFIG_HAVE_VSNPRINTF
+#endif /* ATX_CONFIG_HAVE_STDIO_H_ */
 
 #if defined(ATX_CONFIG_HAVE_CTYPE_H)
 #define ATX_CONFIG_HAVE_IS_SPACE
@@ -74,8 +81,9 @@
 #if defined(_MSC_VER)
 #define ATX_CONFIG_HAVE_INT64
 #define ATX_CONFIG_INT64_TYPE __int64
-#define ATX_strdup _strdup
-#define snprintf   _snprintf
+#define ATX_strdup     _strdup
+#define ATX_vsnprintf  _vsnprintf
+#define ATX_snprintf   _snprintf
 #if (_MSC_VER >= 1300)
 typedef __w64 long ATX_PointerLong;
 #define ATX_POINTER_TO_LONG(_p) ((long)(ATX_PointerLong) (_p) )
@@ -96,6 +104,12 @@ typedef __w64 long ATX_PointerLong;
 /* some compilers (ex: MSVC 8) deprecate those, so we rename them */
 #if !defined(ATX_strdup)
 #define ATX_strdup strdup
+#endif
+#if !defined(ATX_snprintf)
+#define ATX_snprintf snprintf
+#endif
+#if !defined(ATX_vsnprintf)
+#define ATX_vsnprintf vsnprintf
 #endif
 
 #endif /* _ATX_CONFIG_H_ */

@@ -63,17 +63,29 @@ ATX_List_Create(ATX_List** list)
 ATX_Result
 ATX_List_Destroy(ATX_List* list)
 {
+    /* destroy all items */
+    ATX_List_Clear(list);
+
+    /* destroy the list object */
+    ATX_FreeMemory((void*)list);
+
+    return ATX_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|    ATX_List_Clear
++---------------------------------------------------------------------*/
+ATX_Result
+ATX_List_Clear(ATX_List* list)
+{
     ATX_ListItem* item = list->head;
-    
+
     /* destroy all items */
     while (item) {
         ATX_ListItem* next = item->next;
         ATX_FreeMemory(item);
         item = next;
     }
-
-    /* destroy the list object */
-    ATX_FreeMemory((void*)list);
 
     return ATX_SUCCESS;
 }
