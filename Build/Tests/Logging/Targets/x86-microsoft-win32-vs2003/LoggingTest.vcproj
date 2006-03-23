@@ -119,9 +119,6 @@
 			<File
 				RelativePath="..\..\..\..\..\Source\Tests\Logging\LoggingTest.c">
 			</File>
-			<File
-				RelativePath="..\..\..\..\..\Source\Tests\Logging\LoggingTestExtra.c">
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
