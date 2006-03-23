@@ -40,7 +40,7 @@
 #define ATX_FILE_STANDARD_ERROR  "@STDERR"
 
 /*----------------------------------------------------------------------
-|   ATX_InputStream
+|   ATX_File
 +---------------------------------------------------------------------*/
 ATX_DECLARE_INTERFACE(ATX_File)
 ATX_BEGIN_INTERFACE_DEFINITION(ATX_File)

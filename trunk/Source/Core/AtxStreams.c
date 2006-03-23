@@ -239,6 +239,31 @@ ATX_InputStream_Load(ATX_InputStream* self, ATX_Size max_read, ATX_DataBuffer** 
 }
 
 /*----------------------------------------------------------------------
+|   ATX_OutputStream_WriteFully
++---------------------------------------------------------------------*/
+ATX_Result
+ATX_OutputStream_WriteFully(ATX_OutputStream* self, 
+                            const void*       buffer, 
+                            ATX_Size          bytes_to_write)
+{
+    /* shortcut */
+    if (bytes_to_write == 0) return ATX_SUCCESS;
+
+    /* write until failure */
+    while (bytes_to_write) {
+        ATX_Size bytes_written;
+        ATX_Result result = ATX_OutputStream_Write(self, buffer, bytes_to_write, &bytes_written);
+        if (ATX_FAILED(result)) return result;
+        if (bytes_written == 0) return ATX_FAILURE;
+        ATX_ASSERT(bytes_written <= bytes_to_write);
+        bytes_to_write -= bytes_written;
+        buffer = (const void*)(((const ATX_Byte*)buffer)+bytes_written);
+    }
+
+    return ATX_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
 |   ATX_OutputStream_WriteString
 +---------------------------------------------------------------------*/
 ATX_Result
@@ -251,10 +276,9 @@ ATX_OutputStream_WriteString(ATX_OutputStream* self, ATX_CString string)
     }
 
     /* write the string */
-    return ATX_OutputStream_Write(self, 
-                                  (const void*)string, 
-                                  string_length, 
-                                  NULL);
+    return ATX_OutputStream_WriteFully(self, 
+                                       (const void*)string, 
+                                       string_length);
 }
 
 /*----------------------------------------------------------------------
@@ -266,7 +290,7 @@ ATX_OutputStream_WriteLine(ATX_OutputStream* self, ATX_CString string)
     ATX_Result result;
     result = ATX_OutputStream_WriteString(self, string);
     if (ATX_FAILED(result)) return result;
-    result = ATX_OutputStream_Write(self, (const void*)"\r\n", 2, NULL);
+    result = ATX_OutputStream_WriteFully(self, (const void*)"\r\n", 2);
     if (ATX_FAILED(result)) return result;
 
     return ATX_SUCCESS;

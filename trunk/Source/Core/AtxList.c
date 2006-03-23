@@ -87,6 +87,11 @@ ATX_List_Clear(ATX_List* list)
         item = next;
     }
 
+    /* reset item count and pointers */
+    list->item_count = 0;
+    list->head = NULL;
+    list->tail = NULL;
+
     return ATX_SUCCESS;
 }
 

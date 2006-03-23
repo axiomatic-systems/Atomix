@@ -58,6 +58,7 @@
 #endif /* ATX_CONFIG_HAVE_STRING_H */
 
 #if defined(ATX_CONFIG_HAVE_STDIO_H)
+#define ATX_CONFIG_HAVE_SNPRINTF
 #define ATX_CONFIG_HAVE_VSNPRINTF
 #endif /* ATX_CONFIG_HAVE_STDIO_H_ */
 
@@ -104,6 +105,9 @@ typedef __w64 long ATX_PointerLong;
 /* some compilers (ex: MSVC 8) deprecate those, so we rename them */
 #if !defined(ATX_strdup)
 #define ATX_strdup strdup
+#endif
+#if !defined(ATX_snprintf)
+#define ATX_snprintf snprintf
 #endif
 #if !defined(ATX_snprintf)
 #define ATX_snprintf snprintf

@@ -88,13 +88,13 @@ ATX_String_Assign(ATX_String* str, const char* chars);
 extern ATX_Result 
 ATX_String_AssignN(ATX_String* str, const char* chars, ATX_Size size);
 
-extern void 
+extern ATX_Result 
 ATX_String_Append(ATX_String* str, const char* other);
 
-extern void 
+extern ATX_Result 
 ATX_String_AppendSubString(ATX_String* str, const char* other, ATX_Size size);
 
-extern void 
+extern ATX_Result 
 ATX_String_AppendChar(ATX_String* str, char c);
 
 extern ATX_String
@@ -196,7 +196,7 @@ ATX_String_TrimChar(ATX_String* str, char c);
 extern void
 ATX_String_TrimChars(ATX_String* str, const char* chars);
 
-extern void
+extern ATX_Result
 ATX_String_Insert(ATX_String* str, const char* s, ATX_Ordinal where);
 
 /*void Erase(ATX_Ordinal start, ATX_Cardinal count = 1);*/

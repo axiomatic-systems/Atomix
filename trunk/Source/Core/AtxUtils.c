@@ -259,6 +259,73 @@ ATX_ParseInteger(const char* str, long* result, ATX_Boolean relaxed)
     return ATX_SUCCESS;
 }
 
+/*----------------------------------------------------------------------
+|   ATX_IntegerToString
++---------------------------------------------------------------------*/
+ATX_Result
+ATX_IntegerToString(long value, char* buffer, ATX_Size buffer_size)
+{
+    char s[32];
+    char* c = &s[31];
+    ATX_Boolean negative;
+    *c-- = '\0';
+
+    /* handle the sign */
+    negative = ATX_FALSE;
+    if (value < 0) {
+        negative = ATX_TRUE;
+        value = -value;
+    }
+
+    /* process the digits */
+    do {
+        int digit = value%10;
+        *c-- = '0'+digit;
+        value /= 10;
+    } while(value);
+
+    if (negative) {
+        *c = '-';
+    } else {
+        ++c;
+    }
+
+    /* check that the string fits */
+    if (ATX_StringLength(s)+1 > buffer_size) return ATX_ERROR_OUT_OF_RANGE;
+
+    /* copy the string */
+    ATX_CopyString(buffer, c);
+
+    return ATX_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   ATX_IntegerToStringU
++---------------------------------------------------------------------*/
+ATX_Result
+ATX_IntegerToStringU(unsigned long value, char* buffer, ATX_Size buffer_size)
+{
+    char s[32];
+    char* c = &s[31];
+    *c-- = '\0';
+
+    /* process the digits */
+    do {
+        unsigned int digit = value%10;
+        *c-- = '0'+digit;
+        value /= 10;
+    } while(value);
+    ++c;
+
+    /* check that the string fits */
+    if (ATX_StringLength(s)+1 > buffer_size) return ATX_ERROR_OUT_OF_RANGE;
+
+    /* copy the string */
+    ATX_CopyString(buffer, c);
+
+    return ATX_SUCCESS;
+}
+
 #if !defined(ATX_CONFIG_HAVE_STRCPY)
 /*----------------------------------------------------------------------
 |    ATX_CopyString
