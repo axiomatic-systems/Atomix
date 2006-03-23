@@ -6,7 +6,7 @@ c_compiler_warnings         = cxx_compiler_warnings + ' -Wmissing-prototypes -Wm
 c_compiler_defines          = '-D_REENTRANT'
 
 if env['build_config'] == 'Debug':
-    c_compiler_flags = '-g -DATX_DEBUG'    
+    c_compiler_flags = '-g -DATX_DEBUG -DATX_CONFIG_ENABLE_LOGGING'    
 else:
     c_compiler_flags = '-O3'
 
@@ -15,9 +15,5 @@ env['CCFLAGS']  = ' '.join([c_compiler_compliance_flags, c_compiler_flags, c_com
 env['CXXFLAGS'] = ' '.join([c_compiler_compliance_flags, c_compiler_flags, cxx_compiler_warnings])
 
 ### Atomix System Files
-env['ATX_SYSTEM_SOURCES']=['AtxStdcDebug.c', 'AtxBsdSockets.c', 'AtxStdcFile.c']
+env['ATX_SYSTEM_SOURCES']=['AtxStdcDebug.c', 'AtxBsdSockets.c', 'AtxStdcFile.c' ,'AtxPosixSystem.c']
 env['ATX_EXTRA_LIBS']='m'
-
-### Neptune System Files
-env['NPT_SYSTEM_SOURCES']=['NptStdcDebug.cpp', 'NptBsdSockets.cpp', 'NptStdcFile.cpp',      \
-                           'NptPosixSystem.cpp', 'NptPosixThreads.cpp', 'NptPosixQueue.cpp']

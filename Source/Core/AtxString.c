@@ -305,31 +305,31 @@ ATX_String_SetLength(ATX_String* self, ATX_Size length)
 /*----------------------------------------------------------------------
 |       ATX_String_Append
 +---------------------------------------------------------------------*/
-void
+ATX_Result
 ATX_String_Append(ATX_String* self, const char* str)
 {
     /* shortcut */
-    if (str == NULL || str[0] == '\0') return;
-    ATX_String_AppendSubString(self, str, ATX_StringLength(str));
+    if (str == NULL || str[0] == '\0') return ATX_SUCCESS;
+    return ATX_String_AppendSubString(self, str, ATX_StringLength(str));
 }
 
 /*----------------------------------------------------------------------
 |       ATX_String_AppendChar
 +---------------------------------------------------------------------*/
-void
+ATX_Result
 ATX_String_AppendChar(ATX_String* self, char c)
 {
-    ATX_String_AppendSubString(self, &c, 1);
+    return ATX_String_AppendSubString(self, &c, 1);
 }
 
 /*----------------------------------------------------------------------
 |       ATX_String_AppendSubString
 +---------------------------------------------------------------------*/
-void
+ATX_Result
 ATX_String_AppendSubString(ATX_String* self, const char* str, ATX_Size length)
 {
     /* shortcut */
-    if (str == NULL || length == 0) return;
+    if (str == NULL || length == 0) return ATX_SUCCESS;
 
     {
         /* compute the new length */
@@ -337,7 +337,7 @@ ATX_String_AppendSubString(ATX_String* self, const char* str, ATX_Size length)
         ATX_Size new_length = old_length + length;
 
         /* allocate enough space */
-        ATX_String_Reserve(self, new_length);
+        ATX_CHECK(ATX_String_Reserve(self, new_length));
 
         /* append the new string at the end of the current one */
         ATX_CopyMemory(self->chars+old_length, str, length);
@@ -346,6 +346,8 @@ ATX_String_AppendSubString(ATX_String* self, const char* str, ATX_Size length)
         ATX_String_GetBuffer(self)->length = new_length;
         self->chars[new_length] = '\0';
     }
+
+    return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
@@ -623,7 +625,7 @@ ATX_String_Replace(ATX_String* self, char a, char b)
 /*----------------------------------------------------------------------
 |       ATX_String_Insert
 +---------------------------------------------------------------------*/
-void
+ATX_Result
 ATX_String_Insert(ATX_String* self, const char* str, ATX_Ordinal where)
 {
     ATX_Size str_length;
@@ -631,11 +633,12 @@ ATX_String_Insert(ATX_String* self, const char* str, ATX_Ordinal where)
     ATX_Size new_length;
 
     /* check args */
-    if (str == NULL || where > ATX_String_GetLength(self)) return;
+    if (str == NULL) return ATX_SUCCESS;
+    if (where > ATX_String_GetLength(self)) return ATX_ERROR_INVALID_PARAMETERS;
 
     /* measure the string to insert */
     str_length = ATX_StringLength(str);
-    if (str_length == 0) return;
+    if (str_length == 0) return ATX_SUCCESS;
 
     /* compute the size of the new string */
     old_length = ATX_String_GetLength(self);
@@ -646,6 +649,9 @@ ATX_String_Insert(ATX_String* self, const char* str, ATX_Ordinal where)
         char* src = self->chars;
         char* nst = ATX_StringBuffer_Create(new_length);
         char* dst = nst;
+
+        /* check for errors */
+        if (nst == NULL) return ATX_ERROR_OUT_OF_MEMORY;
 
         /* copy the beginning of the old string */
         if (where > 0) {
@@ -667,6 +673,8 @@ ATX_String_Insert(ATX_String* self, const char* str, ATX_Ordinal where)
         if (self->chars) ATX_FreeMemory((void*)ATX_String_GetBuffer(self));
         self->chars = nst;
     }
+
+    return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------

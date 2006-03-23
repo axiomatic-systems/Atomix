@@ -77,6 +77,12 @@ ATX_ParseFloat(const char* str, float* result, ATX_Boolean relaxed);
 extern ATX_Result 
 ATX_ParseInteger(const char* str, long* result, ATX_Boolean relaxed);
 
+extern ATX_Result
+ATX_IntegerToString(long value, char* buffer, ATX_Size buffer_size);
+
+extern ATX_Result
+ATX_IntegerToStringU(unsigned long value, char* buffer, ATX_Size buffer_size);
+
 /*----------------------------------------------------------------------
 |    byte IO
 +---------------------------------------------------------------------*/
@@ -163,6 +169,12 @@ extern char* ATX_DuplicateString(const char* s);
 #define ATX_StringLength(s) (ATX_Size)strlen(s)
 #else
 extern unsigned long ATX_StringLength(const char* s);
+#endif
+
+#if defined(ATX_CONFIG_HAVE_SNPRINTF)
+#define ATX_FormatStringN ATX_snprintf
+#else
+extern int ATX_FormatStringN(char *buffer, size_t count, const char *format, ...);
 #endif
 
 #if defined(ATX_CONFIG_HAVE_VSNPRINTF)

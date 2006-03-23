@@ -297,7 +297,7 @@ StdcFileOutputStream_Create(StdcFileWrapper*   file,
                             ATX_OutputStream** stream)
 {
     StdcFileStream* file_stream = NULL;
-    ATX_Result       result;
+    ATX_Result      result;
 
     /* create the object */
     result = StdcFileStream_Create(file, &file_stream);

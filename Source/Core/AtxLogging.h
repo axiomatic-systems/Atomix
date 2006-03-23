@@ -78,7 +78,8 @@ typedef struct {
 #define ATX_LOG_LEVEL_FINER   200
 #define ATX_LOG_LEVEL_FINEST  100 
 
-#define ATX_LOG_LEVEL_NONE    1000
+#define ATX_LOG_LEVEL_OFF     32767
+#define ATX_LOG_LEVEL_ALL     (-1)
 
 /*----------------------------------------------------------------------
 |   macros
@@ -115,7 +116,7 @@ typedef struct {
 
 #define ATX_LOG_LX(_logger, _level, _argsx)                          \
 do {                                                                 \
-    ATX_LOG_GET_LOGGER((_logger));                                   \
+    ATX_LOG_GET_LOGGER((_logger))                                    \
     if ((_logger).logger && (_level) >= (_logger).logger->level) {   \
         ATX_Logger_Log _argsx;                                       \
     }                                                                \
@@ -277,7 +278,7 @@ extern "C" {
 
 extern int         ATX_Log_GetLogLevel(const char* name);
 extern const char* ATX_Log_GetLogLevelName(int level);
-extern ATX_Logger* ATX_Log_GetLogger();
+extern ATX_Logger* ATX_Log_GetLogger(const char* name);
 extern void ATX_Logger_Log(ATX_Logger*  self, 
                            int          level, 
                            const char*  source_file,

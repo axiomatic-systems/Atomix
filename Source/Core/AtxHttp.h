@@ -127,9 +127,9 @@ ATX_HttpClient_SetOptionBool(ATX_HttpClient* client,
                              ATX_Boolean     value);
 
 extern ATX_Result
-ATX_HttpClient_GetOption(const ATX_HttpClient* client, 
-                             ATX_CString       option,
-                             ATX_Boolean*      value);
+ATX_HttpClient_GetOptionBool(const ATX_HttpClient* client, 
+                             ATX_CString           option,
+                             ATX_Boolean*          value);
 
 extern ATX_Result 
 ATX_HttpClient_SendRequest(ATX_HttpClient*    client,

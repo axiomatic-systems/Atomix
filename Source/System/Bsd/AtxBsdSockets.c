@@ -1176,10 +1176,17 @@ BsdTcpClientSocket_Connect(ATX_Socket*              _self,
 
         return ATX_SUCCESS;
     }
-    if (io_result == ATX_BSD_SOCKET_ERROR && GetSocketError() != EINPROGRESS) {
-        /* error */
-        return MapErrorCode(GetSocketError());
+    if (io_result == ATX_BSD_SOCKET_ERROR) {
+        ATX_Result result = MapErrorCode(GetSocketError());
+        if (result != ATX_ERROR_WOULD_BLOCK) {
+            /* error */
+            BsdSocket_SetBlockingMode(self, ATX_TRUE);
+            return result;
+        }
     }
+
+    /* put the socket back in blocking mode */
+    BsdSocket_SetBlockingMode(self, ATX_TRUE);
 
     /* wait for connection to succeed or fail */
     FD_ZERO(&read_set);
@@ -1229,9 +1236,6 @@ BsdTcpClientSocket_Connect(ATX_Socket*              _self,
         }
     }
     
-    /* put the socket back in blocking mode */
-    BsdSocket_SetBlockingMode(self, ATX_TRUE);
-
     /* get socket info */
     BsdSocket_RefreshInfo(self);
 

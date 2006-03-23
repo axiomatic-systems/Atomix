@@ -59,6 +59,9 @@ ATX_END_INTERFACE_DEFINITION
 /*----------------------------------------------------------------------
 |       base class implementations
 +---------------------------------------------------------------------*/
+ATX_Result ATX_OutputStream_WriteFully(ATX_OutputStream* stream,
+                                       ATX_AnyConst      buffer,
+                                       ATX_Size          bytes_to_write);
 ATX_Result ATX_OutputStream_WriteString(ATX_OutputStream* stream,
                                         ATX_CString       string);
 ATX_Result ATX_OutputStream_WriteLine(ATX_OutputStream* stream,

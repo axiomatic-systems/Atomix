@@ -129,9 +129,9 @@ if os.path.exists(target_config_file):
 # modules
 #######################################################
 LibraryModule(name               = 'Atomix', 
-              build_source_dirs  = ['Core', 'System/StdC','System/Bsd'],
+              build_source_dirs  = ['Core', 'System/StdC','System/Bsd', 'System/Posix'],
               include_dirs       = ['Config','Atomix'])
             
 Application('NetPump', 'Source/Apps/NetPump')
-for test in ['Strings', 'Misc', 'Properties', 'RingBuffer', 'Http']:
+for test in ['Strings', 'Misc', 'Properties', 'RingBuffer', 'Http', 'Logging']:
     Application(test+'Test', 'Source/Tests/'+test)
