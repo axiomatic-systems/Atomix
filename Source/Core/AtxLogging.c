@@ -48,6 +48,7 @@ typedef struct {
 } ATX_LogManager;
 
 typedef struct {
+    ATX_Boolean       use_colors;
     ATX_OutputStream* stream;
 } ATX_LogFileHandler;
 
@@ -64,17 +65,28 @@ typedef struct {
 #define ATX_LOG_STACK_BUFFER_MAX_SIZE 512
 #define ATX_LOG_HEAP_BUFFER_MAX_SIZE  65536
 
+#if !defined(ATOMIX_LOG_CONFIG)
 #define ATX_LOG_CONFIG_ENV "ATOMIX_LOG_CONFIG"
-#define ATX_LOG_DEFAULT_CONFIG_SOURCE "file:atomix-logging.properties"
+#endif
 
-#define ATX_LOG_ROOT_DEFAULT_LOG_LEVEL              ATX_LOG_LEVEL_INFO
-#define ATX_LOG_ROOT_DEFAULT_HANDLER                "FileHandler"
+#if !defined(ATX_LOG_DEFAULT_CONFIG_SOURCE)
+#define ATX_LOG_DEFAULT_CONFIG_SOURCE "file:atomix-logging.properties"
+#endif
+
+#define ATX_LOG_ROOT_DEFAULT_LOG_LEVEL ATX_LOG_LEVEL_INFO
+#define ATX_LOG_ROOT_DEFAULT_HANDLER   "ConsoleHandler"
 #if !defined(ATX_LOG_ROOT_DEFAULT_FILE_HANDLER_FILENAME)
-#define ATX_LOG_ROOT_DEFAULT_FILE_HANDLER_FILENAME  "@STDOUT"
+#define ATX_LOG_ROOT_DEFAULT_FILE_HANDLER_FILENAME "_atomix.log"
 #endif
 
 #define ATX_LOG_TCP_HANDLER_DEFAULT_PORT            7723
 #define ATX_LOG_TCP_HANDLER_DEFAULT_CONNECT_TIMEOUT 5000 /* 5 seconds */
+
+#if defined(WIN32)
+#define ATX_LOG_CONSOLE_HANDLER_DEFAULT_COLOR_MODE ATX_FALSE
+#else
+#define ATX_LOG_CONSOLE_HANDLER_DEFAULT_COLOR_MODE ATX_TRUE
+#endif
 
 /*----------------------------------------------------------------------
 |   globals
@@ -87,6 +99,7 @@ static ATX_LogManager LogManager;
 static ATX_Logger* ATX_Logger_Create(const char* name);
 static ATX_Result ATX_Logger_Destroy(ATX_Logger* self);
 static ATX_Result ATX_LogFileHandler_Create(const char*     logger_name, 
+                                            ATX_Boolean     use_console,
                                             ATX_LogHandler* handler);
 static ATX_Result ATX_LogTcpHandler_Create(const char*     logger_name, 
                                            ATX_LogHandler* handler);
@@ -100,7 +113,9 @@ ATX_LogHandler_Create(const char*     logger_name,
                       ATX_LogHandler* handler)
 {
     if (ATX_StringsEqual(handler_name, "FileHandler")) {
-        return ATX_LogFileHandler_Create(logger_name, handler);
+        return ATX_LogFileHandler_Create(logger_name, ATX_FALSE, handler);
+    } else if (ATX_StringsEqual(handler_name, "ConsoleHandler")) {
+        return ATX_LogFileHandler_Create(logger_name, ATX_TRUE, handler);
     } else if (ATX_StringsEqual(handler_name, "TcpHandler")) {
         return ATX_LogTcpHandler_Create(logger_name, handler);
     }
@@ -126,6 +141,8 @@ ATX_Log_GetLogLevel(const char* name)
         return ATX_LOG_LEVEL_FINER;
     } else if (ATX_StringsEqual(name, "FINEST")) {
         return ATX_LOG_LEVEL_FINEST;
+    } else if (ATX_StringsEqual(name, "ALL")) {
+        return ATX_LOG_LEVEL_ALL;
     } else if (ATX_StringsEqual(name, "OFF")) {
         return ATX_LOG_LEVEL_OFF;
     } else {
@@ -148,6 +165,23 @@ ATX_Log_GetLogLevelName(int level)
         case ATX_LOG_LEVEL_FINEST:  return "FINEST";
         case ATX_LOG_LEVEL_OFF:     return "OFF";
         default:                    return "";
+    }
+}
+
+/*----------------------------------------------------------------------
+|   ATX_Log_GetLogLevelAnsiColor
++---------------------------------------------------------------------*/
+static const char*
+ATX_Log_GetLogLevelAnsiColor(int level)
+{
+    switch (level) {
+        case ATX_LOG_LEVEL_SEVERE:  return "31";
+        case ATX_LOG_LEVEL_WARNING: return "33";
+        case ATX_LOG_LEVEL_INFO:    return "32";
+        case ATX_LOG_LEVEL_FINE:    return "34";
+        case ATX_LOG_LEVEL_FINER:   return "35";
+        case ATX_LOG_LEVEL_FINEST:  return "36";
+        default:                    return NULL;
     }
 }
 
@@ -418,6 +452,7 @@ ATX_LogManager_ConfigureLogger(ATX_Logger* logger)
             ATX_CSTR(logger->name),".forward");
         if (forward) {
             if (ATX_String_Compare(forward, "false", ATX_TRUE) == 0||
+                ATX_String_Compare(forward, "no", ATX_FALSE) == 0  ||
                 ATX_String_Compare(forward, "0", ATX_FALSE) == 0) {
                 logger->forward_to_parent = ATX_FALSE;
             }
@@ -474,8 +509,6 @@ ATX_LogManager_Init(void)
         LogManager.root->level_is_inherited = ATX_FALSE;
         ATX_LogManager_SetConfigValue(".handlers", 
                                       ATX_LOG_ROOT_DEFAULT_HANDLER);
-        ATX_LogManager_SetConfigValue(".FileHandler.filename", 
-                                      ATX_LOG_ROOT_DEFAULT_FILE_HANDLER_FILENAME);
         ATX_LogManager_ConfigureLogger(LogManager.root);
     }
 
@@ -738,6 +771,7 @@ ATX_LogFileHandler_Log(ATX_LogHandler* _self, const ATX_LogRecord* record)
     const char*         level_name = ATX_Log_GetLogLevelName(record->level);
     char                level_string[16];
     char                buffer[64];
+    const char*         ansi_color = NULL;
 
     /* format and emit the record */
     if (level_name[0] == '\0') {
@@ -755,7 +789,18 @@ ATX_LogFileHandler_Log(ATX_LogHandler* _self, const ATX_LogRecord* record)
     ATX_IntegerToStringU(record->timestamp.nanoseconds/1000000L, buffer, sizeof(buffer));
     ATX_OutputStream_WriteString(self->stream, buffer);
     ATX_OutputStream_Write(self->stream, " ", 1, NULL);
+    if (self->use_colors) {
+        ansi_color = ATX_Log_GetLogLevelAnsiColor(record->level);
+        if (ansi_color) {
+            ATX_OutputStream_Write(self->stream, "\033[", 2, NULL);
+            ATX_OutputStream_WriteString(self->stream, ansi_color);
+            ATX_OutputStream_Write(self->stream, ";1m", 3, NULL);
+        }
+    }
     ATX_OutputStream_WriteString(self->stream, level_name);
+    if (self->use_colors && ansi_color) {
+        ATX_OutputStream_Write(self->stream, "\033[0m", 4, NULL);
+    }
     ATX_OutputStream_Write(self->stream, ": ", 2, NULL);
     ATX_OutputStream_WriteString(self->stream, record->message);
     ATX_OutputStream_Write(self->stream, "\r\n", 2, NULL);
@@ -780,34 +825,57 @@ ATX_LogFileHandler_Destroy(ATX_LogHandler* _self)
 |   ATX_LogFileHandler_Create
 +---------------------------------------------------------------------*/
 static ATX_Result
-ATX_LogFileHandler_Create(const char* logger_name, ATX_LogHandler* handler)
+ATX_LogFileHandler_Create(const char*     logger_name,
+                          ATX_Boolean     use_console,
+                          ATX_LogHandler* handler)
 {
     ATX_LogFileHandler* instance;
     const char*         filename;
-    ATX_String*         filename_conf;
     ATX_String          filename_synth = ATX_EMPTY_STRING;
     ATX_File*           file;
     ATX_Result          result = ATX_SUCCESS;
 
     /* compute a prefix for the configuration of this handler */
     ATX_String logger_prefix = ATX_String_Create(logger_name);
-    ATX_CHECK(ATX_String_Append(&logger_prefix, ".FileHandler"));
+    ATX_CHECK(ATX_String_Append(&logger_prefix, 
+                                use_console ?
+                                ".ConsoleHandler" :
+                                ".FileHandler"));
 
     /* allocate a new object */
     instance = ATX_AllocateZeroMemory(sizeof(ATX_LogFileHandler));
     
     /* configure the object */
-    filename_conf = ATX_LogManager_GetConfigValue(ATX_CSTR(logger_prefix), ".filename");
-    if (filename_conf) {
-        filename = ATX_CSTR(*filename_conf);
-    } else if (logger_name[0]) {
-        ATX_String_Reserve(&filename_synth, ATX_StringLength(logger_name));
-        ATX_String_Assign(&filename_synth, logger_name);
-        ATX_String_Append(&filename_synth, ".log");
-        filename = ATX_CSTR(filename_synth);
+    if (use_console) {
+        ATX_String* colors;
+        filename = ATX_FILE_STANDARD_OUTPUT;
+        instance->use_colors = ATX_LOG_CONSOLE_HANDLER_DEFAULT_COLOR_MODE;
+        colors = ATX_LogManager_GetConfigValue(ATX_CSTR(logger_prefix),".colors");
+        if (colors) {
+            if (ATX_String_Compare(colors, "true", ATX_TRUE) == 0  ||
+                ATX_String_Compare(colors, "yes", ATX_FALSE) == 0  ||
+                ATX_String_Compare(colors, "on", ATX_FALSE) == 0) {
+                instance->use_colors = ATX_TRUE;
+            }
+            if (ATX_String_Compare(colors, "false", ATX_TRUE) == 0  ||
+                ATX_String_Compare(colors, "no", ATX_FALSE) == 0  ||
+                ATX_String_Compare(colors, "off", ATX_FALSE) == 0) {
+                instance->use_colors = ATX_FALSE;
+            }
+        }
     } else {
-        /* default name for the root logger */
-        filename = ATX_LOG_ROOT_DEFAULT_FILE_HANDLER_FILENAME;
+        ATX_String* filename_conf = ATX_LogManager_GetConfigValue(ATX_CSTR(logger_prefix), ".filename");
+        if (filename_conf) {
+            filename = ATX_CSTR(*filename_conf);
+        } else if (logger_name[0]) {
+            ATX_String_Reserve(&filename_synth, ATX_StringLength(logger_name));
+            ATX_String_Assign(&filename_synth, logger_name);
+            ATX_String_Append(&filename_synth, ".log");
+            filename = ATX_CSTR(filename_synth);
+        } else {
+            /* default name for the root logger */
+            filename = ATX_LOG_ROOT_DEFAULT_FILE_HANDLER_FILENAME;
+        }
     }
 
     /* open the log file */
@@ -915,9 +983,9 @@ ATX_LogTcpHandler_Log(ATX_LogHandler* _self, const ATX_LogRecord* record)
         ATX_String_Append(&msg, record->logger_name);
         ATX_String_Append(&msg, "\r\nLevel: ");
         ATX_String_Append(&msg, level_name);
-        ATX_String_Append(&msg, "\r\nSourceFile: ");
+        ATX_String_Append(&msg, "\r\nSource-File: ");
         ATX_String_Append(&msg, record->source_file);
-        ATX_String_Append(&msg, "\r\nSourceLine: ");
+        ATX_String_Append(&msg, "\r\nSource-Line: ");
         ATX_IntegerToStringU(record->source_line, buffer, sizeof(buffer));
         ATX_String_Append(&msg, buffer);
         ATX_String_Append(&msg, "\r\nTimeStamp: ");
@@ -985,7 +1053,7 @@ ATX_LogTcpHandler_Create(const char* logger_name, ATX_LogHandler* handler)
         /* default hostname */
         ATX_String_Assign(&instance->host, "localhost");
     }
-    port = ATX_LogManager_GetConfigValue(ATX_CSTR(logger_prefix), ".hostname");
+    port = ATX_LogManager_GetConfigValue(ATX_CSTR(logger_prefix), ".port");
     if (port) {
         long port_int;
         if (ATX_SUCCEEDED(ATX_String_ToInteger(port, &port_int, ATX_TRUE))) {

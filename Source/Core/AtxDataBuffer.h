@@ -24,6 +24,10 @@ typedef struct ATX_DataBuffer ATX_DataBuffer;
 /*----------------------------------------------------------------------
 |    functions
 +---------------------------------------------------------------------*/
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 ATX_Result ATX_DataBuffer_Create(ATX_Size size, ATX_DataBuffer** buffer);
 ATX_Result ATX_DataBuffer_Destroy(ATX_DataBuffer* buffer);
 ATX_Result ATX_DataBuffer_SetBuffer(ATX_DataBuffer* buffer,
@@ -41,5 +45,9 @@ ATX_Result ATX_DataBuffer_SetDataSize(ATX_DataBuffer* buffer, ATX_Size size);
 ATX_Result ATX_DataBuffer_SetData(ATX_DataBuffer* buffer, 
                                   const ATX_Byte* data,
                                   ATX_Size        data_size);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* _ATX_DATA_BUFFER_H_ */

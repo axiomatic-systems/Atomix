@@ -42,6 +42,20 @@ main(int argc, char** argv)
     ATX_LOG_SEVERE_L(FooLogger, "this is severe!");
     ATX_LOG_SEVERE_L1(FooLogger, "this is severe (%d)", 9);
 
+    ATX_LOG_SEVERE("severe");
+    ATX_LOG_WARNING("warning");
+    ATX_LOG_INFO("info");
+    ATX_LOG_FINE("fine");
+    ATX_LOG_FINER("finer");
+    ATX_LOG_FINEST("finest");
+
+    ATX_LOG_SEVERE_L(FooLogger, "severe");
+    ATX_LOG_WARNING_L(FooLogger, "warning");
+    ATX_LOG_INFO_L(FooLogger, "info");
+    ATX_LOG_FINE_L(FooLogger, "fine");
+    ATX_LOG_FINER_L(FooLogger, "finer");
+    ATX_LOG_FINEST_L(FooLogger, "finest");
+
     return 0;
 }
 
