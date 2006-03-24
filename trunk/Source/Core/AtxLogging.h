@@ -79,7 +79,7 @@ typedef struct {
 #define ATX_LOG_LEVEL_FINEST  100 
 
 #define ATX_LOG_LEVEL_OFF     32767
-#define ATX_LOG_LEVEL_ALL     (-1)
+#define ATX_LOG_LEVEL_ALL     0
 
 /*----------------------------------------------------------------------
 |   macros
