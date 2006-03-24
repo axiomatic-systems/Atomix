@@ -318,7 +318,7 @@ ATX_IntegerToStringU(unsigned long value, char* buffer, ATX_Size buffer_size)
     ++c;
 
     /* check that the string fits */
-    if (ATX_StringLength(s)+1 > buffer_size) return ATX_ERROR_OUT_OF_RANGE;
+    if (ATX_StringLength(c)+1 > buffer_size) return ATX_ERROR_OUT_OF_RANGE;
 
     /* copy the string */
     ATX_CopyString(buffer, c);
