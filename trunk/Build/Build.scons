@@ -130,7 +130,8 @@ if os.path.exists(target_config_file):
 #######################################################
 LibraryModule(name               = 'Atomix', 
               build_source_dirs  = ['Core', 'System/StdC','System/Bsd', 'System/Posix'],
-              include_dirs       = ['Config','Atomix'])
+              include_dirs       = ['Config','Atomix'],
+              linked_modules     = env['ATX_EXTRA_LIBS'])
             
 Application('NetPump', 'Source/Apps/NetPump')
 for test in ['Strings', 'Misc', 'Properties', 'RingBuffer', 'Http', 'Logging']:

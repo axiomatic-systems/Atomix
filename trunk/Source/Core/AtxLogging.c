@@ -308,7 +308,8 @@ ATX_LogManager_ParseConfigFile(const char* filename)
 
     /* load the file */
     ATX_DataBuffer* buffer = NULL;
-    ATX_CHECK(ATX_LoadFile(filename, &buffer));
+    result = ATX_LoadFile(filename, &buffer);
+    if (ATX_FAILED(result)) return result;
 
     /* parse the config */
     result = ATX_LogManager_ParseConfig((const char*)ATX_DataBuffer_GetData(buffer),
@@ -337,26 +338,6 @@ ATX_LogManager_ParseConfigSource(ATX_String* source)
     }
 
     return ATX_SUCCESS;
-}
-
-/*----------------------------------------------------------------------
-|   ATX_LogManager_Terminate
-+---------------------------------------------------------------------*/
-static void
-ATX_LogManager_Terminate(void)
-{
-    /* destroy everything we've created */
-    ATX_LogManager_ClearConfig();
-    ATX_List_Destroy(LogManager.config);
-
-    {
-        ATX_ListItem* item = ATX_List_GetFirstItem(LogManager.loggers);
-        ATX_Logger* logger = (ATX_Logger*)ATX_ListItem_GetData(item);
-        ATX_Logger_Destroy(logger);
-        item = ATX_ListItem_GetNext(item);
-    }
-    ATX_List_Destroy(LogManager.loggers);
-    ATX_Logger_Destroy(LogManager.root);
 }
 
 /*----------------------------------------------------------------------
@@ -463,6 +444,29 @@ ATX_LogManager_ConfigureLogger(ATX_Logger* logger)
 }
 
 /*----------------------------------------------------------------------
+|   ATX_LogManager_Terminate
++---------------------------------------------------------------------*/
+static void
+ATX_LogManager_Terminate(void)
+{
+    /* destroy everything we've created */
+    ATX_LogManager_ClearConfig();
+    ATX_List_Destroy(LogManager.config);
+
+    {
+        ATX_ListItem* item = ATX_List_GetFirstItem(LogManager.loggers);
+        while (item) {
+            ATX_Logger* logger = (ATX_Logger*)ATX_ListItem_GetData(item);
+            ATX_Logger_Destroy(logger);
+            item = ATX_ListItem_GetNext(item);
+        }
+    }
+
+    ATX_List_Destroy(LogManager.loggers);
+    ATX_Logger_Destroy(LogManager.root);
+}
+
+/*----------------------------------------------------------------------
 |   ATX_LogManager_Init
 +---------------------------------------------------------------------*/
 static void
@@ -546,8 +550,10 @@ ATX_Logger_Destroy(ATX_Logger* self)
     /* destroy all handlers */
     ATX_LogHandlerEntry* entry = self->handlers;
     while (entry) {
+        ATX_LogHandlerEntry* next = entry->next;
         entry->handler.iface->Destroy(&entry->handler);
-        entry = entry->next;
+        ATX_FreeMemory((void*)entry);
+        entry = next;
     }
     
     /* destruct other members */
