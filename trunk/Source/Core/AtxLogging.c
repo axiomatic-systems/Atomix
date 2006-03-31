@@ -103,6 +103,8 @@ static ATX_Result ATX_LogFileHandler_Create(const char*     logger_name,
                                             ATX_LogHandler* handler);
 static ATX_Result ATX_LogTcpHandler_Create(const char*     logger_name, 
                                            ATX_LogHandler* handler);
+static ATX_Result ATX_LogNullHandler_Create(const char*     logger_name, 
+                                            ATX_LogHandler* handler);
 
 /*----------------------------------------------------------------------
 |   ATX_LogHandler_Create
@@ -112,7 +114,9 @@ ATX_LogHandler_Create(const char*     logger_name,
                       const char*     handler_name, 
                       ATX_LogHandler* handler)
 {
-    if (ATX_StringsEqual(handler_name, "FileHandler")) {
+    if (ATX_StringsEqual(handler_name, "NullHandler")) {
+        return ATX_LogNullHandler_Create(logger_name, handler);
+    } else if (ATX_StringsEqual(handler_name, "FileHandler")) {
         return ATX_LogFileHandler_Create(logger_name, ATX_FALSE, handler);
     } else if (ATX_StringsEqual(handler_name, "ConsoleHandler")) {
         return ATX_LogFileHandler_Create(logger_name, ATX_TRUE, handler);
@@ -183,6 +187,32 @@ ATX_Log_GetLogLevelAnsiColor(int level)
         case ATX_LOG_LEVEL_FINEST:  return "36";
         default:                    return NULL;
     }
+}
+
+/*----------------------------------------------------------------------
+|   ATX_LogManager_ConfigValueIsBooleanTrue
++---------------------------------------------------------------------*/
+static ATX_Boolean
+ATX_LogManager_ConfigValueIsBooleanTrue(ATX_String* value)
+{
+    return 
+        ATX_String_Compare(value, "true", ATX_TRUE) == 0 ||
+        ATX_String_Compare(value, "yes",  ATX_TRUE) == 0 ||
+        ATX_String_Compare(value, "on",   ATX_TRUE) == 0 ||
+        ATX_String_Compare(value, "1",    ATX_FALSE) == 0;
+}
+
+/*----------------------------------------------------------------------
+|   ATX_LogManager_ConfigValueIsBooleanFalse
++---------------------------------------------------------------------*/
+static ATX_Boolean
+ATX_LogManager_ConfigValueIsBooleanFalse(ATX_String* value)
+{
+    return 
+        ATX_String_Compare(value, "false", ATX_TRUE) == 0  ||
+        ATX_String_Compare(value, "no",    ATX_TRUE) == 0  ||
+        ATX_String_Compare(value, "off",   ATX_TRUE) == 0  ||
+        ATX_String_Compare(value, "0",     ATX_FALSE) == 0;
 }
 
 /*----------------------------------------------------------------------
@@ -431,12 +461,8 @@ ATX_LogManager_ConfigureLogger(ATX_Logger* logger)
     {
         ATX_String* forward = ATX_LogManager_GetConfigValue(
             ATX_CSTR(logger->name),".forward");
-        if (forward) {
-            if (ATX_String_Compare(forward, "false", ATX_TRUE) == 0||
-                ATX_String_Compare(forward, "no", ATX_FALSE) == 0  ||
-                ATX_String_Compare(forward, "0", ATX_FALSE) == 0) {
-                logger->forward_to_parent = ATX_FALSE;
-            }
+        if (forward && !ATX_LogManager_ConfigValueIsBooleanTrue(forward)) {
+            logger->forward_to_parent = ATX_FALSE;
         }
     }
 
@@ -588,39 +614,7 @@ ATX_Logger_Log(ATX_Logger*  self,
         /* try to format the message (it might not fit) */
         result = ATX_FormatStringVN(message, buffer_size-1, msg, args);
         message[buffer_size-1] = 0; /* force a NULL termination */
-        if (result >= 0) {
-            /* the message is formatted, publish it to the handlers */
-            ATX_LogRecord record;
-            
-            /* setup the log record */
-            record.logger_name = ATX_CSTR(self->name),
-            record.level       = level;
-            record.message     = message;
-            record.source_file = source_file;
-            record.source_line = source_line;
-            ATX_System_GetCurrentTimeStamp(&record.timestamp);
-
-            /* call all handlers for this logger and parents */
-            {
-                ATX_Logger* logger = self;
-                while (logger) {
-                    /* call all handlers for the current logger */
-                    ATX_LogHandlerEntry* entry = logger->handlers;
-                    while (entry) {
-                        entry->handler.iface->Log(&entry->handler, &record);
-                        entry = entry->next;
-                    }
-
-                    /* forward to the parent unless this logger does not forward */
-                    if (logger->forward_to_parent) {
-                        logger = logger->parent;
-                    } else {
-                        break;
-                    }
-                }
-            }
-            break;
-        }
+        if (result >= 0) break;
 
         /* the buffer was too small, try something bigger */
         buffer_size = (buffer_size+ATX_LOG_HEAP_BUFFER_INCREMENT)*2;
@@ -629,6 +623,38 @@ ATX_Logger_Log(ATX_Logger*  self,
         message = ATX_AllocateMemory(buffer_size);
         if (message == NULL) return;
     }
+
+    {
+        /* the message is formatted, publish it to the handlers */
+        ATX_LogRecord record;
+        ATX_Logger*   logger = self;
+        
+        /* setup the log record */
+        record.logger_name = ATX_CSTR(self->name),
+        record.level       = level;
+        record.message     = message;
+        record.source_file = source_file;
+        record.source_line = source_line;
+        ATX_System_GetCurrentTimeStamp(&record.timestamp);
+
+        /* call all handlers for this logger and parents */
+        while (logger && level >= logger->level) {
+            /* call all handlers for the current logger */
+            ATX_LogHandlerEntry* entry = logger->handlers;
+            while (entry) {
+                entry->handler.iface->Log(&entry->handler, &record);
+                entry = entry->next;
+            }
+
+            /* forward to the parent unless this logger does not forward */
+            if (logger->forward_to_parent) {
+                logger = logger->parent;
+            } else {
+                break;
+            }
+        }
+    }
+
 
     /* free anything we may have allocated */
     if (message != buffer) ATX_FreeMemory((void*)message);
@@ -763,6 +789,54 @@ ATX_Log_GetLogger(const char* name)
 }
 
 /*----------------------------------------------------------------------
+|   ATX_LogNullHandler forward references
++---------------------------------------------------------------------*/
+static const ATX_LogHandlerInterface ATX_LogNullHandler_Interface;
+
+/*----------------------------------------------------------------------
+|   ATX_LogNullHandler_Destroy
++---------------------------------------------------------------------*/
+static void
+ATX_LogNullHandler_Destroy(ATX_LogHandler* self)
+{
+    ATX_COMPILER_UNUSED(self);
+}
+
+/*----------------------------------------------------------------------
+|   ATX_LogNullHandler_Create
++---------------------------------------------------------------------*/
+static ATX_Result
+ATX_LogNullHandler_Create(const char* logger_name, ATX_LogHandler* handler)
+{
+    ATX_COMPILER_UNUSED(logger_name);
+
+    /* setup the interface */
+    handler->instance = NULL;
+    handler->iface    = &ATX_LogNullHandler_Interface;
+
+    return ATX_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   ATX_LogNullHandler_Log
++---------------------------------------------------------------------*/
+static void
+ATX_LogNullHandler_Log(ATX_LogHandler* self, const ATX_LogRecord* record)
+{
+    ATX_COMPILER_UNUSED(self);
+    ATX_COMPILER_UNUSED(record);
+}
+
+/*----------------------------------------------------------------------
+|   ATX_LogNullHandler_Interface
++---------------------------------------------------------------------*/
+static const ATX_LogHandlerInterface 
+ATX_LogNullHandler_Interface = {
+    ATX_LogNullHandler_Log,
+    ATX_LogNullHandler_Destroy
+};
+
+/*----------------------------------------------------------------------
 |   ATX_LogFileHandler forward references
 +---------------------------------------------------------------------*/
 static const ATX_LogHandlerInterface ATX_LogFileHandler_Interface;
@@ -858,14 +932,9 @@ ATX_LogFileHandler_Create(const char*     logger_name,
         instance->use_colors = ATX_LOG_CONSOLE_HANDLER_DEFAULT_COLOR_MODE;
         colors = ATX_LogManager_GetConfigValue(ATX_CSTR(logger_prefix),".colors");
         if (colors) {
-            if (ATX_String_Compare(colors, "true", ATX_TRUE) == 0  ||
-                ATX_String_Compare(colors, "yes", ATX_FALSE) == 0  ||
-                ATX_String_Compare(colors, "on", ATX_FALSE) == 0) {
+            if (ATX_LogManager_ConfigValueIsBooleanTrue(colors)) {
                 instance->use_colors = ATX_TRUE;
-            }
-            if (ATX_String_Compare(colors, "false", ATX_TRUE) == 0  ||
-                ATX_String_Compare(colors, "no", ATX_FALSE) == 0  ||
-                ATX_String_Compare(colors, "off", ATX_FALSE) == 0) {
+            } else if (ATX_LogManager_ConfigValueIsBooleanFalse(colors)) {
                 instance->use_colors = ATX_FALSE;
             }
         }

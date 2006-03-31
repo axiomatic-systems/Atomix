@@ -249,7 +249,15 @@ ATX_INTERFACE(object)->OnPropertyChanged(object,                          \
 /*----------------------------------------------------------------------
 |       functions
 +---------------------------------------------------------------------*/
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 ATX_Result ATX_Properties_Create(ATX_Properties** properties);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _ATX_PROPERTIES_H_ */
 

@@ -85,13 +85,16 @@ main(int argc, char** argv)
     ATX_HttpResponse* response;
     ATX_InputStream*  response_body = NULL;
     ATX_Size          response_body_size = 0;
+    const char*       url = "http://zebulon.bok.net/tmp/redirect";
     ATX_Result        result;
 
-    ATX_COMPILER_UNUSED(argc);
-    ATX_COMPILER_UNUSED(argv);
+
+    /* command line args */
+    if (argc == 2) url = argv[1];
+    ATX_Debug("test url=%s\n", url);
 
     /* create a request */
-    result = ATX_HttpRequest_Create(ATX_HTTP_METHOD_GET, "http://zebulon.bok.net/tmp/redirect", &request);
+    result = ATX_HttpRequest_Create(ATX_HTTP_METHOD_GET, url, &request);
     CHECK_RESULT(result, "ATX_HttpRequest_Create failed");
     
     /* create a client */
