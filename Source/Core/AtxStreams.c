@@ -209,11 +209,16 @@ ATX_InputStream_Load(ATX_InputStream* self, ATX_Size max_read, ATX_DataBuffer** 
 
         /* check if we know how much data is available */
         result = ATX_InputStream_GetAvailable(self, &available);
-        if (ATX_SUCCEEDED(result)) {
+        if (ATX_SUCCEEDED(result) && available) {
             /* we know how much is available */
             bytes_to_read = available;
         } else {
             bytes_to_read = ATX_INPUT_STREAM_LOAD_DEFAULT_READ_CHUNK;
+        }
+
+        /* make sure we don't read more than what was asked */
+        if (size != 0 && total_bytes_read+bytes_to_read>size) {
+            bytes_to_read = size-total_bytes_read;
         }
 
         /* stop if we've read everything */

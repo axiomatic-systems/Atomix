@@ -138,6 +138,10 @@ ATX_INTERFACE(object)->Transform(object, buffer, size)
 /*----------------------------------------------------------------------
 |       functions
 +---------------------------------------------------------------------*/
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 ATX_Result ATX_SubInputStream_Create(ATX_InputStream*       parent,
                                      ATX_Offset             offset,
                                      ATX_Size               size,
@@ -149,6 +153,10 @@ ATX_Result ATX_SubOutputStream_Create(ATX_OutputStream*      parent,
                                       ATX_Size               size,
                                       ATX_StreamTransformer* transformer,
                                       ATX_OutputStream**     stream);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* _ATX_STREAMS_H_ */
 

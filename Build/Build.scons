@@ -8,7 +8,7 @@ from glob import glob
 def GlobSources(dir, patterns):
     root = GetBuildPath('#'+ROOT)+'/'+dir+'/'
     files = []
-    for pattern in patterns:
+    for pattern in Split(patterns):
         files += glob(root+pattern)
     return [dir+'/'+os.path.basename(x) for x in  files]
 
@@ -65,6 +65,7 @@ class Module:
 class LibraryModule(Module):
     def __init__(self, name, 
                  build_source_dirs, 
+                 build_source_files = {},
                  source_root = 'Source',
                  build_source_pattern=['*.c', '*.cpp'], 
                  build_include_dirs = [], 
@@ -90,6 +91,12 @@ class LibraryModule(Module):
             DeclareBuildDir(dir)
             sources += GlobSources(dir, build_source_pattern)
             
+        # add cherry-picked files
+        for dir in build_source_files.keys():
+            pattern = build_source_files[dir]
+            DeclareBuildDir(dir)
+            sources += GlobSources(dir, pattern)
+        
         # calculate our build include path
         cpp_path = GetIncludeDirs(Split(self.build_include_dirs) + Split(self.build_source_dirs) + Split(self.included_modules))
         
@@ -129,7 +136,8 @@ if os.path.exists(target_config_file):
 # modules
 #######################################################
 LibraryModule(name               = 'Atomix', 
-              build_source_dirs  = ['Core', 'System/StdC','System/Bsd', 'System/Posix'],
+              build_source_dirs  = ['Core'],
+              build_source_files = env['ATX_SYSTEM_SOURCES'],
               include_dirs       = ['Config','Atomix'],
               linked_modules     = env['ATX_EXTRA_LIBS'])
             

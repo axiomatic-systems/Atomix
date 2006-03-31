@@ -14,9 +14,9 @@
 +---------------------------------------------------------------------*/
 #include "Atomix.h"
 
-ATX_DEFINE_LOGGER(MyLogger, "atomix.test.logger")
-ATX_SET_LOCAL_LOGGER("atomix.test.other")
-ATX_DEFINE_LOGGER(FooLogger, "atomix.foo")
+ATX_DEFINE_LOGGER(MyLogger, "atomix.test.my")
+ATX_DEFINE_LOGGER(FooLogger, "atomix.test.foo")
+ATX_SET_LOCAL_LOGGER("atomix.test")
 
 /*----------------------------------------------------------------------
 |  main

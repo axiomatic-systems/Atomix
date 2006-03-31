@@ -13,6 +13,7 @@
 |       includes
 +---------------------------------------------------------------------*/
 #if defined(WIN32)
+
 #define STRICT
 #define ATX_WIN32_USE_WINSOCK2
 #ifdef ATX_WIN32_USE_WINSOCK2
@@ -24,7 +25,23 @@
 #include <winsock.h>
 #endif
 #include <windows.h>
+
+#elif defined(__PPU__)
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/select.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <netex/net.h>
+#include <netex/netset.h>
+#include <netex/errno.h>
 #else
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/time.h>
@@ -36,7 +53,8 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <errno.h>
-#endif /* defined(WIN32) */
+
+#endif 
 
 #include "AtxConfig.h"
 #include "AtxInterfaces.h"
@@ -78,8 +96,51 @@ typedef const char*  SocketConstBuffer;
 typedef char*  SocketOption;
 typedef SOCKET SocketFd;
 #define GetSocketError() WSAGetLastError()
-static ATX_Boolean WinsockInitialized = ATX_FALSE;
-#else /* defined(WIN32) */
+
+/*----------------------------------------------------------------------
+|       PS3 adaptation layer
++---------------------------------------------------------------------*/
+#elif defined(__PPU__)
+#undef EWOULDBLOCK    
+#undef ECONNREFUSED  
+#undef ECONNABORTED  
+#undef ECONNRESET    
+#undef ETIMEDOUT     
+#undef ENETRESET     
+#undef EADDRINUSE    
+#undef ENETDOWN      
+#undef ENETUNREACH   
+#undef EAGAIN        
+#undef EINTR	      
+#undef EINPROGRESS
+
+#define EWOULDBLOCK   SYS_NET_EWOULDBLOCK 
+#define ECONNREFUSED  SYS_NET_ECONNREFUSED
+#define ECONNABORTED  SYS_NET_ECONNABORTED
+#define ECONNRESET    SYS_NET_ECONNRESET
+#define ETIMEDOUT     SYS_NET_ETIMEDOUT
+#define ENETRESET     SYS_NET_ENETRESET
+#define EADDRINUSE    SYS_NET_EADDRINUSE
+#define ENETDOWN      SYS_NET_ENETDOWN
+#define ENETUNREACH   SYS_NET_ENETUNREACH
+#define EAGAIN        SYS_NET_EAGAIN
+#define EINTR	      SYS_NET_EINTR
+#define EINPROGRESS   SYS_NET_EINPROGRESS
+
+typedef void*  SocketBuffer;
+typedef const void*  SocketConstBuffer;
+typedef void*  SocketOption;
+typedef int    SocketFd;
+#define GetSocketError() sys_net_errno
+#define closesocket  socketclose
+#define select socketselect
+#define ATX_BSD_INVALID_SOCKET (-1)
+#define ATX_BSD_SOCKET_ERROR   (-1)
+
+/*----------------------------------------------------------------------
+|       Default adaptation layer
++---------------------------------------------------------------------*/
+#else 
 typedef void*  SocketBuffer;
 typedef const void*  SocketConstBuffer;
 typedef void*  SocketOption;
@@ -89,7 +150,7 @@ typedef int    SocketFd;
 #define ioctlsocket ioctl
 #define ATX_BSD_INVALID_SOCKET (-1)
 #define ATX_BSD_SOCKET_ERROR   (-1)
-#endif /* defined(WIN32) */
+#endif
 
 /*----------------------------------------------------------------------
 |       types
@@ -140,25 +201,79 @@ typedef struct {
     ATX_IMPLEMENTS(ATX_DatagramSocket);
 } BsdUdpSocket;
 
+#if defined(WIN32)
 /*----------------------------------------------------------------------
 |       BsdSockets_Init
 +---------------------------------------------------------------------*/
 static ATX_Result
 BsdSockets_Init(void)
 {
-#if defined(WIN32)
-    if (WinsockInitialized == ATX_FALSE) {
+    static ATX_Boolean initialized = ATX_FALSE;
+    if (!initialized) {
 		WORD    wVersionRequested;
 		WSADATA wsaData;
 		wVersionRequested = MAKEWORD( 2, 0 );
 		if (WSAStartup( wVersionRequested, &wsaData ) != 0) {
 			return ATX_FAILURE;
 		}
-		WinsockInitialized = ATX_TRUE;
+		initialized = ATX_TRUE;
 	}
-#endif
 	return ATX_SUCCESS;
 }
+#elif defined(__PPU__)
+/*----------------------------------------------------------------------
+|       BsdSockets_Init
++---------------------------------------------------------------------*/
+static ATX_Result
+BsdSockets_Init(void)
+{
+    static ATX_Boolean initialized = ATX_FALSE;
+    static char settings_ethernet_with_dhcp[] =
+        "type nic\n"
+        "dhcp\n"
+        "\n"
+        "vendor \"SCE\"\n"
+        "product \"Gigabit Ethernet\"\n"
+        "phy_config auto\n";
+
+    if (!initialized){
+        /* initialize networking library */
+        int ret = sys_net_initialize_network();
+        int sid;
+
+        if (ret < 0) {
+            ATX_Debug("sys_net_initialize_network() failed (%d)\n", ret);
+            return ATX_FAILURE;
+        }
+
+        /* bring up network interface */
+        sid = sys_netset_open(settings_ethernet_with_dhcp, NULL, 0);
+        if (sid < 0) {
+            ATX_Debug("sys_netset_open() failed(%d, %d)\n", sid, sys_net_errno);
+            return(ATX_FAILURE);
+        }
+
+        ret = sys_netset_if_up(sid, 15 * 1000, 0);
+        if (ret < 0) {
+            ATX_Debug("sys_netset_if_up() failed(%08x, %d)\n", ret, sys_net_errno);
+            sys_netset_close(sid, 0);
+            return ATX_FAILURE;
+        }
+
+        initialized = ATX_TRUE;
+    } 
+    return ATX_SUCCESS;
+}
+#else
+/*----------------------------------------------------------------------
+|       BsdSockets_Init
++---------------------------------------------------------------------*/
+static ATX_Result
+BsdSockets_Init(void)
+{
+    return ATX_SUCCESS;
+}
+#endif
 
 /*----------------------------------------------------------------------
 |   MapErrorCode
@@ -524,6 +639,19 @@ BsdSocketInputStream_GetSize(ATX_InputStream* self,
     return ATX_SUCCESS;
 }
 
+#if defined(__PPU__)
+/*----------------------------------------------------------------------
+|       BsdSocketInputStream_GetAvailable
++---------------------------------------------------------------------*/
+ATX_METHOD
+BsdSocketInputStream_GetAvailable(ATX_InputStream* self, 
+                                  ATX_Size*        available)
+{
+    ATX_COMPILER_UNUSED(self);
+    ATX_COMPILER_UNUSED(available);
+    return ATX_ERROR_NOT_IMPLEMENTED;
+}
+#else 
 /*----------------------------------------------------------------------
 |       BsdSocketInputStream_GetAvailable
 +---------------------------------------------------------------------*/
@@ -542,6 +670,7 @@ BsdSocketInputStream_GetAvailable(ATX_InputStream* _self,
         return ATX_SUCCESS;
     }
 }
+#endif
 
 /*----------------------------------------------------------------------
 |       BsdSocketOutputStream_Seek
@@ -734,6 +863,23 @@ BsdSocket_SetBlockingMode(BsdSocket* self, ATX_Boolean blocking)
         return ATX_FAILURE;
     }
     return ATX_SUCCESS;
+}
+#elif defined(__PPU__)
+/*----------------------------------------------------------------------
+|       BsdSocketFd_SetBlockingMode
++---------------------------------------------------------------------*/
+static ATX_Result
+BsdSocket_SetBlockingMode(BsdSocket* self, ATX_Boolean blocking)
+{
+    int opt = blocking?0:1;
+
+    int result = setsockopt(self->socket_ref->fd, 
+                            SOL_SOCKET, 
+                            SO_NBIO, 
+                            (void*)&opt, 
+                            sizeof(opt));
+
+    return result == 0?ATX_SUCCESS:ATX_FAILURE;
 }
 #else
 /*----------------------------------------------------------------------
