@@ -10,10 +10,11 @@ PLATFORM_TO_TARGET_MAP = {
     'linux2'     : 'x86-unknown-linux',
     'win32'      : 'x86-microsoft-win32',
     'cygwin'     : 'x86-unknown-cygwin',
-    'darwin'     : 'powerpc-apple-macosx',
-    'ps3'        : 'ppu-sony-ps3'
+    'darwin'     : 'powerpc-apple-macosx'
 }
-    
+  
+CROSS_PLATFORMS = ['ppu-sony-ps3']
+  
 def DefaultTarget():
     if PLATFORM_TO_TARGET_MAP.has_key(sys.platform):
         return PLATFORM_TO_TARGET_MAP[sys.platform]
@@ -26,7 +27,7 @@ def DefaultTarget():
 
 options = Options()
 options.AddOptions(
-    EnumOption('target', 'build target', DefaultTarget(), allowed_values=PLATFORM_TO_TARGET_MAP.values()),
+    EnumOption('target', 'build target', DefaultTarget(), allowed_values=PLATFORM_TO_TARGET_MAP.values()+CROSS_PLATFORMS),
     ListOption('build_configs', 'build configurations', 'Debug', names=['Debug', 'Release'])
 )
 

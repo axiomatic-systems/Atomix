@@ -1,8 +1,10 @@
 ### compiler tool chain
-env['AR'] = '/c/develop/ps3/cell/host-win32/ppu/bin/ppu-lv2-ar'
-env['RANLIB'] = '/c/develop/ps3/cell/host-win32/ppu/bin/ppu-lv2-ranlib'
-env['CC'] = 'c:/develop/ps3/cell/host-win32/ppu/bin/ppu-lv2-gcc'
-env['LINK'] = '/c/develop/ps3/cell/host-win32/ppu/bin/ppu-lv2-gcc'
+env['ENV']['PATH'] += os.environ['PATH']
+env['AR']     = 'ppu-lv2-ar'
+env['RANLIB'] = 'ppu-lv2-ranlib'
+env['CC']     = 'ppu-lv2-gcc'
+env['CXX']    = 'ppu-lv2-g++'
+env['LINK']   = 'ppu-lv2-g++'
 
 ### compiler flags
 

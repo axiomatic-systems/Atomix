@@ -8,7 +8,7 @@
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "AtxDataBuffer.h"
 #include "AtxResults.h"
@@ -25,7 +25,7 @@ struct ATX_DataBuffer {
 };
 
 /*----------------------------------------------------------------------
-|       ATX_DataBuffer_Create
+|   ATX_DataBuffer_Create
 +---------------------------------------------------------------------*/
 ATX_Result 
 ATX_DataBuffer_Create(ATX_Size size, ATX_DataBuffer** buffer)
@@ -50,6 +50,22 @@ ATX_DataBuffer_Create(ATX_Size size, ATX_DataBuffer** buffer)
 }
 
 /*----------------------------------------------------------------------
+|   ATX_DataBuffer_Clone
++---------------------------------------------------------------------*/
+ATX_Result
+ATX_DataBuffer_Clone(const ATX_DataBuffer* self, ATX_DataBuffer** clone)
+{
+    /* create a clone with a buffer of the same size */
+    ATX_CHECK(ATX_DataBuffer_Create(self->data_size, clone));
+
+    /* copy the data */
+    ATX_CHECK(ATX_DataBuffer_SetData(*clone, 
+                                     self->buffer, 
+                                     self->data_size));
+    return ATX_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
 |   ATX_DataBuffer_Destroy
 +---------------------------------------------------------------------*/
 ATX_Result 
@@ -65,7 +81,7 @@ ATX_DataBuffer_Destroy(ATX_DataBuffer* self)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_DataBuffer_ReallocateBuffer
+|   ATX_DataBuffer_ReallocateBuffer
 +---------------------------------------------------------------------*/
 static ATX_Result
 ATX_DataBuffer_ReallocateBuffer(ATX_DataBuffer* self, ATX_Size size)
@@ -94,7 +110,7 @@ ATX_DataBuffer_ReallocateBuffer(ATX_DataBuffer* self, ATX_Size size)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_DataBuffer_SetBuffer
+|   ATX_DataBuffer_SetBuffer
 +---------------------------------------------------------------------*/
 ATX_Result 
 ATX_DataBuffer_SetBuffer(ATX_DataBuffer* self,
@@ -116,7 +132,7 @@ ATX_DataBuffer_SetBuffer(ATX_DataBuffer* self,
 }
 
 /*----------------------------------------------------------------------
-|       ATX_DataBuffer_SetBufferSize
+|   ATX_DataBuffer_SetBufferSize
 +---------------------------------------------------------------------*/
 ATX_Result 
 ATX_DataBuffer_SetBufferSize(ATX_DataBuffer* self,
@@ -131,7 +147,7 @@ ATX_DataBuffer_SetBufferSize(ATX_DataBuffer* self,
 }
 
 /*----------------------------------------------------------------------
-|       ATX_DataBuffer_GowBuffer
+|   ATX_DataBuffer_GrowBuffer
 +---------------------------------------------------------------------*/
 ATX_Result 
 ATX_DataBuffer_GrowBuffer(ATX_DataBuffer* self,
@@ -148,7 +164,7 @@ ATX_DataBuffer_GrowBuffer(ATX_DataBuffer* self,
 }
 
 /*----------------------------------------------------------------------
-|       ATX_DataBuffer_GetBufferSize
+|   ATX_DataBuffer_GetBufferSize
 +---------------------------------------------------------------------*/
 ATX_Size   
 ATX_DataBuffer_GetBufferSize(const ATX_DataBuffer* self)
@@ -157,7 +173,7 @@ ATX_DataBuffer_GetBufferSize(const ATX_DataBuffer* self)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_DataBuffer_GetData
+|   ATX_DataBuffer_GetData
 +---------------------------------------------------------------------*/
 const ATX_Byte*  
 ATX_DataBuffer_GetData(const ATX_DataBuffer* self)
@@ -166,7 +182,7 @@ ATX_DataBuffer_GetData(const ATX_DataBuffer* self)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_DataBuffer_UseData
+|   ATX_DataBuffer_UseData
 +---------------------------------------------------------------------*/
 ATX_Byte* 
 ATX_DataBuffer_UseData(ATX_DataBuffer* self)
@@ -175,7 +191,7 @@ ATX_DataBuffer_UseData(ATX_DataBuffer* self)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_DataBuffer_GetDataSize
+|   ATX_DataBuffer_GetDataSize
 +---------------------------------------------------------------------*/
 ATX_Size   
 ATX_DataBuffer_GetDataSize(const ATX_DataBuffer* self)
@@ -184,7 +200,7 @@ ATX_DataBuffer_GetDataSize(const ATX_DataBuffer* self)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_DataBuffer_SetDataSize
+|   ATX_DataBuffer_SetDataSize
 +---------------------------------------------------------------------*/
 ATX_Result 
 ATX_DataBuffer_SetDataSize(ATX_DataBuffer* self, ATX_Size size)
@@ -204,7 +220,7 @@ ATX_DataBuffer_SetDataSize(ATX_DataBuffer* self, ATX_Size size)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_DataBuffer_SetData
+|   ATX_DataBuffer_SetData
 +---------------------------------------------------------------------*/
 ATX_Result 
 ATX_DataBuffer_SetData(ATX_DataBuffer* self, 
@@ -222,4 +238,26 @@ ATX_DataBuffer_SetData(ATX_DataBuffer* self,
     self->data_size = data_size;
 
     return ATX_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   ATX_DataBuffer_Equals
++---------------------------------------------------------------------*/
+ATX_Boolean
+ATX_DataBuffer_Equals(const ATX_DataBuffer* self, 
+                      const ATX_DataBuffer* other)
+{
+    /* true if both are NULL */
+    if (self == NULL && other == NULL) return ATX_TRUE;
+
+    /* not true if one of them is NULL */
+    if (self == NULL || other == NULL) return ATX_FALSE;
+
+    /* check that the sizes are the same */
+    if (self->data_size != other->data_size) return ATX_FALSE;
+
+    /* now compare the data */
+    return ATX_MemoryEqual(self->buffer, 
+                           other->buffer, 
+                           self->data_size);
 }
