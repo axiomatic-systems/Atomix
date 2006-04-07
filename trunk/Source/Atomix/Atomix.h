@@ -39,5 +39,6 @@
 #include "AtxList.h"
 #include "AtxRingBuffer.h"
 #include "AtxHttp.h"
+#include "AtxSystem.h"
 
 #endif /* _ATOMIX_H_ */
