@@ -126,6 +126,9 @@ Import("env")
 
 ROOT = "."
 
+env['ATX_EXTRA_LIBS'] = ''
+
+
 ### try to read in any target specific configuration
 target_config_file = env.GetBuildPath('#/Build/Targets/'+env['target']+'/Config.scons')
 if os.path.exists(target_config_file):
