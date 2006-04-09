@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CA4A89CE09E9CF1600C0F566 /* LoggingTest.c in Sources */ = {isa = PBXBuildFile; fileRef = CA7070D409E9ACF900D42D0D /* LoggingTest.c */; };
+		CA4A89CF09E9CF1C00C0F566 /* libAtomix.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D2AAC046055464E500DB518D /* libAtomix.a */; };
+		CA6E43D409E9CA9E00A63A75 /* AtxPosixSystem.c in Sources */ = {isa = PBXBuildFile; fileRef = CA6E43D309E9CA9E00A63A75 /* AtxPosixSystem.c */; };
+		CA7070E409E9ADC200D42D0D /* AtxLogging.c in Sources */ = {isa = PBXBuildFile; fileRef = CA7070E209E9ADC200D42D0D /* AtxLogging.c */; };
+		CA7070E509E9ADC200D42D0D /* AtxLogging.h in Headers */ = {isa = PBXBuildFile; fileRef = CA7070E309E9ADC200D42D0D /* AtxLogging.h */; };
+		CA7070E809E9ADD300D42D0D /* AtxSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = CA7070E609E9ADD300D42D0D /* AtxSystem.h */; };
+		CA7070E909E9ADD300D42D0D /* AtxTime.h in Headers */ = {isa = PBXBuildFile; fileRef = CA7070E709E9ADD300D42D0D /* AtxTime.h */; };
 		CA9C03E209C4B8320046C315 /* Atomix.h in Headers */ = {isa = PBXBuildFile; fileRef = CA9C03A509C4B8320046C315 /* Atomix.h */; };
 		CA9C03E309C4B8320046C315 /* AtxVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = CA9C03A609C4B8320046C315 /* AtxVersion.h */; };
 		CA9C03E409C4B8320046C315 /* AtxConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = CA9C03A809C4B8320046C315 /* AtxConfig.h */; };
@@ -73,51 +80,65 @@
 /* End PBXBuildStyle section */
 
 /* Begin PBXContainerItemProxy section */
-		CA9C042409C4BA610046C315 /* PBXContainerItemProxy */ = {
+		CA4A89CC09E9CF0500C0F566 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = D2AAC045055464E500DB518D /* Atomix */;
+			remoteInfo = Atomix;
+		};
+		CA9C042409C4BA610046C315 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
 			remoteInfo = Atomix;
 		};
 		CA9C043409C4BAF00046C315 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = D2AAC045055464E500DB518D /* Atomix */;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
 			remoteInfo = Atomix;
 		};
 		CA9C043E09C4BB150046C315 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = D2AAC045055464E500DB518D /* Atomix */;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
 			remoteInfo = Atomix;
 		};
 		CA9C044E09C4BB520046C315 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = D2AAC045055464E500DB518D /* Atomix */;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
 			remoteInfo = Atomix;
 		};
 		CA9C045809C4BB760046C315 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = D2AAC045055464E500DB518D /* Atomix */;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
 			remoteInfo = Atomix;
 		};
 		CA9C046209C4BB9C0046C315 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = D2AAC045055464E500DB518D /* Atomix */;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
 			remoteInfo = Atomix;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		CA4A89CA09E9CEF100C0F566 /* LoggingTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = LoggingTest; path = build/Debug/LoggingTest; sourceTree = "<group>"; };
+		CA6E43D309E9CA9E00A63A75 /* AtxPosixSystem.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = AtxPosixSystem.c; path = Posix/AtxPosixSystem.c; sourceTree = "<group>"; };
+		CA7070D409E9ACF900D42D0D /* LoggingTest.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = LoggingTest.c; sourceTree = "<group>"; };
+		CA7070E209E9ADC200D42D0D /* AtxLogging.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = AtxLogging.c; sourceTree = "<group>"; };
+		CA7070E309E9ADC200D42D0D /* AtxLogging.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = AtxLogging.h; sourceTree = "<group>"; };
+		CA7070E609E9ADD300D42D0D /* AtxSystem.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = AtxSystem.h; sourceTree = "<group>"; };
+		CA7070E709E9ADD300D42D0D /* AtxTime.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = AtxTime.h; sourceTree = "<group>"; };
 		CA9C03A309C4B8320046C315 /* NetPump.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = NetPump.c; sourceTree = "<group>"; };
 		CA9C03A509C4B8320046C315 /* Atomix.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = Atomix.h; sourceTree = "<group>"; };
 		CA9C03A609C4B8320046C315 /* AtxVersion.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = AtxVersion.h; sourceTree = "<group>"; };
@@ -161,16 +182,24 @@
 		CA9C03DC09C4B8320046C315 /* PropertiesTest.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = PropertiesTest.c; sourceTree = "<group>"; };
 		CA9C03DE09C4B8320046C315 /* RingBufferTest.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = RingBufferTest.c; sourceTree = "<group>"; };
 		CA9C03E009C4B8320046C315 /* StringsTest.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = StringsTest.c; sourceTree = "<group>"; };
-		CA9C042209C4BA4F0046C315 /* NetPump */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = NetPump; path = build/Debug/NetPump; sourceTree = "<group>"; };
-		CA9C043209C4BAEB0046C315 /* HttpTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = HttpTest; path = build/Debug/HttpTest; sourceTree = "<group>"; };
-		CA9C043C09C4BB0E0046C315 /* MiscTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = MiscTest; path = build/Debug/MiscTest; sourceTree = "<group>"; };
-		CA9C044C09C4BB4C0046C315 /* PropertiesTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = PropertiesTest; path = build/Debug/PropertiesTest; sourceTree = "<group>"; };
-		CA9C045609C4BB720046C315 /* RingBufferTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = RingBufferTest; path = build/Debug/RingBufferTest; sourceTree = "<group>"; };
-		CA9C046009C4BB960046C315 /* StringsTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = StringsTest; path = build/Debug/StringsTest; sourceTree = "<group>"; };
+		CA9C042209C4BA4F0046C315 /* NetPump */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NetPump; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA9C043209C4BAEB0046C315 /* HttpTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = HttpTest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA9C043C09C4BB0E0046C315 /* MiscTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MiscTest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA9C044C09C4BB4C0046C315 /* PropertiesTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = PropertiesTest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA9C045609C4BB720046C315 /* RingBufferTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = RingBufferTest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA9C046009C4BB960046C315 /* StringsTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = StringsTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2AAC046055464E500DB518D /* libAtomix.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libAtomix.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		CA4A89C809E9CEF100C0F566 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CA4A89CF09E9CF1C00C0F566 /* libAtomix.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CA9C042009C4BA4F0046C315 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -263,6 +292,7 @@
 				CA9C044C09C4BB4C0046C315 /* PropertiesTest */,
 				CA9C045609C4BB720046C315 /* RingBufferTest */,
 				CA9C046009C4BB960046C315 /* StringsTest */,
+				CA4A89CA09E9CEF100C0F566 /* LoggingTest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -272,6 +302,22 @@
 			children = (
 			);
 			name = Documentation;
+			sourceTree = "<group>";
+		};
+		CA6E43D509E9CAA500A63A75 /* Posix */ = {
+			isa = PBXGroup;
+			children = (
+				CA6E43D309E9CA9E00A63A75 /* AtxPosixSystem.c */,
+			);
+			name = Posix;
+			sourceTree = "<group>";
+		};
+		CA7070CE09E9ACC300D42D0D /* Logging */ = {
+			isa = PBXGroup;
+			children = (
+				CA7070D409E9ACF900D42D0D /* LoggingTest.c */,
+			);
+			path = Logging;
 			sourceTree = "<group>";
 		};
 		CA9C03A109C4B8320046C315 /* Apps */ = {
@@ -313,6 +359,10 @@
 		CA9C03A909C4B8320046C315 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				CA7070E609E9ADD300D42D0D /* AtxSystem.h */,
+				CA7070E709E9ADD300D42D0D /* AtxTime.h */,
+				CA7070E209E9ADC200D42D0D /* AtxLogging.c */,
+				CA7070E309E9ADC200D42D0D /* AtxLogging.h */,
 				CA9C03AA09C4B8320046C315 /* AtxDataBuffer.c */,
 				CA9C03AB09C4B8320046C315 /* AtxDataBuffer.h */,
 				CA9C03AC09C4B8320046C315 /* AtxDebug.h */,
@@ -368,6 +418,7 @@
 		CA9C03CB09C4B8320046C315 /* System */ = {
 			isa = PBXGroup;
 			children = (
+				CA6E43D509E9CAA500A63A75 /* Posix */,
 				CA9C03CC09C4B8320046C315 /* Bsd */,
 				CA9C03D009C4B8320046C315 /* StdC */,
 			);
@@ -395,6 +446,7 @@
 		CA9C03D609C4B8320046C315 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				CA7070CE09E9ACC300D42D0D /* Logging */,
 				CA9C03D709C4B8320046C315 /* Http */,
 				CA9C03D909C4B8320046C315 /* Misc */,
 				CA9C03DB09C4B8320046C315 /* Properties */,
@@ -474,12 +526,40 @@
 				CA9C03FF09C4B8320046C315 /* AtxString.h in Headers */,
 				CA9C040009C4B8320046C315 /* AtxTypes.h in Headers */,
 				CA9C040209C4B8320046C315 /* AtxUtils.h in Headers */,
+				CA7070E509E9ADC200D42D0D /* AtxLogging.h in Headers */,
+				CA7070E809E9ADD300D42D0D /* AtxSystem.h in Headers */,
+				CA7070E909E9ADD300D42D0D /* AtxTime.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		CA4A89C909E9CEF100C0F566 /* LoggingTest */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CA4A89DE09E9CF5E00C0F566 /* Build configuration list for PBXNativeTarget "LoggingTest" */;
+			buildPhases = (
+				CA4A89C709E9CEF100C0F566 /* Sources */,
+				CA4A89C809E9CEF100C0F566 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			buildSettings = {
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = NO;
+				PRODUCT_NAME = LoggingTest;
+				ZERO_LINK = YES;
+			};
+			dependencies = (
+				CA4A89CD09E9CF0500C0F566 /* PBXTargetDependency */,
+			);
+			name = LoggingTest;
+			productName = LoggingTest;
+			productReference = CA4A89CA09E9CEF100C0F566 /* LoggingTest */;
+			productType = "com.apple.product-type.tool";
+		};
 		CA9C042109C4BA4F0046C315 /* NetPump */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = CA9C042A09C4BAA50046C315 /* Build configuration list for PBXNativeTarget "NetPump" */;
@@ -672,11 +752,20 @@
 				CA9C044B09C4BB4C0046C315 /* PropertiesTest */,
 				CA9C045509C4BB720046C315 /* RingBufferTest */,
 				CA9C045F09C4BB960046C315 /* StringsTest */,
+				CA4A89C909E9CEF100C0F566 /* LoggingTest */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		CA4A89C709E9CEF100C0F566 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CA4A89CE09E9CF1600C0F566 /* LoggingTest.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CA9C041F09C4BA4F0046C315 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -743,12 +832,19 @@
 				CA9C040409C4B8320046C315 /* AtxBsdSockets.c in Sources */,
 				CA9C040609C4B8320046C315 /* AtxStdcDebug.c in Sources */,
 				CA9C040709C4B8320046C315 /* AtxStdcFile.c in Sources */,
+				CA7070E409E9ADC200D42D0D /* AtxLogging.c in Sources */,
+				CA6E43D409E9CA9E00A63A75 /* AtxPosixSystem.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		CA4A89CD09E9CF0500C0F566 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D2AAC045055464E500DB518D /* Atomix */;
+			targetProxy = CA4A89CC09E9CF0500C0F566 /* PBXContainerItemProxy */;
+		};
 		CA9C042509C4BA610046C315 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = D2AAC045055464E500DB518D /* Atomix */;
@@ -816,6 +912,11 @@
 				GCC_C_LANGUAGE_STANDARD = ansi;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_ENABLE_PASCAL_STRINGS = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(GCC_PREPROCESSOR_DEFINITIONS)",
+					ATX_DEBUG,
+					ATX_CONFIG_ENABLE_LOGGING,
+				);
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
@@ -865,6 +966,36 @@
 					"$(WARNING_CFLAGS)",
 					"-Wno-long-long",
 				);
+			};
+			name = Release;
+		};
+		CA4A89DF09E9CF5E00C0F566 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = NO;
+				PRODUCT_NAME = LoggingTest;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		CA4A89E009E9CF5E00C0F566 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = NO;
+				PRODUCT_NAME = LoggingTest;
+				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
@@ -1065,6 +1196,15 @@
 			buildConfigurations = (
 				1DEB91F008733DB70010E9CD /* Debug */,
 				1DEB91F108733DB70010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CA4A89DE09E9CF5E00C0F566 /* Build configuration list for PBXNativeTarget "LoggingTest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CA4A89DF09E9CF5E00C0F566 /* Debug */,
+				CA4A89E009E9CF5E00C0F566 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
