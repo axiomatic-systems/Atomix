@@ -23,6 +23,12 @@
 #include "AtxHttp.h"
 #include "AtxSockets.h"
 #include "AtxVersion.h"
+#include "AtxLogging.h"
+
+/*----------------------------------------------------------------------
+|    logging
++---------------------------------------------------------------------*/
+ATX_SET_LOCAL_LOGGER("atomix.http")
 
 /*----------------------------------------------------------------------
 |    types
@@ -307,14 +313,14 @@ ATX_HttpClient_SendRequestOnce(ATX_HttpClient*    self,
     *response = NULL;
 
     /* resolve the host address */
-    ATX_Debug("ATX_HttpClient::SendRequest - resolving name [%s]...\n",
-              ATX_CSTR(request->url.host));
+    ATX_LOG_INFO_1("ATX_HttpClient::SendRequest - resolving name [%s]...\n",
+                   ATX_CSTR(request->url.host));
     result = ATX_IpAddress_ResolveName(&address.ip_address, 
                                        ATX_CSTR(request->url.host),
                                        ATX_HTTP_RESOLVER_TIMEOUT);
     if (ATX_FAILED(result)) return result;
     address.port = request->url.port;
-    ATX_Debug("ATX_HttpClient::SendRequest - name resolved\n");
+    ATX_LOG_INFO("ATX_HttpClient::SendRequest - name resolved\n");
 
     /* setup some headers */
     ATX_HttpMessage_SetHeader((ATX_HttpMessage*)request,
@@ -332,7 +338,7 @@ ATX_HttpClient_SendRequestOnce(ATX_HttpClient*    self,
     if (ATX_FAILED(result)) return result;
 
     /* connect to the server */
-    ATX_Debug("ATX_HttpClient::SendRequest - connecting on port %d...\n",
+    ATX_LOG_INFO_1("ATX_HttpClient::SendRequest - connecting on port %d...\n",
                request->url.port);
     result = ATX_Socket_Connect(connection, &address, ATX_HTTP_CONNECT_TIMEOUT);
     if (ATX_FAILED(result)) goto end;
@@ -396,8 +402,8 @@ ATX_HttpClient_SendRequest(ATX_HttpClient*    self,
                     request->url = url;
                     keep_going = ATX_TRUE;
 
-                    ATX_Debug("ATX_HttpClient::SendRequest - redirecting to %s\n",
-                              ATX_String_GetChars(location));
+                    ATX_LOG_INFO_1("ATX_HttpClient::SendRequest - redirecting to %s\n",
+                                ATX_String_GetChars(location));
                 }
             }
         }       
@@ -676,7 +682,7 @@ ATX_HttpMessage_Emit(const ATX_HttpMessage* message, ATX_OutputStream* stream)
             ATX_OutputStream_WriteString(stream, ATX_CSTR(header->name));
             ATX_OutputStream_Write(stream, ": ", 2, NULL);
             ATX_OutputStream_WriteLine(stream, ATX_CSTR(header->value));
-            ATX_Debug("ATX_HttpMessage::Emit - %s: %s\n", ATX_CSTR(header->name), ATX_CSTR(header->value));
+            ATX_LOG_FINE_2("ATX_HttpMessage::Emit - %s: %s\n", ATX_CSTR(header->name), ATX_CSTR(header->value));
         }
         item = ATX_ListItem_GetNext(item);
     }
@@ -838,9 +844,9 @@ ATX_HttpResponse_Parse(ATX_HttpResponse* response, ATX_InputStream* stream)
                 ATX_HttpMessage_SetHeader((ATX_HttpMessage*)response, 
                                           ATX_CSTR(header_name), 
                                           ATX_CSTR(header_value));
-                ATX_Debug("ATX_HttpResponse::Parse - %s: %s\n",
-                          ATX_CSTR(header_name),
-                          ATX_CSTR(header_value));
+                ATX_LOG_FINE_2("ATX_HttpResponse::Parse - %s: %s\n",
+                               ATX_CSTR(header_name),
+                               ATX_CSTR(header_value));
             }
             break;
         }
@@ -860,9 +866,9 @@ ATX_HttpResponse_Parse(ATX_HttpResponse* response, ATX_InputStream* stream)
                 ATX_HttpMessage_SetHeader((ATX_HttpMessage*)response, 
                                           ATX_CSTR(header_name), 
                                           ATX_CSTR(header_value));
-                ATX_Debug("ATX_HttpResponse::Parse - %s: %s\n",
-                           ATX_CSTR(header_name),
-                           ATX_CSTR(header_value));
+                ATX_LOG_FINE_2("ATX_HttpResponse::Parse - %s: %s\n",
+                               ATX_CSTR(header_name),
+                               ATX_CSTR(header_value));
             }
 
             /* parse header name */

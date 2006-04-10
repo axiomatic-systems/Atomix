@@ -84,7 +84,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = D2AAC045055464E500DB518D /* Atomix */;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
 			remoteInfo = Atomix;
 		};
 		CA9C042409C4BA610046C315 /* PBXContainerItemProxy */ = {
@@ -132,7 +132,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		CA4A89CA09E9CEF100C0F566 /* LoggingTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = LoggingTest; path = build/Debug/LoggingTest; sourceTree = "<group>"; };
+		CA4A89CA09E9CEF100C0F566 /* LoggingTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LoggingTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA6E43D309E9CA9E00A63A75 /* AtxPosixSystem.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = AtxPosixSystem.c; path = Posix/AtxPosixSystem.c; sourceTree = "<group>"; };
 		CA7070D409E9ACF900D42D0D /* LoggingTest.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = LoggingTest.c; sourceTree = "<group>"; };
 		CA7070E209E9ADC200D42D0D /* AtxLogging.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = AtxLogging.c; sourceTree = "<group>"; };
