@@ -107,7 +107,7 @@ main(int argc, char** argv)
 
     /* print the response */
     ATX_Debug("StatusCode = %d\n", ATX_HttpResponse_GetStatusCode(response));
-    ATX_Debug("ResonPhrase = %s\n", 
+    ATX_Debug("ReasonPhrase = %s\n", 
               ATX_String_GetChars(ATX_HttpResponse_GetReasonPhrase(response)));
     ATX_HttpMessage_GetBody((const ATX_HttpMessage*)response, NULL, &response_body_size);
     ATX_Debug("BodySize = %d\n", response_body_size);

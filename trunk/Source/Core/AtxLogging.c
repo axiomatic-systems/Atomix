@@ -610,6 +610,9 @@ ATX_Logger_Log(ATX_Logger*  self,
 
     va_start(args, msg);
 
+    /* check the log level (in case filtering has not already been done) */
+    if (level < self->level) return;
+        
     for(;;) {
         /* try to format the message (it might not fit) */
         result = ATX_FormatStringVN(message, buffer_size-1, msg, args);
@@ -638,7 +641,7 @@ ATX_Logger_Log(ATX_Logger*  self,
         ATX_System_GetCurrentTimeStamp(&record.timestamp);
 
         /* call all handlers for this logger and parents */
-        while (logger && level >= logger->level) {
+        while (logger) {
             /* call all handlers for the current logger */
             ATX_LogHandlerEntry* entry = logger->handlers;
             while (entry) {
@@ -862,6 +865,9 @@ ATX_LogFileHandler_Log(ATX_LogHandler* _self, const ATX_LogRecord* record)
     ATX_OutputStream_WriteString(self->stream, record->logger_name);
     ATX_OutputStream_Write(self->stream, "] ", 2, NULL);
     ATX_OutputStream_WriteString(self->stream, record->source_file);
+    ATX_OutputStream_Write(self->stream, ":", 1, NULL);
+    ATX_IntegerToStringU(record->source_line, buffer, sizeof(buffer));
+    ATX_OutputStream_WriteString(self->stream, buffer);
     ATX_OutputStream_Write(self->stream, " ", 1, NULL);
     ATX_IntegerToStringU(record->timestamp.seconds, buffer, sizeof(buffer));
     ATX_OutputStream_WriteString(self->stream, buffer);
