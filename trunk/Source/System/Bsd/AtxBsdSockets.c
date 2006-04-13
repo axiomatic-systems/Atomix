@@ -38,7 +38,6 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <netex/net.h>
-#include <netex/netset.h>
 #include <netex/errno.h>
 #else
 
@@ -87,15 +86,18 @@
 #define ENETUNREACH  WSAENETUNREACH
 #define EAGAIN       WSAEWOULDBLOCK
 #define EINTR		 WSAEINTR
-#define ATX_BSD_INVALID_SOCKET INVALID_SOCKET
-#define ATX_BSD_SOCKET_ERROR SOCKET_ERROR
-typedef int    ssize_t;
-typedef int    socklen_t;
-typedef char*  SocketBuffer;
+
+typedef int          ssize_t;
+typedef int          socklen_t;
+typedef char*        SocketBuffer;
 typedef const char*  SocketConstBuffer;
-typedef char*  SocketOption;
-typedef SOCKET SocketFd;
-#define GetSocketError() WSAGetLastError()
+typedef char*        SocketOption;
+typedef SOCKET       SocketFd;
+
+#define GetSocketError()                 WSAGetLastError()
+#define ATX_BSD_SOCKET_IS_INVALID(_s)    ((_s) == INVALID_SOCKET)
+#define ATX_BSD_SOCKET_CALL_FAILED(_e)   ((_e) == SOCKET_ERROR)
+#define ATX_BSD_SOCKET_SELECT_FAILED(_e) ((_e) == SOCKET_ERROR)
 
 /*----------------------------------------------------------------------
 |       PS3 adaptation layer
@@ -127,29 +129,36 @@ typedef SOCKET SocketFd;
 #define EINTR	      SYS_NET_EINTR
 #define EINPROGRESS   SYS_NET_EINPROGRESS
 
-typedef void*  SocketBuffer;
+typedef void*        SocketBuffer;
 typedef const void*  SocketConstBuffer;
-typedef void*  SocketOption;
-typedef int    SocketFd;
-#define GetSocketError() sys_net_errno
-#define closesocket  socketclose
-#define select socketselect
-#define ATX_BSD_INVALID_SOCKET (-1)
-#define ATX_BSD_SOCKET_ERROR   (-1)
+typedef void*        SocketOption;
+typedef int          SocketFd;
+
+#define closesocket      socketclose
+#define select           socketselect
+
+#define GetSocketError()                 sys_net_errno
+#define ATX_BSD_SOCKET_IS_INVALID(_s)    ((_s) < 0)
+#define ATX_BSD_SOCKET_CALL_FAILED(_e)   ((_e) < 0)
+#define ATX_BSD_SOCKET_SELECT_FAILED(_e) ((_e) < 0)
 
 /*----------------------------------------------------------------------
 |       Default adaptation layer
 +---------------------------------------------------------------------*/
 #else 
-typedef void*  SocketBuffer;
+typedef void*        SocketBuffer;
 typedef const void*  SocketConstBuffer;
-typedef void*  SocketOption;
-typedef int    SocketFd;
-#define GetSocketError() errno
+typedef void*        SocketOption;
+typedef int          SocketFd;
+
 #define closesocket  close
-#define ioctlsocket ioctl
-#define ATX_BSD_INVALID_SOCKET (-1)
-#define ATX_BSD_SOCKET_ERROR   (-1)
+#define ioctlsocket  ioctl
+
+#define GetSocketError()                 errno
+#define ATX_BSD_SOCKET_IS_INVALID(_s)    ((_s)  < 0)
+#define ATX_BSD_SOCKET_CALL_FAILED(_e)   ((_e) != 0)
+#define ATX_BSD_SOCKET_SELECT_FAILED(_e) ((_e)  < 0)
+
 #endif
 
 /*----------------------------------------------------------------------
@@ -228,35 +237,13 @@ static ATX_Result
 BsdSockets_Init(void)
 {
     static ATX_Boolean initialized = ATX_FALSE;
-    static char settings_ethernet_with_dhcp[] =
-        "type nic\n"
-        "dhcp\n"
-        "\n"
-        "vendor \"SCE\"\n"
-        "product \"Gigabit Ethernet\"\n"
-        "phy_config auto\n";
 
     if (!initialized){
         /* initialize networking library */
         int ret = sys_net_initialize_network();
-        int sid;
 
         if (ret < 0) {
             ATX_Debug("sys_net_initialize_network() failed (%d)\n", ret);
-            return ATX_FAILURE;
-        }
-
-        /* bring up network interface */
-        sid = sys_netset_open(settings_ethernet_with_dhcp, NULL, 0);
-        if (sid < 0) {
-            ATX_Debug("sys_netset_open() failed(%d, %d)\n", sid, sys_net_errno);
-            return(ATX_FAILURE);
-        }
-
-        ret = sys_netset_if_up(sid, 15 * 1000, 0);
-        if (ret < 0) {
-            ATX_Debug("sys_netset_if_up() failed(%08x, %d)\n", ret, sys_net_errno);
-            sys_netset_close(sid, 0);
             return ATX_FAILURE;
         }
 
@@ -662,7 +649,7 @@ BsdSocketInputStream_GetAvailable(ATX_InputStream* _self,
     BsdSocketStream* self = ATX_SELF(BsdSocketStream, ATX_InputStream);
     unsigned long    ready = 0;
     int io_result = ioctlsocket(self->socket_ref->fd, FIONREAD, &ready); 
-    if (io_result == ATX_BSD_SOCKET_ERROR) {
+    if (ATX_BSD_SOCKET_CALL_FAILED(io_result)) {
         *available = 0;
         return ATX_FAILURE;
     } else {
@@ -859,7 +846,7 @@ static ATX_Result
 BsdSocket_SetBlockingMode(BsdSocket* self, ATX_Boolean blocking)
 {
     unsigned long args = (blocking == ATX_TRUE) ? 0 : 1;
-    if (ioctlsocket(self->socket_ref->fd, FIONBIO, &args)) {
+    if (ATX_BSD_SOCKET_CALL_FAILED(ioctlsocket(self->socket_ref->fd, FIONBIO, &args))) {
         return ATX_FAILURE;
     }
     return ATX_SUCCESS;
@@ -872,14 +859,14 @@ static ATX_Result
 BsdSocket_SetBlockingMode(BsdSocket* self, ATX_Boolean blocking)
 {
     int opt = blocking?0:1;
-
-    int result = setsockopt(self->socket_ref->fd, 
-                            SOL_SOCKET, 
-                            SO_NBIO, 
-                            (void*)&opt, 
-                            sizeof(opt));
-
-    return result == 0?ATX_SUCCESS:ATX_FAILURE;
+    if (setsockopt(self->socket_ref->fd, 
+                   SOL_SOCKET, 
+                   SO_NBIO, 
+                   (void*)&opt, 
+                   sizeof(opt))) {
+        return ATX_FAILURE;
+    }
+    return ATX_SUCCESS;
 }
 #else
 /*----------------------------------------------------------------------
@@ -1092,7 +1079,7 @@ BsdUdpSocket_Connect(ATX_Socket*              _self,
     io_result = connect(ATX_BASE(self, BsdSocket).socket_ref->fd, 
                         (struct sockaddr *)&inet_address, 
                         sizeof(inet_address));
-    if (io_result == ATX_BSD_SOCKET_ERROR) { 
+    if (ATX_BSD_SOCKET_CALL_FAILED(io_result)) { 
         return ATX_FAILURE;
     }
     
@@ -1149,7 +1136,7 @@ BsdUdpSocket_Send(ATX_DatagramSocket*      _self,
     }
 
     /* check the result */
-    if (io_result == ATX_BSD_SOCKET_ERROR) {
+    if (ATX_BSD_SOCKET_CALL_FAILED(io_result)) {
         return ATX_FAILURE;
     }
 
@@ -1188,13 +1175,10 @@ BsdUdpSocket_Receive(ATX_DatagramSocket* _self,
                              &inet_address_length);
 
         /* convert the address format */
-        if (io_result != ATX_BSD_SOCKET_ERROR) {
+        if (!ATX_BSD_SOCKET_CALL_FAILED(io_result)) {
             if (inet_address_length == sizeof(inet_address)) {
                 InetAddressToSocketAddress(&inet_address, address);
             }
-            ATX_DataBuffer_SetDataSize(packet, io_result);
-        } else {
-            ATX_DataBuffer_SetDataSize(packet, 0);
         }
     } else {
         io_result = recv(ATX_BASE(self, BsdSocket).socket_ref->fd,
@@ -1204,10 +1188,12 @@ BsdUdpSocket_Receive(ATX_DatagramSocket* _self,
     }
 
     /* check the result */
-    if (io_result == ATX_BSD_SOCKET_ERROR) {
-        return ATX_FAILURE;
+    if (ATX_BSD_SOCKET_CALL_FAILED(io_result)) {
+        ATX_DataBuffer_SetDataSize(packet, 0);
+        return MapErrorCode(io_result);
     }
 
+    ATX_DataBuffer_SetDataSize(packet, io_result);
     return ATX_SUCCESS;
 }
 
@@ -1322,7 +1308,7 @@ BsdTcpClientSocket_Connect(ATX_Socket*              _self,
 
         return ATX_SUCCESS;
     }
-    if (io_result == ATX_BSD_SOCKET_ERROR) {
+    if (ATX_BSD_SOCKET_CALL_FAILED(io_result)) {
         ATX_Result result = MapErrorCode(GetSocketError());
         if (result != ATX_ERROR_WOULD_BLOCK) {
             /* error */
@@ -1350,9 +1336,9 @@ BsdTcpClientSocket_Connect(ATX_Socket*              _self,
     io_result = select((int)(socket_fd+1), &read_set, &write_set, &except_set, 
                        timeout == ATX_SOCKET_TIMEOUT_INFINITE ? 
                        NULL : &timeout_value);
-    if (io_result == ATX_BSD_SOCKET_ERROR) {
+    if (ATX_BSD_SOCKET_SELECT_FAILED(io_result)) {
         /* select error */
-        return ATX_ERROR_SELECT_FAILED;
+        return MapErrorCode(GetSocketError());
     } else if (io_result == 0) {
         /* timeout */
         return ATX_ERROR_TIMEOUT;
@@ -1364,11 +1350,12 @@ BsdTcpClientSocket_Connect(ATX_Socket*              _self,
         socklen_t length = sizeof(error);
 
         /* get error status from socket */
-        if (getsockopt(socket_fd, 
-                       SOL_SOCKET, 
-                       SO_ERROR, 
-                       (SocketOption)&error, 
-                       &length) == ATX_BSD_SOCKET_ERROR) {
+        if (ATX_BSD_SOCKET_CALL_FAILED(
+                getsockopt(socket_fd, 
+                           SOL_SOCKET, 
+                           SO_ERROR, 
+                           (SocketOption)&error, 
+                           &length))) {
             return ATX_ERROR_CONNECTION_FAILED;
         }
         if (error) {
@@ -1496,7 +1483,7 @@ BsdTcpServerSocket_WaitForNewClient(ATX_ServerSocket* _self,
     socket_fd = accept(ATX_BASE(self, BsdSocket).socket_ref->fd, 
                        (struct sockaddr*)&inet_address, 
                        &namelen); 
-    if (socket_fd == ATX_BSD_INVALID_SOCKET) {
+    if (ATX_BSD_SOCKET_IS_INVALID(socket_fd)) {
         client = NULL;
         return ATX_ERROR_ACCEPT_FAILED;
     }
