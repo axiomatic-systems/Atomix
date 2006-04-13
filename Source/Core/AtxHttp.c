@@ -302,13 +302,14 @@ ATX_HttpClient_SendRequestOnce(ATX_HttpClient*    self,
                                ATX_HttpResponse** response)
 
 {
-    ATX_Socket*       connection = NULL;
     ATX_SocketAddress address;
+    ATX_Socket*       connection = NULL;
     ATX_InputStream*  input_stream = NULL;
     ATX_OutputStream* output_stream = NULL;
     ATX_Result        result;
 
     ATX_COMPILER_UNUSED(self);
+
     /* set default return value */
     *response = NULL;
 
@@ -353,7 +354,10 @@ ATX_HttpClient_SendRequestOnce(ATX_HttpClient*    self,
     result = ATX_Socket_GetInputStream(connection, &input_stream);
     if (ATX_FAILED(result)) goto end;
     result = ATX_HttpResponse_CreateFromStream(input_stream, response);
-    if (ATX_FAILED(result)) goto end;
+    if (ATX_FAILED(result)) {
+        *response = NULL;
+        goto end;
+    }
 
 end:
     if (ATX_FAILED(result)) {
@@ -911,12 +915,17 @@ ATX_HttpResponse_CreateFromStream(ATX_InputStream*   stream,
 
     /* construct the base object */
     result = ATX_HttpMessage_Construct(&(*response)->base);
-    if (ATX_FAILED(result)) return result;
+    if (ATX_FAILED(result)) {
+        ATX_FreeMemory((void*)*response);
+        *response = NULL;
+        return result;
+    }
 
     /* parse the response from the stream */
     result = ATX_HttpResponse_Parse(*response, stream);
     if (ATX_FAILED(result)) {
         ATX_HttpResponse_Destroy(*response);
+        *response = NULL;
         return result;
     }
 
