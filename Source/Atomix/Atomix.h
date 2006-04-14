@@ -40,5 +40,6 @@
 #include "AtxRingBuffer.h"
 #include "AtxHttp.h"
 #include "AtxSystem.h"
+#include "AtxDataBuffer.h"
 
 #endif /* _ATOMIX_H_ */

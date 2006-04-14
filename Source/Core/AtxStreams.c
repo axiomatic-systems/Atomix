@@ -543,3 +543,309 @@ ATX_BEGIN_INTERFACE_MAP(ATX_SubInputStream, ATX_InputStream)
 +---------------------------------------------------------------------*/
 ATX_IMPLEMENT_REFERENCEABLE_INTERFACE(ATX_SubInputStream, reference_count)
 
+/*----------------------------------------------------------------------
+|   ATX_MemoryStream
++---------------------------------------------------------------------*/
+struct ATX_MemoryStream {
+    /* intefaces */
+    ATX_IMPLEMENTS(ATX_InputStream);
+    ATX_IMPLEMENTS(ATX_OutputStream);
+    ATX_IMPLEMENTS(ATX_Referenceable);
+
+    /* members */
+    ATX_Cardinal    reference_count;
+    ATX_DataBuffer* buffer;
+    ATX_Offset      read_offset;
+    ATX_Offset      write_offset;
+};
+
+/*----------------------------------------------------------------------
+|   forward declarations
++---------------------------------------------------------------------*/
+ATX_DECLARE_INTERFACE_MAP(ATX_MemoryStream, ATX_InputStream)
+ATX_DECLARE_INTERFACE_MAP(ATX_MemoryStream, ATX_OutputStream)
+ATX_DECLARE_INTERFACE_MAP(ATX_MemoryStream, ATX_Referenceable)
+
+/*----------------------------------------------------------------------
+|   ATX_MemoryStream_Create
++---------------------------------------------------------------------*/
+ATX_Result
+ATX_MemoryStream_Create(ATX_Size size, ATX_MemoryStream** stream)
+{ 
+    ATX_Result result;
+
+    /* allocate the object */
+    *stream = ATX_AllocateZeroMemory(sizeof(ATX_MemoryStream));
+    if (*stream == NULL) return ATX_ERROR_OUT_OF_MEMORY;
+
+    /* construct the object */
+    result = ATX_DataBuffer_Create(size, &(*stream)->buffer);
+    if (ATX_FAILED(result)) {
+        ATX_FreeMemory((void*)(*stream));
+        return result;
+    }
+    (*stream)->reference_count = 1;
+    (*stream)->read_offset = 0;
+    (*stream)->write_offset = 0;
+
+    /* setup the interfaces */
+    ATX_SET_INTERFACE(*stream, ATX_MemoryStream, ATX_InputStream);
+    ATX_SET_INTERFACE(*stream, ATX_MemoryStream, ATX_OutputStream);
+    ATX_SET_INTERFACE(*stream, ATX_MemoryStream, ATX_Referenceable);
+
+    return ATX_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   ATX_MemoryStream_AddReference
++---------------------------------------------------------------------*/
+static ATX_Result
+ATX_MemoryStream_AddReference(ATX_Referenceable* _self)
+{
+    ATX_MemoryStream* self = ATX_SELF(ATX_MemoryStream, ATX_Referenceable);
+    ++self->reference_count;
+    return ATX_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   ATX_MemoryStream_Release
++---------------------------------------------------------------------*/
+static ATX_Result
+ATX_MemoryStream_Release(ATX_Referenceable* _self)
+{
+    ATX_MemoryStream* self = ATX_SELF(ATX_MemoryStream, ATX_Referenceable);
+    if (--self->reference_count == 0) {
+        ATX_DataBuffer_Destroy(self->buffer);
+        ATX_FreeMemory((void*)self);
+    }
+
+    return ATX_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   ATX_MemoryStream_Destroy
++---------------------------------------------------------------------*/
+ATX_Result
+ATX_MemoryStream_Destroy(ATX_MemoryStream* self)
+{
+    return ATX_MemoryStream_Release(&ATX_BASE(self, ATX_Referenceable));
+}
+
+/*----------------------------------------------------------------------
+|   ATX_MemoryStream_GetBuffer
++---------------------------------------------------------------------*/
+ATX_Result 
+ATX_MemoryStream_GetBuffer(ATX_MemoryStream*       self, 
+                           const ATX_DataBuffer**  buffer)
+{
+    *buffer = self->buffer;
+    return ATX_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   ATX_MemoryStream_GetInputStream
++---------------------------------------------------------------------*/
+ATX_Result 
+ATX_MemoryStream_GetInputStream(ATX_MemoryStream* self,
+                                ATX_InputStream** stream)
+{
+    ++self->reference_count;
+    *stream = &ATX_BASE(self, ATX_InputStream);
+    return ATX_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   ATX_MemoryStream_GetOutputStream
++---------------------------------------------------------------------*/
+ATX_Result 
+ATX_MemoryStream_GetOutputStream(ATX_MemoryStream*  self,
+                                 ATX_OutputStream** stream)
+{
+    ++self->reference_count;
+    *stream = &ATX_BASE(self, ATX_OutputStream);
+    return ATX_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   ATX_MemoryStream_Read
++---------------------------------------------------------------------*/
+ATX_METHOD
+ATX_MemoryStream_Read(ATX_InputStream* _self,
+                      ATX_Any          buffer, 
+                      ATX_Size         bytes_to_read, 
+                      ATX_Size*        bytes_read)
+{
+    ATX_MemoryStream* self = ATX_SELF(ATX_MemoryStream, ATX_InputStream);
+    ATX_Size          available;
+
+    /* check for shortcut */
+    if (bytes_to_read == 0) {
+        if (bytes_read) *bytes_read = 0;
+        return ATX_SUCCESS;
+    }
+
+    /* clip to what's available */
+    available = ATX_DataBuffer_GetDataSize(self->buffer);
+    if (self->read_offset+bytes_to_read > available) {
+        bytes_to_read = available-self->read_offset;
+    }
+
+    /* copy the data */
+    if (bytes_to_read) {
+        ATX_CopyMemory(buffer, (void*)(((char*)ATX_DataBuffer_UseData(self->buffer))+self->read_offset), bytes_to_read);
+        self->read_offset += bytes_to_read;
+    } 
+    if (bytes_read) *bytes_read = bytes_to_read;
+
+    return bytes_to_read?ATX_SUCCESS:ATX_ERROR_EOS; 
+}
+
+/*----------------------------------------------------------------------
+|   ATX_MemoryStream_InputSeek
++---------------------------------------------------------------------*/
+ATX_METHOD
+ATX_MemoryStream_InputSeek(ATX_InputStream* _self, 
+                           ATX_Offset       offset)
+{
+    ATX_MemoryStream* self = ATX_SELF(ATX_MemoryStream, ATX_InputStream);
+    if ((ATX_Size)offset > ATX_DataBuffer_GetDataSize(self->buffer)) {
+        return ATX_ERROR_INVALID_PARAMETERS;
+    } else {
+        self->read_offset = offset;
+        return ATX_SUCCESS;
+    }
+}
+
+/*----------------------------------------------------------------------
+|   ATX_MemoryStream_InputTell
++---------------------------------------------------------------------*/
+ATX_METHOD
+ATX_MemoryStream_InputTell(ATX_InputStream* _self, 
+                           ATX_Offset*      where)
+{
+    ATX_MemoryStream* self = ATX_SELF(ATX_MemoryStream, ATX_InputStream);
+    if (where) *where = self->read_offset;
+    return ATX_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   ATX_MemoryStream_GetSize
++---------------------------------------------------------------------*/
+ATX_METHOD
+ATX_MemoryStream_GetSize(ATX_InputStream* _self,
+                         ATX_Size*        size)
+{
+    ATX_MemoryStream* self = ATX_SELF(ATX_MemoryStream, ATX_InputStream);
+    if (size) *size = ATX_DataBuffer_GetDataSize(self->buffer);
+    return ATX_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   ATX_MemoryStream_GetAvailable
++---------------------------------------------------------------------*/
+ATX_METHOD
+ATX_MemoryStream_GetAvailable(ATX_InputStream* _self,
+                              ATX_Size*        available)
+{
+    ATX_MemoryStream* self = ATX_SELF(ATX_MemoryStream, ATX_InputStream);
+    *available = ATX_DataBuffer_GetDataSize(self->buffer)-self->read_offset; 
+    return ATX_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   ATX_MemoryStream_Write
++---------------------------------------------------------------------*/
+ATX_METHOD
+ATX_MemoryStream_Write(ATX_OutputStream* _self,
+                       ATX_AnyConst      data,
+                       ATX_Size          bytes_to_write,
+                       ATX_Size*         bytes_written)
+{
+    ATX_MemoryStream* self = ATX_SELF(ATX_MemoryStream, ATX_OutputStream);
+
+    ATX_CHECK(ATX_DataBuffer_GrowBuffer(self->buffer, self->write_offset+bytes_to_write));
+
+    ATX_CopyMemory(ATX_DataBuffer_UseData(self->buffer)+self->write_offset, data, bytes_to_write);
+    self->write_offset += bytes_to_write;
+    if ((ATX_Size)self->write_offset > ATX_DataBuffer_GetDataSize(self->buffer)) {
+        ATX_DataBuffer_SetDataSize(self->buffer, self->write_offset);
+    }
+    if (bytes_written) *bytes_written = bytes_to_write;
+
+    return ATX_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   ATX_MemoryStream_OutputSeek
++---------------------------------------------------------------------*/
+ATX_METHOD
+ATX_MemoryStream_OutputSeek(ATX_OutputStream* _self, 
+                            ATX_Offset        offset)
+{
+    ATX_MemoryStream* self = ATX_SELF(ATX_MemoryStream, ATX_OutputStream);
+    if ((ATX_Size)offset <= ATX_DataBuffer_GetDataSize(self->buffer)) {
+        self->write_offset = offset;
+        return ATX_SUCCESS;
+    } else {
+        return ATX_ERROR_INVALID_PARAMETERS;
+    }
+}
+
+/*----------------------------------------------------------------------
+|   ATX_MemoryStream_OutputTell
++---------------------------------------------------------------------*/
+ATX_METHOD
+ATX_MemoryStream_OutputTell(ATX_OutputStream* _self, 
+                            ATX_Offset*       where)
+{
+    ATX_MemoryStream* self = ATX_SELF(ATX_MemoryStream, ATX_OutputStream);
+    if (where) *where = self->write_offset;
+    return ATX_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   ATX_MemoryStream_Flush
++---------------------------------------------------------------------*/
+ATX_METHOD
+ATX_MemoryStream_Flush(ATX_OutputStream* self)
+{
+    ATX_COMPILER_UNUSED(self);
+    return ATX_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   ATX_MemoryStream_GetInterface
++---------------------------------------------------------------------*/
+ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(ATX_MemoryStream)
+    ATX_GET_INTERFACE_ACCEPT(ATX_MemoryStream, ATX_InputStream)
+    ATX_GET_INTERFACE_ACCEPT(ATX_MemoryStream, ATX_Referenceable)
+ATX_END_GET_INTERFACE_IMPLEMENTATION
+
+/*----------------------------------------------------------------------
+|   ATX_InputStream interface
++---------------------------------------------------------------------*/
+ATX_BEGIN_INTERFACE_MAP(ATX_MemoryStream, ATX_InputStream)
+    ATX_MemoryStream_Read,
+    ATX_MemoryStream_InputSeek,
+    ATX_MemoryStream_InputTell,
+    ATX_MemoryStream_GetSize,
+    ATX_MemoryStream_GetAvailable
+};
+
+/*----------------------------------------------------------------------
+|   ATX_OutputStream interface
++---------------------------------------------------------------------*/
+ATX_BEGIN_INTERFACE_MAP(ATX_MemoryStream, ATX_OutputStream)
+    ATX_MemoryStream_Write,
+    ATX_MemoryStream_OutputSeek,
+    ATX_MemoryStream_OutputTell,
+    ATX_MemoryStream_Flush
+};
+
+/*----------------------------------------------------------------------
+|   ATX_Referenceable interface
++---------------------------------------------------------------------*/
+ATX_BEGIN_INTERFACE_MAP(ATX_MemoryStream, ATX_Referenceable)
+    ATX_MemoryStream_AddReference,
+    ATX_MemoryStream_Release
+};
