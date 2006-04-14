@@ -19,6 +19,111 @@ ATX_DEFINE_LOGGER(FooLogger, "atomix.test.foo")
 ATX_SET_LOCAL_LOGGER("atomix.test")
 
 /*----------------------------------------------------------------------
+|  TestCheck functions
++---------------------------------------------------------------------*/
+static ATX_Result TestCheck(void)
+{
+    ATX_LOG_CHECK(ATX_LOG_LEVEL_WARNING, ATX_FAILURE);
+    ATX_LOG_SEVERE("###");
+    return ATX_SUCCESS;
+}
+static ATX_Result TestCheckSevere(void)
+{
+    ATX_CHECK_SEVERE(ATX_FAILURE);
+    ATX_LOG_SEVERE("###");
+    return ATX_SUCCESS;
+}
+static ATX_Result TestCheckWarning(void)
+{
+    ATX_CHECK_WARNING(ATX_FAILURE);
+    ATX_LOG_SEVERE("###");
+    return ATX_SUCCESS;
+}
+static ATX_Result TestCheckInfo(void)
+{
+    ATX_CHECK_INFO(ATX_FAILURE);
+    ATX_LOG_SEVERE("###");
+    return ATX_SUCCESS;
+}
+static ATX_Result TestCheckFine(void)
+{
+    ATX_CHECK_FINE(ATX_FAILURE);
+    ATX_LOG_SEVERE("###");
+    return ATX_SUCCESS;
+}
+static ATX_Result TestCheckFiner(void)
+{
+    ATX_CHECK_FINER(ATX_FAILURE);
+    ATX_LOG_SEVERE("###");
+    return ATX_SUCCESS;
+}
+static ATX_Result TestCheckFinest(void)
+{
+    ATX_CHECK_FINEST(ATX_FAILURE);
+    ATX_LOG_SEVERE("###");
+    return ATX_SUCCESS;
+}
+
+static ATX_Result TestCheckL(void)
+{
+    ATX_LOG_CHECK_L(FooLogger, ATX_LOG_LEVEL_WARNING, ATX_FAILURE);
+    ATX_LOG_SEVERE("###");
+    return ATX_SUCCESS;
+}
+static ATX_Result TestCheckSevereL(void)
+{
+    ATX_CHECK_SEVERE(ATX_FAILURE);
+    ATX_LOG_SEVERE("###");
+    return ATX_SUCCESS;
+}
+static ATX_Result TestCheckWarningL(void)
+{
+    ATX_CHECK_WARNING_L(FooLogger, ATX_FAILURE);
+    ATX_LOG_SEVERE("###");
+    return ATX_SUCCESS;
+}
+static ATX_Result TestCheckInfoL(void)
+{
+    ATX_CHECK_INFO_L(FooLogger, ATX_FAILURE);
+    ATX_LOG_SEVERE("###");
+    return ATX_SUCCESS;
+}
+static ATX_Result TestCheckFineL(void)
+{
+    ATX_CHECK_FINE_L(FooLogger, ATX_FAILURE);
+    ATX_LOG_SEVERE("###");
+    return ATX_SUCCESS;
+}
+static ATX_Result TestCheckFinerL(void)
+{
+    ATX_CHECK_FINER_L(FooLogger, ATX_FAILURE);
+    ATX_LOG_SEVERE("###");
+    return ATX_SUCCESS;
+}
+static ATX_Result TestCheckFinestL(void)
+{
+    ATX_CHECK_FINEST_L(FooLogger, ATX_FAILURE);
+    ATX_LOG_SEVERE("###");
+    return ATX_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|  TestLargeBuffer
++---------------------------------------------------------------------*/
+static void
+TestLargeBuffer(void)
+{
+    char* buffer = ATX_AllocateMemory(32768);
+    int i;
+    for (i=0; i<32768; i++) {
+        buffer[i] = 'a';
+    }
+    buffer[32767] = 0;
+    ATX_LOG_SEVERE(buffer);
+    ATX_FreeMemory((void*)buffer);
+}
+
+/*----------------------------------------------------------------------
 |  main
 +---------------------------------------------------------------------*/
 int 
@@ -55,6 +160,24 @@ main(int argc, char** argv)
     ATX_LOG_FINE_L(FooLogger, "fine");
     ATX_LOG_FINER_L(FooLogger, "finer");
     ATX_LOG_FINEST_L(FooLogger, "finest");
+
+    TestLargeBuffer();
+
+    TestCheck();
+    TestCheckSevere();
+    TestCheckWarning();
+    TestCheckInfo();
+    TestCheckFine();
+    TestCheckFiner();
+    TestCheckFinest();
+
+    TestCheckL();
+    TestCheckSevereL();
+    TestCheckWarningL();
+    TestCheckInfoL();
+    TestCheckFineL();
+    TestCheckFinerL();
+    TestCheckFinestL();
 
     return 0;
 }

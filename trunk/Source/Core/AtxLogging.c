@@ -48,6 +48,10 @@ typedef struct {
 } ATX_LogManager;
 
 typedef struct {
+    ATX_Boolean use_colors;
+} ATX_LogConsoleHandler;
+
+typedef struct {
     ATX_Boolean       use_colors;
     ATX_OutputStream* stream;
 } ATX_LogFileHandler;
@@ -98,8 +102,9 @@ static ATX_LogManager LogManager;
 +---------------------------------------------------------------------*/
 static ATX_Logger* ATX_Logger_Create(const char* name);
 static ATX_Result ATX_Logger_Destroy(ATX_Logger* self);
+static ATX_Result ATX_LogConsoleHandler_Create(const char*     logger_name, 
+                                               ATX_LogHandler* handler);
 static ATX_Result ATX_LogFileHandler_Create(const char*     logger_name, 
-                                            ATX_Boolean     use_console,
                                             ATX_LogHandler* handler);
 static ATX_Result ATX_LogTcpHandler_Create(const char*     logger_name, 
                                            ATX_LogHandler* handler);
@@ -117,9 +122,9 @@ ATX_LogHandler_Create(const char*     logger_name,
     if (ATX_StringsEqual(handler_name, "NullHandler")) {
         return ATX_LogNullHandler_Create(logger_name, handler);
     } else if (ATX_StringsEqual(handler_name, "FileHandler")) {
-        return ATX_LogFileHandler_Create(logger_name, ATX_FALSE, handler);
+        return ATX_LogFileHandler_Create(logger_name, handler);
     } else if (ATX_StringsEqual(handler_name, "ConsoleHandler")) {
-        return ATX_LogFileHandler_Create(logger_name, ATX_TRUE, handler);
+        return ATX_LogConsoleHandler_Create(logger_name, handler);
     } else if (ATX_StringsEqual(handler_name, "TcpHandler")) {
         return ATX_LogTcpHandler_Create(logger_name, handler);
     }
@@ -840,6 +845,149 @@ ATX_LogNullHandler_Interface = {
 };
 
 /*----------------------------------------------------------------------
+|   ATX_Log_FormatRecordToStream
++---------------------------------------------------------------------*/
+static void
+ATX_Log_FormatRecordToStream(const ATX_LogRecord* record,
+                             ATX_OutputStream*    stream,
+                             ATX_Boolean          use_colors)
+{
+    const char* level_name = ATX_Log_GetLogLevelName(record->level);
+    char        level_string[16];
+    char        buffer[64];
+    const char* ansi_color = NULL;
+
+    /* format and emit the record */
+    if (level_name[0] == '\0') {
+        ATX_IntegerToString(record->level, level_string, sizeof(level_string));
+        level_name = level_string;
+    }
+    ATX_OutputStream_Write(stream, "[", 1, NULL);
+    ATX_OutputStream_WriteString(stream, record->logger_name);
+    ATX_OutputStream_Write(stream, "] ", 2, NULL);
+    ATX_OutputStream_WriteString(stream, record->source_file);
+    ATX_OutputStream_Write(stream, ":", 1, NULL);
+    ATX_IntegerToStringU(record->source_line, buffer, sizeof(buffer));
+    ATX_OutputStream_WriteString(stream, buffer);
+    ATX_OutputStream_Write(stream, " ", 1, NULL);
+    ATX_IntegerToStringU(record->timestamp.seconds, buffer, sizeof(buffer));
+    ATX_OutputStream_WriteString(stream, buffer);
+    ATX_OutputStream_WriteString(stream, ":");
+    ATX_IntegerToStringU(record->timestamp.nanoseconds/1000000L, buffer, sizeof(buffer));
+    ATX_OutputStream_WriteString(stream, buffer);
+    ATX_OutputStream_Write(stream, " ", 1, NULL);
+    if (use_colors) {
+        ansi_color = ATX_Log_GetLogLevelAnsiColor(record->level);
+        if (ansi_color) {
+            ATX_OutputStream_Write(stream, "\033[", 2, NULL);
+            ATX_OutputStream_WriteString(stream, ansi_color);
+            ATX_OutputStream_Write(stream, ";1m", 3, NULL);
+        }
+    }
+    ATX_OutputStream_WriteString(stream, level_name);
+    if (use_colors && ansi_color) {
+        ATX_OutputStream_Write(stream, "\033[0m", 4, NULL);
+    }
+    ATX_OutputStream_Write(stream, ": ", 2, NULL);
+    ATX_OutputStream_WriteString(stream, record->message);
+    ATX_OutputStream_Write(stream, "\r\n", 2, NULL);
+}
+
+/*----------------------------------------------------------------------
+|   ATX_LogConsoleHandler forward references
++---------------------------------------------------------------------*/
+static const ATX_LogHandlerInterface ATX_LogConsoleHandler_Interface;
+
+/*----------------------------------------------------------------------
+|   ATX_LogConsoleHandler_Log
++---------------------------------------------------------------------*/
+static void
+ATX_LogConsoleHandler_Log(ATX_LogHandler* self, const ATX_LogRecord* record)
+{
+    ATX_MemoryStream* memory_stream;
+    ATX_OutputStream* output_stream;
+    ATX_COMPILER_UNUSED(self);
+
+    if (ATX_FAILED(ATX_MemoryStream_Create(4096, &memory_stream))) return;
+    if (ATX_SUCCEEDED(ATX_MemoryStream_GetOutputStream(memory_stream, &output_stream))) {
+        const ATX_DataBuffer* buffer;
+        ATX_Log_FormatRecordToStream(record, output_stream, ATX_FALSE);
+        ATX_OutputStream_Write(output_stream, "\0", 1, NULL);
+        ATX_MemoryStream_GetBuffer(memory_stream, &buffer);
+        ATX_Debug((const char*)ATX_DataBuffer_GetData(buffer));
+        ATX_RELEASE_OBJECT(output_stream);
+    }
+    ATX_MemoryStream_Destroy(memory_stream);
+}
+
+/*----------------------------------------------------------------------
+|   ATX_LogConsoleHandler_Destroy
++---------------------------------------------------------------------*/
+static void
+ATX_LogConsoleHandler_Destroy(ATX_LogHandler* _self)
+{
+    ATX_LogFileHandler* self = (ATX_LogFileHandler*)_self->instance;
+
+    /* release the stream */
+    ATX_RELEASE_OBJECT(self->stream);
+
+    /* free the object memory */
+    ATX_FreeMemory((void*)self);
+}
+
+/*----------------------------------------------------------------------
+|   ATX_LogConsoleHandler_Create
++---------------------------------------------------------------------*/
+static ATX_Result
+ATX_LogConsoleHandler_Create(const char*     logger_name,
+                             ATX_LogHandler* handler)
+{
+    ATX_LogFileHandler* instance;
+    const char*         filename;
+    ATX_Result          result = ATX_SUCCESS;
+
+    /* compute a prefix for the configuration of this handler */
+    ATX_String logger_prefix = ATX_String_Create(logger_name);
+    ATX_CHECK(ATX_String_Append(&logger_prefix, ".ConsoleHandler"));
+
+    /* allocate a new object */
+    instance = ATX_AllocateZeroMemory(sizeof(ATX_LogConsoleHandler));
+    
+    /* configure the object */
+    {
+        ATX_String* colors;
+        filename = ATX_FILE_STANDARD_OUTPUT;
+        instance->use_colors = ATX_LOG_CONSOLE_HANDLER_DEFAULT_COLOR_MODE;
+        colors = ATX_LogManager_GetConfigValue(ATX_CSTR(logger_prefix),".colors");
+        if (colors) {
+            if (ATX_LogManager_ConfigValueIsBooleanTrue(colors)) {
+                instance->use_colors = ATX_TRUE;
+            } else if (ATX_LogManager_ConfigValueIsBooleanFalse(colors)) {
+                instance->use_colors = ATX_FALSE;
+            }
+        }
+    } 
+
+    /* setup the interface */
+    handler->instance = (ATX_LogHandlerInstance*)instance;
+    handler->iface    = &ATX_LogConsoleHandler_Interface;
+
+    /* cleanup */
+    ATX_String_Destruct(&logger_prefix);
+
+    return result;
+}
+
+/*----------------------------------------------------------------------
+|   ATX_LogConsoleHandler_Interface
++---------------------------------------------------------------------*/
+static const ATX_LogHandlerInterface 
+ATX_LogConsoleHandler_Interface = {
+    ATX_LogConsoleHandler_Log,
+    ATX_LogConsoleHandler_Destroy
+};
+
+/*----------------------------------------------------------------------
 |   ATX_LogFileHandler forward references
 +---------------------------------------------------------------------*/
 static const ATX_LogHandlerInterface ATX_LogFileHandler_Interface;
@@ -851,45 +999,7 @@ static void
 ATX_LogFileHandler_Log(ATX_LogHandler* _self, const ATX_LogRecord* record)
 {
     ATX_LogFileHandler* self = (ATX_LogFileHandler*)_self->instance;
-    const char*         level_name = ATX_Log_GetLogLevelName(record->level);
-    char                level_string[16];
-    char                buffer[64];
-    const char*         ansi_color = NULL;
-
-    /* format and emit the record */
-    if (level_name[0] == '\0') {
-        ATX_IntegerToString(record->level, level_string, sizeof(level_string));
-        level_name = level_string;
-    }
-    ATX_OutputStream_Write(self->stream, "[", 1, NULL);
-    ATX_OutputStream_WriteString(self->stream, record->logger_name);
-    ATX_OutputStream_Write(self->stream, "] ", 2, NULL);
-    ATX_OutputStream_WriteString(self->stream, record->source_file);
-    ATX_OutputStream_Write(self->stream, ":", 1, NULL);
-    ATX_IntegerToStringU(record->source_line, buffer, sizeof(buffer));
-    ATX_OutputStream_WriteString(self->stream, buffer);
-    ATX_OutputStream_Write(self->stream, " ", 1, NULL);
-    ATX_IntegerToStringU(record->timestamp.seconds, buffer, sizeof(buffer));
-    ATX_OutputStream_WriteString(self->stream, buffer);
-    ATX_OutputStream_WriteString(self->stream, ":");
-    ATX_IntegerToStringU(record->timestamp.nanoseconds/1000000L, buffer, sizeof(buffer));
-    ATX_OutputStream_WriteString(self->stream, buffer);
-    ATX_OutputStream_Write(self->stream, " ", 1, NULL);
-    if (self->use_colors) {
-        ansi_color = ATX_Log_GetLogLevelAnsiColor(record->level);
-        if (ansi_color) {
-            ATX_OutputStream_Write(self->stream, "\033[", 2, NULL);
-            ATX_OutputStream_WriteString(self->stream, ansi_color);
-            ATX_OutputStream_Write(self->stream, ";1m", 3, NULL);
-        }
-    }
-    ATX_OutputStream_WriteString(self->stream, level_name);
-    if (self->use_colors && ansi_color) {
-        ATX_OutputStream_Write(self->stream, "\033[0m", 4, NULL);
-    }
-    ATX_OutputStream_Write(self->stream, ": ", 2, NULL);
-    ATX_OutputStream_WriteString(self->stream, record->message);
-    ATX_OutputStream_Write(self->stream, "\r\n", 2, NULL);
+    ATX_Log_FormatRecordToStream(record, self->stream, ATX_FALSE);
 }
 
 /*----------------------------------------------------------------------
@@ -912,7 +1022,6 @@ ATX_LogFileHandler_Destroy(ATX_LogHandler* _self)
 +---------------------------------------------------------------------*/
 static ATX_Result
 ATX_LogFileHandler_Create(const char*     logger_name,
-                          ATX_Boolean     use_console,
                           ATX_LogHandler* handler)
 {
     ATX_LogFileHandler* instance;
@@ -923,28 +1032,13 @@ ATX_LogFileHandler_Create(const char*     logger_name,
 
     /* compute a prefix for the configuration of this handler */
     ATX_String logger_prefix = ATX_String_Create(logger_name);
-    ATX_CHECK(ATX_String_Append(&logger_prefix, 
-                                use_console ?
-                                ".ConsoleHandler" :
-                                ".FileHandler"));
+    ATX_CHECK(ATX_String_Append(&logger_prefix, ".FileHandler"));
 
     /* allocate a new object */
     instance = ATX_AllocateZeroMemory(sizeof(ATX_LogFileHandler));
     
     /* configure the object */
-    if (use_console) {
-        ATX_String* colors;
-        filename = ATX_FILE_STANDARD_OUTPUT;
-        instance->use_colors = ATX_LOG_CONSOLE_HANDLER_DEFAULT_COLOR_MODE;
-        colors = ATX_LogManager_GetConfigValue(ATX_CSTR(logger_prefix),".colors");
-        if (colors) {
-            if (ATX_LogManager_ConfigValueIsBooleanTrue(colors)) {
-                instance->use_colors = ATX_TRUE;
-            } else if (ATX_LogManager_ConfigValueIsBooleanFalse(colors)) {
-                instance->use_colors = ATX_FALSE;
-            }
-        }
-    } else {
+    {
         ATX_String* filename_conf = ATX_LogManager_GetConfigValue(ATX_CSTR(logger_prefix), ".filename");
         if (filename_conf) {
             filename = ATX_CSTR(*filename_conf);

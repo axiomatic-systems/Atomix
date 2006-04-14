@@ -136,6 +136,20 @@ ATX_END_INTERFACE_DEFINITION
 ATX_INTERFACE(object)->Transform(object, buffer, size)
 
 /*----------------------------------------------------------------------
+|       ATX_MemoryStream
++---------------------------------------------------------------------*/
+typedef struct ATX_MemoryStream ATX_MemoryStream;
+ATX_Result ATX_MemoryStream_Create(ATX_Size           size, 
+                                   ATX_MemoryStream** stream);
+ATX_Result ATX_MemoryStream_Destroy(ATX_MemoryStream* self);
+ATX_Result ATX_MemoryStream_GetBuffer(ATX_MemoryStream*       self, 
+                                      const ATX_DataBuffer**  buffer);
+ATX_Result ATX_MemoryStream_GetInputStream(ATX_MemoryStream* self,
+                                           ATX_InputStream** stream);
+ATX_Result ATX_MemoryStream_GetOutputStream(ATX_MemoryStream* self,
+                                            ATX_OutputStream** stream);
+
+/*----------------------------------------------------------------------
 |       functions
 +---------------------------------------------------------------------*/
 #ifdef __cplusplus
