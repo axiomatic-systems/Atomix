@@ -25,6 +25,11 @@ struct ATX_DataBuffer {
 };
 
 /*----------------------------------------------------------------------
+|   constants
++---------------------------------------------------------------------*/
+#define ATX_DATA_BUFFER_EXTRA_GROW_SPACE 256
+
+/*----------------------------------------------------------------------
 |   ATX_DataBuffer_Create
 +---------------------------------------------------------------------*/
 ATX_Result 
@@ -158,7 +163,7 @@ ATX_DataBuffer_GrowBuffer(ATX_DataBuffer* self,
     /* try doubling the size */
     {
         ATX_Size new_size = self->buffer_size*2;
-        if (new_size < size) new_size = size;
+        if (new_size < size) new_size = size + ATX_DATA_BUFFER_EXTRA_GROW_SPACE;
         return ATX_DataBuffer_SetBufferSize(self, new_size);
     }
 }
