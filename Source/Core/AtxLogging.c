@@ -925,8 +925,10 @@ ATX_LogConsoleHandler_Log(ATX_LogHandler* self, const ATX_LogRecord* record)
 |   ATX_LogConsoleHandler_Destroy
 +---------------------------------------------------------------------*/
 static void
-ATX_LogConsoleHandler_Destroy(ATX_LogHandler* self)
+ATX_LogConsoleHandler_Destroy(ATX_LogHandler* _self)
 {
+    ATX_LogFileHandler* self = (ATX_LogFileHandler*)_self->instance;
+
     /* free the object memory */
     ATX_FreeMemory((void*)self);
 }
