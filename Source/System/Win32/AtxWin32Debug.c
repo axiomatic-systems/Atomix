@@ -63,7 +63,7 @@ ATX_Debug(const char* format, ...)
         /* use the secure function for VC 8 and above */
         result = _vsnprintf_s(buffer, buffer_size, _TRUNCATE, format, args);
 #else
-        result = _vsnprintf(buffer, buffer_size, format, args);
+        result = _vsnprintf(buffer, buffer_size-1, format, args);
 #endif
         buffer[buffer_size-1] = 0; /* force a NULL termination */
         if (result >= 0) break;
