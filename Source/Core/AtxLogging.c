@@ -914,7 +914,7 @@ ATX_LogConsoleHandler_Log(ATX_LogHandler* self, const ATX_LogRecord* record)
         ATX_Log_FormatRecordToStream(record, output_stream, ATX_FALSE);
         ATX_OutputStream_Write(output_stream, "\0", 1, NULL);
         ATX_MemoryStream_GetBuffer(memory_stream, &buffer);
-        ATX_Debug((const char*)ATX_DataBuffer_GetData(buffer));
+        ATX_Debug("%s", (const char*)ATX_DataBuffer_GetData(buffer));
         ATX_RELEASE_OBJECT(output_stream);
     }
     ATX_MemoryStream_Destroy(memory_stream);
