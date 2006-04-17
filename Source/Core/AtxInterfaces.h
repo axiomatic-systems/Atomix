@@ -61,12 +61,17 @@ typedef struct {
 
 #define ATX_OFFSET_OF(_member,_type) (ATX_POINTER_TO_LONG(&( ((_type *)0)->_member)))
 
-#define ATX_SELF(_self_type, _interface_type) \
-( (_self_type *)( ((ATX_Byte*)(_self)) - ATX_OFFSET_OF(_interface_type##_Base, _self_type)) )
+#define ATX_SELF_O(_object, _self_type, _interface_type) \
+    ( (_self_type *)( ((ATX_Byte*)(_object)) - ATX_OFFSET_OF(_interface_type##_Base, _self_type)) )
+
+#define ATX_SELF(_self_type, _interface_type) ATX_SELF_O(_self, _self_type, _interface_type)
+
+#define ATX_SELF_EX_O(_object, _self_type, _base_type, _interface_type)   \
+( (_self_type *)( ((ATX_Byte*)(_object)) -                                \
+    ATX_OFFSET_OF(_base_type##_Base._interface_type##_Base, _self_type)) )
 
 #define ATX_SELF_EX(_self_type, _base_type, _interface_type) \
-( (_self_type *)( ((ATX_Byte*)(_self)) -                     \
-    ATX_OFFSET_OF(_base_type##_Base._interface_type##_Base, _self_type)) )
+    ATX_SELF_EX_O(_self, _self_type, _base_type, _interface_type)
 
 #define ATX_SELF_M(_member, _self_type, _interface_type) \
 ( (_self_type *)( ((ATX_Byte*)(_self)) -                 \
