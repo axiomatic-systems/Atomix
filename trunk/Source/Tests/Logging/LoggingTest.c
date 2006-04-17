@@ -23,7 +23,7 @@ ATX_SET_LOCAL_LOGGER("atomix.test")
 +---------------------------------------------------------------------*/
 static ATX_Result TestCheck(void)
 {
-    ATX_LOG_CHECK(ATX_LOG_LEVEL_WARNING, ATX_FAILURE);
+    ATX_CHECK_L(ATX_LOG_LEVEL_WARNING, ATX_FAILURE);
     ATX_LOG_SEVERE("###");
     return ATX_SUCCESS;
 }
@@ -66,7 +66,7 @@ static ATX_Result TestCheckFinest(void)
 
 static ATX_Result TestCheckL(void)
 {
-    ATX_LOG_CHECK_L(FooLogger, ATX_LOG_LEVEL_WARNING, ATX_FAILURE);
+    ATX_CHECK_LL(FooLogger, ATX_LOG_LEVEL_WARNING, ATX_FAILURE);
     ATX_LOG_SEVERE("###");
     return ATX_SUCCESS;
 }
