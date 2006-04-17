@@ -114,14 +114,6 @@ typedef struct {
 #define ATX_DEFINE_LOGGER(_logger, _name) \
     static ATX_LoggerReference _logger = { NULL, (_name) };
 
-#define ATX_LOG_CHECK_L(_logger, _level, _result) do {                    \
-    ATX_Result _x = (_result);                                            \
-    if (_x != ATX_SUCCESS) {                                              \
-        ATX_LOG_L1(_logger, _level, "ATX_CHECK failed, result=%d", _x); \
-        return _x;                                                        \
-    }                                                                     \
-} while(0)
-
 #define ATX_LOG_LX(_logger, _level, _argsx)                          \
 do {                                                                 \
     ATX_LOG_GET_LOGGER((_logger))                                    \
@@ -163,32 +155,10 @@ do {                                                                 \
 #define ATX_LOG_L8(_logger, _level, _msg, _arg1, _arg2, _arg3, _arg4, _arg5, _arg6, _arg7, _arg8)
 #define ATX_LOG_L9(_logger, _level, _msg, _arg1, _arg2, _arg3, _arg4, _arg5, _arg6, _arg7, _arg8, _arg9)
 
-#define ATX_LOG_CHECK_L(_logger, _level, _result) do { \
-    ATX_Result _x = (_result);                         \
-    if (_x != ATX_SUCCESS) {                           \
-        return _x;                                     \
-    }                                                  \
-} while(0)
-
 #endif /* ATX_CONFIG_ENABLE_LOGGING */
 
 #define ATX_SET_LOCAL_LOGGER(_name) \
     ATX_DEFINE_LOGGER(_ATX_LocalLogger, (_name))
-
-#define ATX_LOG_CHECK(_level, _result) ATX_LOG_CHECK_L(_ATX_LocalLogger, _level, _result)
-
-#define ATX_CHECK_SEVERE_L(_logger, _result) ATX_LOG_CHECK(_logger, ATX_LOG_LEVEL_SEVERE, _result)
-#define ATX_CHECK_SEVERE(_result) ATX_LOG_CHECK(ATX_LOG_LEVEL_SEVERE, _result)
-#define ATX_CHECK_WARNING_L(_logger, _result) ATX_LOG_CHECK_L(_logger, ATX_LOG_LEVEL_WARNING, _result)
-#define ATX_CHECK_WARNING(_result) ATX_LOG_CHECK(ATX_LOG_LEVEL_WARNING, _result)
-#define ATX_CHECK_INFO_L(_logger, _result) ATX_LOG_CHECK_L(_logger, ATX_LOG_LEVEL_INFO, _result)
-#define ATX_CHECK_INFO(_result) ATX_LOG_CHECK(ATX_LOG_LEVEL_INFO, _result)
-#define ATX_CHECK_FINE_L(_logger, _result) ATX_LOG_CHECK_L(_logger, ATX_LOG_LEVEL_FINE, _result)
-#define ATX_CHECK_FINE(_result) ATX_LOG_CHECK(ATX_LOG_LEVEL_FINE, _result)
-#define ATX_CHECK_FINER_L(_logger, _result) ATX_LOG_CHECK_L(_logger, ATX_LOG_LEVEL_FINER, _result)
-#define ATX_CHECK_FINER(_result) ATX_LOG_CHECK(ATX_LOG_LEVEL_FINER, _result)
-#define ATX_CHECK_FINEST_L(_logger, _result) ATX_LOG_CHECK_L(_logger, ATX_LOG_LEVEL_FINEST, _result)
-#define ATX_CHECK_FINEST(_result) ATX_LOG_CHECK(ATX_LOG_LEVEL_FINEST, _result)
 
 /* NOTE: the following are machine-generated, do not edit */
 #define ATX_LOG_SEVERE_L(_logger, _msg) ATX_LOG_L((_logger), ATX_LOG_LEVEL_SEVERE, (_msg))

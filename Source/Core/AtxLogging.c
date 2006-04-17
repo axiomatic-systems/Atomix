@@ -903,16 +903,16 @@ static const ATX_LogHandlerInterface ATX_LogConsoleHandler_Interface;
 |   ATX_LogConsoleHandler_Log
 +---------------------------------------------------------------------*/
 static void
-ATX_LogConsoleHandler_Log(ATX_LogHandler* self, const ATX_LogRecord* record)
+ATX_LogConsoleHandler_Log(ATX_LogHandler* _self, const ATX_LogRecord* record)
 {
-    ATX_MemoryStream* memory_stream;
-    ATX_OutputStream* output_stream;
-    ATX_COMPILER_UNUSED(self);
+    ATX_LogFileHandler* self = (ATX_LogFileHandler*)_self->instance;
+    ATX_MemoryStream*   memory_stream;
+    ATX_OutputStream*   output_stream;
 
     if (ATX_FAILED(ATX_MemoryStream_Create(4096, &memory_stream))) return;
     if (ATX_SUCCEEDED(ATX_MemoryStream_GetOutputStream(memory_stream, &output_stream))) {
         const ATX_DataBuffer* buffer;
-        ATX_Log_FormatRecordToStream(record, output_stream, ATX_FALSE);
+        ATX_Log_FormatRecordToStream(record, output_stream, self->use_colors);
         ATX_OutputStream_Write(output_stream, "\0", 1, NULL);
         ATX_MemoryStream_GetBuffer(memory_stream, &buffer);
         ATX_Debug("%s", (const char*)ATX_DataBuffer_GetData(buffer));
