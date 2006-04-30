@@ -1,11 +1,9 @@
 /*****************************************************************
 |
-|      File: AtxProperties.h
+|   Atomix - Properties Interface
 |
-|      Atomix - Properties Interface
-|
-|      (c) 2002-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2002-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 /** @file 
@@ -16,21 +14,21 @@
 #define _ATX_PROPERTIES_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "AtxInterfaces.h"
 #include "AtxTypes.h"
 #include "AtxIterator.h"
 
 /*----------------------------------------------------------------------
-|       error codes
+|   error codes
 +---------------------------------------------------------------------*/
 #define ATX_ERROR_NO_SUCH_PROPERTY       (ATX_ERROR_BASE_PROPERTIES - 0)
 #define ATX_ERROR_NO_SUCH_LISTENER       (ATX_ERROR_BASE_PROPERTIES - 1)
 #define ATX_ERROR_PROPERTY_TYPE_MISMATCH (ATX_ERROR_BASE_PROPERTIES - 2)
 
 /*----------------------------------------------------------------------
-|       types
+|   types
 +---------------------------------------------------------------------*/
 /**
  * Type of data represented by the 'value' field of an ATX_Property structure.
@@ -75,7 +73,7 @@ typedef struct {
 } ATX_Property;
 
 /*----------------------------------------------------------------------
-|       ATX_PropertyListener interface
+|   ATX_PropertyListener interface
 +---------------------------------------------------------------------*/
 ATX_DECLARE_INTERFACE(ATX_PropertyListener)
 ATX_BEGIN_INTERFACE_DEFINITION(ATX_PropertyListener)
@@ -86,7 +84,7 @@ ATX_BEGIN_INTERFACE_DEFINITION(ATX_PropertyListener)
 ATX_END_INTERFACE_DEFINITION
 
 /*----------------------------------------------------------------------
-|       ATX_Properties interface
+|   ATX_Properties interface
 +---------------------------------------------------------------------*/
 ATX_DECLARE_INTERFACE(ATX_Properties)
 /**
@@ -177,7 +175,7 @@ ATX_BEGIN_INTERFACE_DEFINITION(ATX_Properties)
 ATX_END_INTERFACE_DEFINITION
 
 /*----------------------------------------------------------------------
-|       convenience macros
+|   convenience macros
 +---------------------------------------------------------------------*/
 /**
  * Convenience macro used to call the GetProperty() method on objects 
@@ -247,7 +245,7 @@ ATX_INTERFACE(object)->OnPropertyChanged(object,                          \
                                          value)
 
 /*----------------------------------------------------------------------
-|       functions
+|   functions
 +---------------------------------------------------------------------*/
 #ifdef __cplusplus
 extern "C" {

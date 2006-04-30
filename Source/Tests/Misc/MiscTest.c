@@ -49,6 +49,14 @@
         }                                       \
     } while(0)                                  \
 
+#define SHOULD_EQUAL_S(a, b, m)                       \
+    do {                                        \
+        if (!ATX_StringsEqual(a,b)) {                 \
+            ATX_Debug("got %s, expected %s in %s\n", a, b, m);\
+            exit(1);                            \
+        }                                       \
+    } while(0)                                  \
+
 /*----------------------------------------------------------------------
 |       main
 +---------------------------------------------------------------------*/
@@ -57,6 +65,7 @@ main(int argc, char** argv)
 {
     float f;
     long  i;
+    char buff[16];
 
     ATX_COMPILER_UNUSED(argc);
     ATX_COMPILER_UNUSED(argv);
@@ -86,6 +95,18 @@ main(int argc, char** argv)
     SHOULD_EQUAL_I(i, 0, "b7");
     SHOULD_SUCCEED(ATX_ParseInteger("7768", &i, ATX_TRUE), "test b8");
     SHOULD_EQUAL_I(i, 7768, "b8");
+
+    SHOULD_SUCCEED(ATX_IntegerToString(-123, buff, sizeof(buff)), "");
+    SHOULD_EQUAL_S(buff, "-123", "");
+    SHOULD_FAIL(ATX_IntegerToString(-1234567, buff, 8), "");
+    SHOULD_SUCCEED(ATX_IntegerToString(-1234567, buff, 9), "");
+    SHOULD_EQUAL_S(buff, "-1234567", "");
+
+    SHOULD_SUCCEED(ATX_IntegerToStringU(123, buff, sizeof(buff)), "");
+    SHOULD_EQUAL_S(buff, "123", "");
+    SHOULD_FAIL(ATX_IntegerToStringU(1234567, buff, 7), "");
+    SHOULD_SUCCEED(ATX_IntegerToStringU(1234567, buff, 8), "");
+    SHOULD_EQUAL_S(buff, "1234567", "");
 
     SHOULD_FAIL(ATX_ParseFloat("ssdfsdf", &f, ATX_FALSE), "test c1");
     SHOULD_FAIL(ATX_ParseFloat("", &f, ATX_FALSE), "test c2");

@@ -1,9 +1,9 @@
 /*****************************************************************
 |
-|      Atomix - String Objects
+|   Atomix - String Objects
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
 ****************************************************************/
 
@@ -11,13 +11,13 @@
 #define _ATX_STRINGS_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "AtxConfig.h"
 #include "AtxTypes.h"
 
 /*----------------------------------------------------------------------
-|       constants
+|   constants
 +---------------------------------------------------------------------*/
 #define ATX_STRING_SEARCH_FAILED (-1)
 #define ATX_EMPTY_STRING {0}
@@ -25,13 +25,13 @@
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
-    extern const char* const ATX_String_EmptyString;
+extern const char* const ATX_String_EmptyString;
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
 
 /*----------------------------------------------------------------------
-|       types
+|   types
 +---------------------------------------------------------------------*/
 typedef struct {
     char* chars;
@@ -44,14 +44,12 @@ typedef struct {
 } ATX_StringBuffer;
 
 /*----------------------------------------------------------------------
-|       ATX_String inline functions
+|   ATX_String inline functions
 +---------------------------------------------------------------------*/
 #define ATX_String_GetBuffer(str) ( ((ATX_StringBuffer*)((str)->chars))-1 )
 #define ATX_String_Construct(str) do {                  \
     (str)->chars = NULL;                                \
 } while(0)
-extern ATX_String ATX_String_Create(const char* s);
-extern ATX_String ATX_String_CreateFromSubString(const char* s, ATX_Ordinal first, ATX_Size length);
 #define ATX_String_Destruct(str) do {                                      \
     if ((str)->chars) ATX_FreeMemory((void*)ATX_String_GetBuffer((str)));  \
 } while(0)
@@ -67,11 +65,17 @@ extern ATX_String ATX_String_CreateFromSubString(const char* s, ATX_Ordinal firs
 #define ATX_INIT_STRING(s) do {(s).chars = NULL; } while(0)
 
 /*----------------------------------------------------------------------
-|       ATX_String functions
+|   ATX_String functions
 +---------------------------------------------------------------------*/
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
+
+extern ATX_String 
+ATX_String_Create(const char* s);
+
+extern ATX_String 
+ATX_String_CreateFromSubString(const char* s, ATX_Ordinal first, ATX_Size length);
 
 extern ATX_String 
 ATX_String_Clone(const ATX_String* str);

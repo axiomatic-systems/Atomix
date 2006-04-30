@@ -1,11 +1,9 @@
 /*****************************************************************
 |
-|      File: AtxHttp.c
+|   Atomix - HTTP
 |
-|      Atomix - HTTP
-|
-|      (c) 2002-2006 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2002-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 

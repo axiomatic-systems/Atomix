@@ -1,16 +1,14 @@
 /*****************************************************************
 |
-|      File: AtxBsdSockets.h
+|   Atomix - Sockets: BSD Implementation
 |
-|      Atomix - Sockets: BSD Implementation
-|
-|      (c) 2002-2006 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2002-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #if defined(WIN32)
 
@@ -66,12 +64,12 @@
 #include "AtxUtils.h"
 
 /*----------------------------------------------------------------------
-|       constants
+|   constants
 +---------------------------------------------------------------------*/
 #define ATX_TCP_SERVER_SOCKET_DEFAULT_LISTEN_COUNT  20
 
 /*----------------------------------------------------------------------
-|       WinSock adaptation layer
+|   WinSock adaptation layer
 +---------------------------------------------------------------------*/
 #if defined(WIN32)
 #define EWOULDBLOCK  WSAEWOULDBLOCK
@@ -100,7 +98,7 @@ typedef SOCKET       SocketFd;
 #define ATX_BSD_SOCKET_SELECT_FAILED(_e) ((_e) == SOCKET_ERROR)
 
 /*----------------------------------------------------------------------
-|       PS3 adaptation layer
+|   PS3 adaptation layer
 +---------------------------------------------------------------------*/
 #elif defined(__PPU__)
 #undef EWOULDBLOCK    
@@ -143,7 +141,7 @@ typedef int          SocketFd;
 #define ATX_BSD_SOCKET_SELECT_FAILED(_e) ((_e) < 0)
 
 /*----------------------------------------------------------------------
-|       Default adaptation layer
+|   Default adaptation layer
 +---------------------------------------------------------------------*/
 #else 
 typedef void*        SocketBuffer;
@@ -162,7 +160,7 @@ typedef int          SocketFd;
 #endif
 
 /*----------------------------------------------------------------------
-|       types
+|   types
 +---------------------------------------------------------------------*/
 typedef struct {
     ATX_Cardinal reference_count;
@@ -212,7 +210,7 @@ typedef struct {
 
 #if defined(WIN32)
 /*----------------------------------------------------------------------
-|       BsdSockets_Init
+|   BsdSockets_Init
 +---------------------------------------------------------------------*/
 static ATX_Result
 BsdSockets_Init(void)
@@ -231,7 +229,7 @@ BsdSockets_Init(void)
 }
 #elif defined(__PPU__)
 /*----------------------------------------------------------------------
-|       BsdSockets_Init
+|   BsdSockets_Init
 +---------------------------------------------------------------------*/
 static ATX_Result
 BsdSockets_Init(void)
@@ -253,7 +251,7 @@ BsdSockets_Init(void)
 }
 #else
 /*----------------------------------------------------------------------
-|       BsdSockets_Init
+|   BsdSockets_Init
 +---------------------------------------------------------------------*/
 static ATX_Result
 BsdSockets_Init(void)
@@ -304,7 +302,7 @@ MapErrorCode(int error)
 }
 
 /*----------------------------------------------------------------------
-|       SocketAddressToInetAddress
+|   SocketAddressToInetAddress
 +---------------------------------------------------------------------*/
 static void
 SocketAddressToInetAddress(const ATX_SocketAddress* socket_address, 
@@ -321,7 +319,7 @@ SocketAddressToInetAddress(const ATX_SocketAddress* socket_address,
 }
 
 /*----------------------------------------------------------------------
-|       InetAddressToSocketAddress
+|   InetAddressToSocketAddress
 +---------------------------------------------------------------------*/
 static void
 InetAddressToSocketAddress(const struct sockaddr_in* inet_address,
@@ -333,7 +331,7 @@ InetAddressToSocketAddress(const struct sockaddr_in* inet_address,
 }
 
 /*----------------------------------------------------------------------
-|       ResolveName
+|   ResolveName
 +---------------------------------------------------------------------*/
 ATX_Result
 ATX_IpAddress_ResolveName(ATX_IpAddress* address,
@@ -374,7 +372,7 @@ ATX_IpAddress_ResolveName(ATX_IpAddress* address,
 }
 
 /*----------------------------------------------------------------------
-|       BsdSocketFdWrapper_Create
+|   BsdSocketFdWrapper_Create
 +---------------------------------------------------------------------*/
 static ATX_Result
 BsdSocketFdWrapper_Create(SocketFd fd, BsdSocketFdWrapper** wrapper)
@@ -391,7 +389,7 @@ BsdSocketFdWrapper_Create(SocketFd fd, BsdSocketFdWrapper** wrapper)
 }
 
 /*----------------------------------------------------------------------
-|       BsdSocketFdWrapper_Destroy
+|   BsdSocketFdWrapper_Destroy
 +---------------------------------------------------------------------*/
 static void
 BsdSocketFdWrapper_Destroy(BsdSocketFdWrapper* self)
@@ -401,7 +399,7 @@ BsdSocketFdWrapper_Destroy(BsdSocketFdWrapper* self)
 }
 
 /*----------------------------------------------------------------------
-|       BsdSocketFdWrapper_AddReference
+|   BsdSocketFdWrapper_AddReference
 +---------------------------------------------------------------------*/
 static void
 BsdSocketFdWrapper_AddReference(BsdSocketFdWrapper* self)
@@ -410,7 +408,7 @@ BsdSocketFdWrapper_AddReference(BsdSocketFdWrapper* self)
 }
 
 /*----------------------------------------------------------------------
-|       BsdSocketFdWrapper_Release
+|   BsdSocketFdWrapper_Release
 +---------------------------------------------------------------------*/
 static void
 BsdSocketFdWrapper_Release(BsdSocketFdWrapper* self)
@@ -422,7 +420,7 @@ BsdSocketFdWrapper_Release(BsdSocketFdWrapper* self)
 }
 
 /*----------------------------------------------------------------------
-|       BsdSocketStream_Create
+|   BsdSocketStream_Create
 +---------------------------------------------------------------------*/
 static ATX_Result
 BsdSocketStream_Create(BsdSocketFdWrapper* socket_ref, BsdSocketStream** stream)
@@ -442,14 +440,14 @@ BsdSocketStream_Create(BsdSocketFdWrapper* socket_ref, BsdSocketStream** stream)
 }
 
 /*----------------------------------------------------------------------
-|       forward declarations
+|   forward declarations
 +---------------------------------------------------------------------*/
 ATX_DECLARE_INTERFACE_MAP(BsdSocketStream, ATX_InputStream)
 ATX_DECLARE_INTERFACE_MAP(BsdSocketStream, ATX_OutputStream)
 ATX_DECLARE_INTERFACE_MAP(BsdSocketStream, ATX_Referenceable)
 
 /*----------------------------------------------------------------------
-|       BsdSocketInputStream_Create
+|   BsdSocketInputStream_Create
 +---------------------------------------------------------------------*/
 static ATX_Result
 BsdSocketInputStream_Create(BsdSocketFdWrapper* socket_ref, 
@@ -475,7 +473,7 @@ BsdSocketInputStream_Create(BsdSocketFdWrapper* socket_ref,
 }
 
 /*----------------------------------------------------------------------
-|       BsdSocketOuputStream_Create
+|   BsdSocketOuputStream_Create
 +---------------------------------------------------------------------*/
 static ATX_Result
 BsdSocketOutputStream_Create(BsdSocketFdWrapper* socket_ref, 
@@ -501,7 +499,7 @@ BsdSocketOutputStream_Create(BsdSocketFdWrapper* socket_ref,
 }
 
 /*----------------------------------------------------------------------
-|       BsdSocketStream_Destroy
+|   BsdSocketStream_Destroy
 +---------------------------------------------------------------------*/
 static ATX_Result
 BsdSocketStream_Destroy(BsdSocketStream* self)
@@ -513,7 +511,7 @@ BsdSocketStream_Destroy(BsdSocketStream* self)
 }
 
 /*----------------------------------------------------------------------
-|       BsdSocketStream_Read
+|   BsdSocketStream_Read
 +---------------------------------------------------------------------*/
 ATX_METHOD
 BsdSocketStream_Read(ATX_InputStream* _self,
@@ -558,7 +556,7 @@ BsdSocketStream_Read(ATX_InputStream* _self,
 }
 
 /*----------------------------------------------------------------------
-|       BsdSocketStream_Write
+|   BsdSocketStream_Write
 +---------------------------------------------------------------------*/
 ATX_METHOD
 BsdSocketStream_Write(ATX_OutputStream* _self,
@@ -588,7 +586,7 @@ BsdSocketStream_Write(ATX_OutputStream* _self,
 }
 
 /*----------------------------------------------------------------------
-|       BsdSocketInputStream_Seek
+|   BsdSocketInputStream_Seek
 +---------------------------------------------------------------------*/
 ATX_METHOD
 BsdSocketInputStream_Seek(ATX_InputStream* self, 
@@ -601,7 +599,7 @@ BsdSocketInputStream_Seek(ATX_InputStream* self,
 }
 
 /*----------------------------------------------------------------------
-|       BsdSocketInputStream_Tell
+|   BsdSocketInputStream_Tell
 +---------------------------------------------------------------------*/
 ATX_METHOD
 BsdSocketInputStream_Tell(ATX_InputStream* self, 
@@ -614,7 +612,7 @@ BsdSocketInputStream_Tell(ATX_InputStream* self,
 }
 
 /*----------------------------------------------------------------------
-|       BsdSocketInputStream_GetSize
+|   BsdSocketInputStream_GetSize
 +---------------------------------------------------------------------*/
 ATX_METHOD
 BsdSocketInputStream_GetSize(ATX_InputStream* self, 
@@ -628,7 +626,7 @@ BsdSocketInputStream_GetSize(ATX_InputStream* self,
 
 #if defined(__PPU__)
 /*----------------------------------------------------------------------
-|       BsdSocketInputStream_GetAvailable
+|   BsdSocketInputStream_GetAvailable
 +---------------------------------------------------------------------*/
 ATX_METHOD
 BsdSocketInputStream_GetAvailable(ATX_InputStream* self, 
@@ -640,7 +638,7 @@ BsdSocketInputStream_GetAvailable(ATX_InputStream* self,
 }
 #else 
 /*----------------------------------------------------------------------
-|       BsdSocketInputStream_GetAvailable
+|   BsdSocketInputStream_GetAvailable
 +---------------------------------------------------------------------*/
 ATX_METHOD
 BsdSocketInputStream_GetAvailable(ATX_InputStream* _self, 
@@ -660,7 +658,7 @@ BsdSocketInputStream_GetAvailable(ATX_InputStream* _self,
 #endif
 
 /*----------------------------------------------------------------------
-|       BsdSocketOutputStream_Seek
+|   BsdSocketOutputStream_Seek
 +---------------------------------------------------------------------*/
 ATX_METHOD
 BsdSocketOutputStream_Seek(ATX_OutputStream* self, 
@@ -674,7 +672,7 @@ BsdSocketOutputStream_Seek(ATX_OutputStream* self,
 }
 
 /*----------------------------------------------------------------------
-|       BsdSocketOutputStream_Tell
+|   BsdSocketOutputStream_Tell
 +---------------------------------------------------------------------*/
 ATX_METHOD
 BsdSocketOutputStream_Tell(ATX_OutputStream* self, 
@@ -687,7 +685,7 @@ BsdSocketOutputStream_Tell(ATX_OutputStream* self,
 }
 
 /*----------------------------------------------------------------------
-|       BsdSocketOutputStream_Flush
+|   BsdSocketOutputStream_Flush
 +---------------------------------------------------------------------*/
 ATX_METHOD
 BsdSocketOutputStream_Flush(ATX_OutputStream* self)
@@ -707,7 +705,7 @@ ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(BsdSocketStream)
 ATX_END_GET_INTERFACE_IMPLEMENTATION
 
 /*----------------------------------------------------------------------
-|       ATX_InputStream interface
+|   ATX_InputStream interface
 +---------------------------------------------------------------------*/
 ATX_BEGIN_INTERFACE_MAP(BsdSocketStream, ATX_InputStream)
     BsdSocketStream_Read,
@@ -718,7 +716,7 @@ ATX_BEGIN_INTERFACE_MAP(BsdSocketStream, ATX_InputStream)
 ATX_END_INTERFACE_MAP
 
 /*----------------------------------------------------------------------
-|       ATX_OutputStream interface
+|   ATX_OutputStream interface
 +---------------------------------------------------------------------*/
 ATX_BEGIN_INTERFACE_MAP(BsdSocketStream, ATX_OutputStream)
     BsdSocketStream_Write,
@@ -728,19 +726,19 @@ ATX_BEGIN_INTERFACE_MAP(BsdSocketStream, ATX_OutputStream)
 ATX_END_INTERFACE_MAP
 
 /*----------------------------------------------------------------------
-|       ATX_Referenceable interface
+|   ATX_Referenceable interface
 +---------------------------------------------------------------------*/
 ATX_IMPLEMENT_REFERENCEABLE_INTERFACE(BsdSocketStream, reference_count)
 
 /*----------------------------------------------------------------------
-|       forward declarations
+|   forward declarations
 +---------------------------------------------------------------------*/
 ATX_DECLARE_INTERFACE_MAP(BsdSocket, ATX_Socket)
 ATX_DECLARE_INTERFACE_MAP(BsdSocket, ATX_Destroyable)
 static ATX_Result BsdSocket_RefreshInfo(BsdSocket* self);
 
 /*----------------------------------------------------------------------
-|       BsdSocket_Construct
+|   BsdSocket_Construct
 +---------------------------------------------------------------------*/
 static ATX_Result
 BsdSocket_Construct(BsdSocket* self, SocketFd fd)
@@ -762,7 +760,7 @@ BsdSocket_Construct(BsdSocket* self, SocketFd fd)
 }
 
 /*----------------------------------------------------------------------
-|       BsdSocket_Destruct
+|   BsdSocket_Destruct
 +---------------------------------------------------------------------*/
 static ATX_Result
 BsdSocket_Destruct(BsdSocket* self)
@@ -772,7 +770,7 @@ BsdSocket_Destruct(BsdSocket* self)
 }
 
 /*----------------------------------------------------------------------
-|       BsdSocket_Create
+|   BsdSocket_Create
 +---------------------------------------------------------------------*/
 static ATX_Result
 BsdSocket_Create(SocketFd fd, ATX_Socket** object)
@@ -793,7 +791,7 @@ BsdSocket_Create(SocketFd fd, ATX_Socket** object)
 }
 
 /*----------------------------------------------------------------------
-|       BsdSocket_Destroy
+|   BsdSocket_Destroy
 +---------------------------------------------------------------------*/
 static ATX_Result
 BsdSocket_Destroy(ATX_Destroyable* _self)
@@ -806,7 +804,7 @@ BsdSocket_Destroy(ATX_Destroyable* _self)
 }
 
 /*----------------------------------------------------------------------
-|       BsdSocket_RefreshInfo
+|   BsdSocket_RefreshInfo
 +---------------------------------------------------------------------*/
 static ATX_Result
 BsdSocket_RefreshInfo(BsdSocket* self)
@@ -840,7 +838,7 @@ BsdSocket_RefreshInfo(BsdSocket* self)
 
 #if defined(WIN32)
 /*----------------------------------------------------------------------
-|       BsdSocketFd_SetBlockingMode
+|   BsdSocketFd_SetBlockingMode
 +---------------------------------------------------------------------*/
 static ATX_Result
 BsdSocket_SetBlockingMode(BsdSocket* self, ATX_Boolean blocking)
@@ -853,7 +851,7 @@ BsdSocket_SetBlockingMode(BsdSocket* self, ATX_Boolean blocking)
 }
 #elif defined(__PPU__)
 /*----------------------------------------------------------------------
-|       BsdSocketFd_SetBlockingMode
+|   BsdSocketFd_SetBlockingMode
 +---------------------------------------------------------------------*/
 static ATX_Result
 BsdSocket_SetBlockingMode(BsdSocket* self, ATX_Boolean blocking)
@@ -870,7 +868,7 @@ BsdSocket_SetBlockingMode(BsdSocket* self, ATX_Boolean blocking)
 }
 #else
 /*----------------------------------------------------------------------
-|       BsdSocketFd_SetBlockingMode
+|   BsdSocketFd_SetBlockingMode
 +---------------------------------------------------------------------*/
 static ATX_Result
 BsdSocket_SetBlockingMode(BsdSocket* self, ATX_Boolean blocking)
@@ -889,7 +887,7 @@ BsdSocket_SetBlockingMode(BsdSocket* self, ATX_Boolean blocking)
 #endif
 
 /*----------------------------------------------------------------------
-|       BsdSocket_Bind
+|   BsdSocket_Bind
 +---------------------------------------------------------------------*/
 ATX_METHOD
 BsdSocket_Bind(ATX_Socket* _self, const ATX_SocketAddress* address)
@@ -914,7 +912,7 @@ BsdSocket_Bind(ATX_Socket* _self, const ATX_SocketAddress* address)
 }
 
 /*----------------------------------------------------------------------
-|       BsdSocket_Connect
+|   BsdSocket_Connect
 +---------------------------------------------------------------------*/
 ATX_METHOD 
 BsdSocket_Connect(ATX_Socket*              self, 
@@ -930,7 +928,7 @@ BsdSocket_Connect(ATX_Socket*              self,
 }
 
 /*----------------------------------------------------------------------
-|       BsdSocket_GetInputStream
+|   BsdSocket_GetInputStream
 +---------------------------------------------------------------------*/
 ATX_METHOD
 BsdSocket_GetInputStream(ATX_Socket* _self, ATX_InputStream** stream)
@@ -945,7 +943,7 @@ BsdSocket_GetInputStream(ATX_Socket* _self, ATX_InputStream** stream)
 }
 
 /*----------------------------------------------------------------------
-|       BsdSocket_GetOutputStream
+|   BsdSocket_GetOutputStream
 +---------------------------------------------------------------------*/
 ATX_METHOD
 BsdSocket_GetOutputStream(ATX_Socket* _self, ATX_OutputStream** stream)
@@ -960,7 +958,7 @@ BsdSocket_GetOutputStream(ATX_Socket* _self, ATX_OutputStream** stream)
 }
 
 /*----------------------------------------------------------------------
-|       BsdSocket_GetInfo
+|   BsdSocket_GetInfo
 +---------------------------------------------------------------------*/
 ATX_METHOD
 BsdSocket_GetInfo(ATX_Socket* _self, ATX_SocketInfo* info)
@@ -982,7 +980,7 @@ ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(BsdSocket)
 ATX_END_GET_INTERFACE_IMPLEMENTATION
 
 /*----------------------------------------------------------------------
-|       ATX_Socket interface
+|   ATX_Socket interface
 +---------------------------------------------------------------------*/
 ATX_BEGIN_INTERFACE_MAP(BsdSocket, ATX_Socket)
     BsdSocket_Bind,
@@ -993,19 +991,19 @@ ATX_BEGIN_INTERFACE_MAP(BsdSocket, ATX_Socket)
 ATX_END_INTERFACE_MAP
 
 /*----------------------------------------------------------------------
-|       ATX_Destroyable interface
+|   ATX_Destroyable interface
 +---------------------------------------------------------------------*/
 ATX_IMPLEMENT_DESTROYABLE_INTERFACE(BsdSocket)
 
 /*----------------------------------------------------------------------
-|       forward declarations
+|   forward declarations
 +---------------------------------------------------------------------*/
 ATX_DECLARE_INTERFACE_MAP(BsdUdpSocket, ATX_DatagramSocket)
 ATX_DECLARE_INTERFACE_MAP(BsdUdpSocket, ATX_Socket)
 ATX_DECLARE_INTERFACE_MAP(BsdUdpSocket, ATX_Destroyable)
 
 /*----------------------------------------------------------------------
-|       ATX_UdpSocket_Create
+|   ATX_UdpSocket_Create
 +---------------------------------------------------------------------*/
 ATX_Result
 ATX_UdpSocket_Create(ATX_DatagramSocket** object)
@@ -1045,7 +1043,7 @@ ATX_UdpSocket_Create(ATX_DatagramSocket** object)
 }
 
 /*----------------------------------------------------------------------
-|       BsdUdpSocket_Destroy
+|   BsdUdpSocket_Destroy
 +---------------------------------------------------------------------*/
 ATX_METHOD
 BsdUdpSocket_Destroy(ATX_Destroyable* _self)
@@ -1058,7 +1056,7 @@ BsdUdpSocket_Destroy(ATX_Destroyable* _self)
 }
 
 /*----------------------------------------------------------------------
-|       BsdUdpSocket_Connect
+|   BsdUdpSocket_Connect
 +---------------------------------------------------------------------*/
 ATX_METHOD
 BsdUdpSocket_Connect(ATX_Socket*              _self,
@@ -1100,7 +1098,7 @@ BsdUdpSocket_Connect(ATX_Socket*              _self,
 }
 
 /*----------------------------------------------------------------------
-|       BsdUdpSocket_Send
+|   BsdUdpSocket_Send
 +---------------------------------------------------------------------*/
 ATX_METHOD 
 BsdUdpSocket_Send(ATX_DatagramSocket*      _self,
@@ -1144,7 +1142,7 @@ BsdUdpSocket_Send(ATX_DatagramSocket*      _self,
 }
 
 /*----------------------------------------------------------------------
-|       BsdUdpSocket_Receive
+|   BsdUdpSocket_Receive
 +---------------------------------------------------------------------*/
 ATX_METHOD 
 BsdUdpSocket_Receive(ATX_DatagramSocket* _self,
@@ -1207,7 +1205,7 @@ ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(BsdUdpSocket)
 ATX_END_GET_INTERFACE_IMPLEMENTATION
 
 /*----------------------------------------------------------------------
-|       ATX_Socket interface
+|   ATX_Socket interface
 +---------------------------------------------------------------------*/
 ATX_IMPLEMENT_GET_INTERFACE_ADAPTER_EX(BsdUdpSocket, BsdSocket, ATX_Socket)
 ATX_INTERFACE_MAP(BsdUdpSocket, ATX_Socket) = {
@@ -1220,7 +1218,7 @@ ATX_INTERFACE_MAP(BsdUdpSocket, ATX_Socket) = {
 };
 
 /*----------------------------------------------------------------------
-|       ATX_DatagramSocket interface
+|   ATX_DatagramSocket interface
 +---------------------------------------------------------------------*/
 ATX_BEGIN_INTERFACE_MAP(BsdUdpSocket, ATX_DatagramSocket)
     BsdUdpSocket_Send,
@@ -1228,7 +1226,7 @@ ATX_BEGIN_INTERFACE_MAP(BsdUdpSocket, ATX_DatagramSocket)
 ATX_END_INTERFACE_MAP
 
 /*----------------------------------------------------------------------
-|       ATX_Destroyable interface
+|   ATX_Destroyable interface
 +---------------------------------------------------------------------*/
 ATX_IMPLEMENT_GET_INTERFACE_ADAPTER_EX(BsdUdpSocket, BsdSocket, ATX_Destroyable)
 ATX_INTERFACE_MAP(BsdUdpSocket, ATX_Destroyable) = {
@@ -1237,13 +1235,13 @@ ATX_INTERFACE_MAP(BsdUdpSocket, ATX_Destroyable) = {
 };
 
 /*----------------------------------------------------------------------
-|       forward declarations
+|   forward declarations
 +---------------------------------------------------------------------*/
 ATX_DECLARE_INTERFACE_MAP(BsdTcpClientSocket, ATX_Socket)
 ATX_DECLARE_INTERFACE_MAP(BsdTcpClientSocket, ATX_Destroyable)
 
 /*----------------------------------------------------------------------
-|       ATX_TcpClientSocket_Create
+|   ATX_TcpClientSocket_Create
 +---------------------------------------------------------------------*/
 ATX_Result
 ATX_TcpClientSocket_Create(ATX_Socket** object)
@@ -1271,7 +1269,7 @@ ATX_TcpClientSocket_Create(ATX_Socket** object)
 }
 
 /*----------------------------------------------------------------------
-|       BsdTcpClientSocket_Connect
+|   BsdTcpClientSocket_Connect
 +---------------------------------------------------------------------*/
 ATX_METHOD
 BsdTcpClientSocket_Connect(ATX_Socket*              _self,
@@ -1385,7 +1383,7 @@ ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(BsdTcpClientSocket)
 ATX_END_GET_INTERFACE_IMPLEMENTATION
 
 /*----------------------------------------------------------------------
-|       ATX_Socket interface
+|   ATX_Socket interface
 +---------------------------------------------------------------------*/
 ATX_BEGIN_INTERFACE_MAP(BsdTcpClientSocket, ATX_Socket)
     BsdSocket_Bind,
@@ -1396,14 +1394,14 @@ ATX_BEGIN_INTERFACE_MAP(BsdTcpClientSocket, ATX_Socket)
 ATX_END_INTERFACE_MAP
 
 /*----------------------------------------------------------------------
-|       forward declarations
+|   forward declarations
 +---------------------------------------------------------------------*/
 ATX_DECLARE_INTERFACE_MAP(BsdTcpServerSocket, ATX_ServerSocket)
 ATX_DECLARE_INTERFACE_MAP(BsdTcpServerSocket, ATX_Socket)
 ATX_DECLARE_INTERFACE_MAP(BsdTcpServerSocket, ATX_Destroyable)
 
 /*----------------------------------------------------------------------
-|       ATX_TcpServerSocket_Create
+|   ATX_TcpServerSocket_Create
 +---------------------------------------------------------------------*/
 ATX_Result
 ATX_TcpServerSocket_Create(ATX_ServerSocket** object)
@@ -1444,7 +1442,7 @@ ATX_TcpServerSocket_Create(ATX_ServerSocket** object)
 }
 
 /*----------------------------------------------------------------------
-|       BsdTcpServerSocket_Listen
+|   BsdTcpServerSocket_Listen
 +---------------------------------------------------------------------*/
 ATX_METHOD
 BsdTcpServerSocket_Listen(ATX_ServerSocket* _self, unsigned int max_clients)
@@ -1462,7 +1460,7 @@ BsdTcpServerSocket_Listen(ATX_ServerSocket* _self, unsigned int max_clients)
 }
 
 /*----------------------------------------------------------------------
-|       BsdTcpServerSocket_WaitForNewClient
+|   BsdTcpServerSocket_WaitForNewClient
 +---------------------------------------------------------------------*/
 ATX_METHOD
 BsdTcpServerSocket_WaitForNewClient(ATX_ServerSocket* _self,
@@ -1506,7 +1504,7 @@ ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(BsdTcpServerSocket)
 ATX_END_GET_INTERFACE_IMPLEMENTATION
 
 /*----------------------------------------------------------------------
-|       ATX_Socket interface
+|   ATX_Socket interface
 +---------------------------------------------------------------------*/
 ATX_IMPLEMENT_GET_INTERFACE_ADAPTER_EX(BsdTcpServerSocket, BsdSocket, ATX_Socket)
 ATX_INTERFACE_MAP(BsdTcpServerSocket, ATX_Socket) = {
@@ -1519,7 +1517,7 @@ ATX_INTERFACE_MAP(BsdTcpServerSocket, ATX_Socket) = {
 };
 
 /*----------------------------------------------------------------------
-|       ATX_ServerSocket interface
+|   ATX_ServerSocket interface
 +---------------------------------------------------------------------*/
 ATX_BEGIN_INTERFACE_MAP(BsdTcpServerSocket, ATX_ServerSocket)
     BsdTcpServerSocket_Listen,
@@ -1527,7 +1525,7 @@ ATX_BEGIN_INTERFACE_MAP(BsdTcpServerSocket, ATX_ServerSocket)
 ATX_END_INTERFACE_MAP
 
 /*----------------------------------------------------------------------
-|       ATX_Destroyable interface
+|   ATX_Destroyable interface
 +---------------------------------------------------------------------*/
 ATX_IMPLEMENT_GET_INTERFACE_ADAPTER_EX(BsdTcpServerSocket, BsdSocket, ATX_Destroyable)
 ATX_INTERFACE_MAP(BsdTcpServerSocket, ATX_Destroyable) = {

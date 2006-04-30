@@ -1,14 +1,14 @@
 /*****************************************************************
 |
-|      Atomix - Sockets
+|   Atomix - Sockets
 |
-|      (c) 2001-2004 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006    Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "AtxSockets.h"
 #include "AtxUtils.h"
@@ -16,7 +16,7 @@
 #include "AtxResults.h"
 
 /*----------------------------------------------------------------------
-|       ATX_IpAddress_Reset
+|   ATX_IpAddress_Reset
 +---------------------------------------------------------------------*/
 void
 ATX_IpAddress_Reset(ATX_IpAddress* address) 
@@ -25,7 +25,7 @@ ATX_IpAddress_Reset(ATX_IpAddress* address)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_IpAddress_Copy
+|   ATX_IpAddress_Copy
 +---------------------------------------------------------------------*/
 void
 ATX_IpAddress_Copy(ATX_IpAddress* address, ATX_IpAddress* other) 
@@ -37,7 +37,7 @@ ATX_IpAddress_Copy(ATX_IpAddress* address, ATX_IpAddress* other)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_IpAddress_SetFromLong
+|   ATX_IpAddress_SetFromLong
 +---------------------------------------------------------------------*/
 void
 ATX_IpAddress_SetFromLong(ATX_IpAddress* address,
@@ -50,7 +50,7 @@ ATX_IpAddress_SetFromLong(ATX_IpAddress* address,
 }
 
 /*----------------------------------------------------------------------
-|       ATX_IpAddress_AsLong
+|   ATX_IpAddress_AsLong
 +---------------------------------------------------------------------*/
 unsigned long
 ATX_IpAddress_AsLong(const ATX_IpAddress* address)
@@ -63,7 +63,7 @@ ATX_IpAddress_AsLong(const ATX_IpAddress* address)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_IpAddress_Parse
+|   ATX_IpAddress_Parse
 +---------------------------------------------------------------------*/
 ATX_Result
 ATX_IpAddress_Parse(ATX_IpAddress* address, const char* name)
@@ -94,7 +94,7 @@ ATX_IpAddress_Parse(ATX_IpAddress* address, const char* name)
 } 
 
 /*----------------------------------------------------------------------
-|       ATX_SocketAddress_Reset
+|   ATX_SocketAddress_Reset
 +---------------------------------------------------------------------*/
 void
 ATX_SocketAddress_Reset(ATX_SocketAddress* address)
@@ -104,7 +104,7 @@ ATX_SocketAddress_Reset(ATX_SocketAddress* address)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_SocketAddress_Set
+|   ATX_SocketAddress_Set
 +---------------------------------------------------------------------*/
 void
 ATX_SocketAddress_Set(ATX_SocketAddress* address, 
@@ -126,7 +126,7 @@ ATX_SocketAddress_Set(ATX_SocketAddress* address,
 }
 
 /*----------------------------------------------------------------------
-|       ATX_Socket_ConnectToHost
+|   ATX_Socket_ConnectToHost
 +---------------------------------------------------------------------*/
 ATX_Result 
 ATX_Socket_ConnectToHost(ATX_Socket* socket,

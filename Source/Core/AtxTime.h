@@ -1,7 +1,5 @@
 /*****************************************************************
 |
-|   File: AtxTime.h
-|
 |   Atomix - Time
 |
 |   (c) 2002-2006 Gilles Boccon-Gibod
@@ -47,19 +45,13 @@ typedef ATX_TimeStamp ATX_TimeInterval;
     )                                          \
 )
 
-#define ATX_TimeStamp_IsLaterOrEqual(t0,t1)       \
-(                                                 \
-    (                                             \
-        (t0).seconds == (t1).seconds &&           \
-        (t0).nanoseconds == (t1).nanoseconds      \
-    ) ||                                          \
-    (                                             \
-        ((t0).seconds > (t1).seconds) ||          \
-        (                                         \
-            (t0).seconds == (t1).seconds &&       \
-            (t0).nanoseconds > (t1).nanoseconds   \
-        )                                         \
-    )                                             \
+#define ATX_TimeStamp_IsLaterOrEqual(t0,t1)   \
+(                                             \
+    ((t0).seconds > (t1).seconds) ||          \
+    (                                         \
+        (t0).seconds == (t1).seconds &&       \
+        (t0).nanoseconds >= (t1).nanoseconds  \
+    )                                         \
 )
 
 #define ATX_TimeStamp_Add(t0,t1,t2) do {                        \

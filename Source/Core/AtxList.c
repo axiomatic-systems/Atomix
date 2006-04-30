@@ -1,11 +1,9 @@
 /*****************************************************************
 |
-|      File: AtxList.c
+|   Atomix - Linked Lists
 |
-|      Atomix - Linked Lists
-|
-|      (c) 2002-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2002-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
@@ -24,10 +22,7 @@
 |    types
 +---------------------------------------------------------------------*/
 struct ATX_ListItem {
-    union {
-        ATX_Any     any;
-        ATX_Object* object;
-    }             data;
+    ATX_Any       data;
     ATX_ListItem* next;
     ATX_ListItem* prev;
 };
@@ -63,6 +58,8 @@ ATX_List_Create(ATX_List** list)
 ATX_Result
 ATX_List_Destroy(ATX_List* list)
 {
+    if (list == NULL) return ATX_SUCCESS;
+
     /* destroy all items */
     ATX_List_Clear(list);
 
@@ -138,7 +135,7 @@ ATX_List_CreateItem(ATX_List* list)
     }
 
     /* initialize the item */
-    item->data.any = NULL;
+    item->data = NULL;
     
     return item;
 }
@@ -156,26 +153,7 @@ ATX_List_AddData(ATX_List* list, ATX_Any data)
     if (item == NULL) return ATX_ERROR_OUT_OF_MEMORY;
 
     /* attach the data to the item */
-    item->data.any = data;
-
-    /* add the item to the list */
-    return ATX_List_AddItem(list, item);
-}
-
-/*----------------------------------------------------------------------
-|    ATX_List_AddObject
-+---------------------------------------------------------------------*/
-ATX_Result 
-ATX_List_AddObject(ATX_List* list, ATX_Object* object)
-{
-    ATX_ListItem* item;
-
-    /* create a new item */
-    item = ATX_List_CreateItem(list);
-    if (item == NULL) return ATX_ERROR_OUT_OF_MEMORY;
-
-    /* attach object to the item */
-    item->data.object = object;
+    item->data = data;
 
     /* add the item to the list */
     return ATX_List_AddItem(list, item);
@@ -240,7 +218,7 @@ ATX_List_RemoveData(ATX_List* list, ATX_Any data)
     ATX_ListItem* item = list->head;
 
     while (item) {
-        if (item->data.any == data) {
+        if (item->data == data) {
             /* match, remove the item from the list */
             return ATX_List_RemoveItem(list, item);
         }
@@ -248,41 +226,6 @@ ATX_List_RemoveData(ATX_List* list, ATX_Any data)
     }
 
     return ATX_ERROR_NO_SUCH_ITEM;
-}
-
-/*----------------------------------------------------------------------
-|    ATX_List_RemoveObject
-+---------------------------------------------------------------------*/
-ATX_Result    
-ATX_List_RemoveObject(ATX_List* list, ATX_Object* object)
-{
-    ATX_ListItem* item = list->head;
-
-    while (item) {
-        if (item->data.object == object) {
-            /* match, remove the item from the list */
-            return ATX_List_RemoveItem(list, item);
-        }
-        item = item->next;
-    }
-
-    return ATX_ERROR_NO_SUCH_ITEM;
-}
-
-/*----------------------------------------------------------------------
-|    ATX_List_ReleaseObjects
-+---------------------------------------------------------------------*/
-ATX_Result    
-ATX_List_ReleaseObjects(ATX_List* list)
-{
-    ATX_ListItem* item = list->head;
-
-    while (item) {
-        ATX_RELEASE_OBJECT(item->data.object);
-        item = item->next;
-    }
-
-    return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
@@ -304,6 +247,23 @@ ATX_List_GetLastItem(ATX_List* list)
 }
 
 /*----------------------------------------------------------------------
+|    ATX_List_GetItem
++---------------------------------------------------------------------*/
+ATX_ListItem*
+ATX_List_GetItem(ATX_List* list, ATX_Ordinal index)
+{
+    ATX_ListItem* item = list->head;
+    
+    /* check the range */
+    if (index >= list->item_count) return NULL;
+
+    /* advance to the requested item */
+    while (index--) item = item->next;
+
+    return item;
+}
+
+/*----------------------------------------------------------------------
 |    ATX_List_GetItemCount
 +---------------------------------------------------------------------*/
 ATX_Cardinal  
@@ -321,7 +281,7 @@ ATX_List_FindData(ATX_List* list, ATX_Any data)
     ATX_ListItem* item = list->head;
 
     while (item) {
-        if (item->data.any == data) {
+        if (item->data == data) {
             /* match, return the item */
             return item;
         }
@@ -337,7 +297,7 @@ ATX_List_FindData(ATX_List* list, ATX_Any data)
 ATX_Any
 ATX_ListItem_GetData(ATX_ListItem* item)
 {
-    return item->data.any;
+    return item->data;
 }
 
 /*----------------------------------------------------------------------
@@ -346,27 +306,7 @@ ATX_ListItem_GetData(ATX_ListItem* item)
 ATX_Result
 ATX_ListItem_SetData(ATX_ListItem* item, ATX_Any data)
 {
-    item->data.any = data;
-    return ATX_SUCCESS;
-}
-
-/*----------------------------------------------------------------------
-|    ATX_ListItem_GetObject
-+---------------------------------------------------------------------*/
-ATX_Result
-ATX_ListItem_GetObject(ATX_ListItem* item, ATX_Object** object)
-{
-    *object = item->data.object;
-    return ATX_SUCCESS;
-}
-
-/*----------------------------------------------------------------------
-|    ATX_ListItem_SetObject
-+---------------------------------------------------------------------*/
-ATX_Result
-ATX_ListItem_SetObject(ATX_ListItem* item, ATX_Object* object)
-{
-    item->data.object = object;
+    item->data = data;
     return ATX_SUCCESS;
 }
 

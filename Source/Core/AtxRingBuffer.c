@@ -1,14 +1,14 @@
 /*****************************************************************
 |
-|      Atomix - Ring Buffer
+|   Atomix - Ring Buffer
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "AtxConfig.h"
 #include "AtxTypes.h"
@@ -17,7 +17,7 @@
 #include "AtxResults.h"
 
 /*----------------------------------------------------------------------
-|       types
+|   types
 +---------------------------------------------------------------------*/
 struct ATX_RingBuffer {
     struct {
@@ -30,7 +30,7 @@ struct ATX_RingBuffer {
 };
 
 /*----------------------------------------------------------------------
-|       ATX_RingBuffer_Create
+|   ATX_RingBuffer_Create
 +---------------------------------------------------------------------*/
 ATX_Result
 ATX_RingBuffer_Create(ATX_Size size, ATX_RingBuffer** buffer)
@@ -60,7 +60,7 @@ ATX_RingBuffer_Create(ATX_Size size, ATX_RingBuffer** buffer)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_RingBuffer_Destroy
+|   ATX_RingBuffer_Destroy
 +---------------------------------------------------------------------*/
 ATX_Result
 ATX_RingBuffer_Destroy(ATX_RingBuffer* ring)
@@ -77,7 +77,7 @@ ATX_RingBuffer_Destroy(ATX_RingBuffer* ring)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_RingBuffer_GetContiguousSpace
+|   ATX_RingBuffer_GetContiguousSpace
 +---------------------------------------------------------------------*/
 ATX_Size
 ATX_RingBuffer_GetContiguousSpace(ATX_RingBuffer* ring)
@@ -91,7 +91,7 @@ ATX_RingBuffer_GetContiguousSpace(ATX_RingBuffer* ring)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_RingBuffer_GetSpace
+|   ATX_RingBuffer_GetSpace
 +---------------------------------------------------------------------*/
 ATX_Size
 ATX_RingBuffer_GetSpace(ATX_RingBuffer* ring)
@@ -103,7 +103,7 @@ ATX_RingBuffer_GetSpace(ATX_RingBuffer* ring)
 }
 
 /*----------------------------------------------------------------------+
-|        ATX_RingBuffer_Write
+|    ATX_RingBuffer_Write
 +----------------------------------------------------------------------*/
 ATX_Result
 ATX_RingBuffer_Write(ATX_RingBuffer*      ring,
@@ -147,7 +147,7 @@ ATX_RingBuffer_Write(ATX_RingBuffer*      ring,
 }
 
 /*----------------------------------------------------------------------
-|       ATX_RingBuffer_GetContiguousAvailable
+|   ATX_RingBuffer_GetContiguousAvailable
 +---------------------------------------------------------------------*/
 ATX_Size
 ATX_RingBuffer_GetContiguousAvailable(ATX_RingBuffer* ring)
@@ -159,7 +159,7 @@ ATX_RingBuffer_GetContiguousAvailable(ATX_RingBuffer* ring)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_RingBuffer_GetAvailable
+|   ATX_RingBuffer_GetAvailable
 +---------------------------------------------------------------------*/
 ATX_Size
 ATX_RingBuffer_GetAvailable(ATX_RingBuffer* ring)
@@ -171,7 +171,7 @@ ATX_RingBuffer_GetAvailable(ATX_RingBuffer* ring)
 }
 
 /*----------------------------------------------------------------------+
-|        ATX_RingBuffer_Read
+|    ATX_RingBuffer_Read
 +----------------------------------------------------------------------*/
 ATX_Result
 ATX_RingBuffer_Read(ATX_RingBuffer* ring,
@@ -215,7 +215,7 @@ ATX_RingBuffer_Read(ATX_RingBuffer* ring,
 }
 
 /*----------------------------------------------------------------------+
-|        ATX_RingBuffer_ReadByte
+|    ATX_RingBuffer_ReadByte
 +----------------------------------------------------------------------*/
 ATX_UInt8
 ATX_RingBuffer_ReadByte(ATX_RingBuffer* ring)
@@ -228,7 +228,7 @@ ATX_RingBuffer_ReadByte(ATX_RingBuffer* ring)
 }
 
 /*----------------------------------------------------------------------+
-|        ATX_RingBuffer_PeekByte
+|    ATX_RingBuffer_PeekByte
 +----------------------------------------------------------------------*/
 ATX_UInt8
 ATX_RingBuffer_PeekByte(ATX_RingBuffer* ring, ATX_Size offset)
@@ -244,7 +244,7 @@ ATX_RingBuffer_PeekByte(ATX_RingBuffer* ring, ATX_Size offset)
 }
 
 /*----------------------------------------------------------------------+
-|        ATX_RingBuffer_GetIn
+|    ATX_RingBuffer_GetIn
 +----------------------------------------------------------------------*/
 ATX_ByteBuffer 
 ATX_RingBuffer_GetIn(ATX_RingBuffer* ring)
@@ -253,7 +253,7 @@ ATX_RingBuffer_GetIn(ATX_RingBuffer* ring)
 }
 
 /*----------------------------------------------------------------------+
-|        ATX_RingBuffer_GetOut
+|    ATX_RingBuffer_GetOut
 +----------------------------------------------------------------------*/
 ATX_ByteBuffer 
 ATX_RingBuffer_GetOut(ATX_RingBuffer* ring)
@@ -262,7 +262,7 @@ ATX_RingBuffer_GetOut(ATX_RingBuffer* ring)
 }
 
 /*----------------------------------------------------------------------+
-|        ATX_RingBuffer_MoveIn
+|    ATX_RingBuffer_MoveIn
 +----------------------------------------------------------------------*/
 ATX_Result
 ATX_RingBuffer_MoveIn(ATX_RingBuffer* ring, ATX_Size offset)
@@ -279,7 +279,7 @@ ATX_RingBuffer_MoveIn(ATX_RingBuffer* ring, ATX_Size offset)
 }
 
 /*----------------------------------------------------------------------+
-|        ATX_RingBuffer_MoveOut
+|    ATX_RingBuffer_MoveOut
 +----------------------------------------------------------------------*/
 ATX_Result
 ATX_RingBuffer_MoveOut(ATX_RingBuffer* ring, ATX_Size offset)

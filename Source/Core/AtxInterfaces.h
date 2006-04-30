@@ -1,11 +1,9 @@
 /*****************************************************************
 |
-|      File: AtxInterfaces.h
+|   Atomix - Interfaces
 |
-|      Atomix - Interfaces
-|
-|      (c) 2002-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2002-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 /** @file 
@@ -16,20 +14,20 @@
 #define _ATX_INTERFACES_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "AtxDefs.h"
 #include "AtxTypes.h"
 
 /*----------------------------------------------------------------------
-|       error codes
+|   error codes
 +---------------------------------------------------------------------*/
 #define ATX_ERROR_NO_SUCH_INTERFACE (ATX_ERROR_BASE_INTERFACES - 0)
 #define ATX_ERROR_INVALID_INTERFACE (ATX_ERROR_BASE_INTERFACES - 1)
 #define ATX_ERROR_NO_SUCH_CLASS     (ATX_ERROR_BASE_INTERFACES - 2)
 
 /*----------------------------------------------------------------------
-|       Win32 adaptation
+|   Win32 adaptation
 +---------------------------------------------------------------------*/
 #if defined(WIN32)
 #undef interface
@@ -37,7 +35,7 @@
 #endif /* WIN32 */
 
 /*----------------------------------------------------------------------
-|       types
+|   types
 +---------------------------------------------------------------------*/
 /**
  * Interface ID constant
@@ -51,7 +49,7 @@ typedef struct {
 } ATX_InterfaceId;
 
 /*----------------------------------------------------------------------
-|       macros
+|   macros
 +---------------------------------------------------------------------*/
 #ifdef __cplusplus
 #define ATX_INTERFACE_ID_TYPE_MOD extern "C" const
@@ -202,7 +200,7 @@ ATX_INTERFACE_MAP(_class,_iface) = {                        \
 (_object)->_base##_Base._iface##_Base.interface = & _class##_##_iface##Interface
 
 /*----------------------------------------------------------------------
-|       ATX_Object interface
+|   ATX_Object interface
 +---------------------------------------------------------------------*/
 /**
 * Basic interface implemented by all objects in the framework.

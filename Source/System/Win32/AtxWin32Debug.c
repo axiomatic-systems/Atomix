@@ -1,16 +1,14 @@
 /*****************************************************************
 |
-|      File: AtxWin32Debug.c
+|   Atomix - Debug Support: Win32 Implementation
 |
-|      Atomix - Debug Support: Win32 Implementation
-|
-|      (c) 2002-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2002-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include <windows.h>
 #include <stdarg.h>
@@ -23,7 +21,7 @@
 #include "AtxUtils.h"
 
 /*----------------------------------------------------------------------
-|       constants
+|   constants
 +---------------------------------------------------------------------*/
 #define ATX_DEBUG_LOCAL_BUFFER_SIZE 1024
 #define ATX_DEBUG_BUFFER_INCREMENT  4096
@@ -31,7 +29,7 @@
 
 #if defined(ATX_DEBUG)
 /*----------------------------------------------------------------------
-|       ATX_Print
+|   ATX_Print
 +---------------------------------------------------------------------*/
 static void
 ATX_Print(const char* message)
@@ -42,7 +40,7 @@ ATX_Print(const char* message)
 #endif
 
 /*----------------------------------------------------------------------
-|       ATX_Debug
+|   ATX_Debug
 +---------------------------------------------------------------------*/
 void
 ATX_Debug(const char* format, ...)

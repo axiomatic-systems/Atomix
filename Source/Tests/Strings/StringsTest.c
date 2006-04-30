@@ -204,6 +204,8 @@ main(int argc, char** argv)
         ATX_String_Append(&r, "5");
         ATX_String_Append(&r, "6");
         ATX_ASSERT(r.chars == r_save.chars);
+        ATX_String_Reserve(&r, 0);
+        ATX_ASSERT(r.chars == r_save.chars);
         ATX_String_Destruct(&r);
     }
 

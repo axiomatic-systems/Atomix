@@ -14,14 +14,16 @@ all:
 	@echo "Master Apps Makefile, choose one of:"
 	@echo "-------------------------------"
 	@echo ""
-	@echo "Properties:    build Properties test"
-	@echo "Clean-NetPump: clean Properties test"
+	@echo "Properties:       build Properties test"
+	@echo "Clean-Properties: clean Properties test"
+	@echo "Strings:          build Strings test"
+	@echo "Clean-Strings:    clean Strings test"
 	@echo ""
 	@echo "All:         build all tests"
 	@echo "Clean-All:   clean all tests"
 
 ### subdirs
-ATX_SUBTARGET_BUILDS = Properties
+ATX_SUBTARGET_BUILDS = Properties Strings
 
 #######################################################################
 #  includes

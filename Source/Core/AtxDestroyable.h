@@ -1,7 +1,5 @@
 /*****************************************************************
 |
-|   File: AtxDestroyable.h
-|
 |   Atomix - Destroyable Interface
 |
 |   (c) 2002-2003 Gilles Boccon-Gibod

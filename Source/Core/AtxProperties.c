@@ -1,7 +1,5 @@
 /*****************************************************************
 |
-|   File: AtxProperties.c
-|
 |   Atomix - Properties Interface
 |
 |   (c) 2002-2006 Gilles Boccon-Gibod
@@ -120,7 +118,7 @@ PropertiesIterator_GetNext(ATX_Iterator* _self,
 }
 
 /*----------------------------------------------------------------------
-|       PropertiesIterator_Reset
+|   PropertiesIterator_Reset
 +---------------------------------------------------------------------*/
 ATX_METHOD
 PropertiesIterator_Reset(ATX_Iterator* _self)
@@ -134,7 +132,7 @@ PropertiesIterator_Reset(ATX_Iterator* _self)
 }
 
 /*----------------------------------------------------------------------
-|       GetInterface implementation
+|   GetInterface implementation
 +---------------------------------------------------------------------*/
 ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(PropertiesIterator) 
     ATX_GET_INTERFACE_ACCEPT(PropertiesIterator, ATX_Iterator)
@@ -155,7 +153,7 @@ ATX_BEGIN_INTERFACE_MAP(PropertiesIterator, ATX_Iterator)
 ATX_END_INTERFACE_MAP
 
 /*----------------------------------------------------------------------
-|       PropertyNode_SetValue
+|   PropertyNode_SetValue
 +---------------------------------------------------------------------*/
 static ATX_Result
 PropertyNode_SetValue(PropertyNode*            node,
@@ -194,7 +192,7 @@ PropertyNode_SetValue(PropertyNode*            node,
 }
 
 /*----------------------------------------------------------------------
-|       PropertyNode_DestroyValue
+|   PropertyNode_DestroyValue
 +---------------------------------------------------------------------*/
 static void
 PropertyNode_DestroyValue(PropertyNode* node)
@@ -217,7 +215,7 @@ PropertyNode_DestroyValue(PropertyNode* node)
 }
 
 /*----------------------------------------------------------------------
-|       PropertyNode_Create
+|   PropertyNode_Create
 +---------------------------------------------------------------------*/
 static PropertyNode*
 PropertyNode_Create(ATX_CString              name, 
@@ -243,7 +241,7 @@ PropertyNode_Create(ATX_CString              name,
 }
 
 /*----------------------------------------------------------------------
-|       PropertyNode_Destroy
+|   PropertyNode_Destroy
 +---------------------------------------------------------------------*/
 static void
 PropertyNode_Destroy(PropertyNode* node)
@@ -257,7 +255,7 @@ PropertyNode_Destroy(PropertyNode* node)
 }
 
 /*----------------------------------------------------------------------
-|       PropertyListenerNode_Create
+|   PropertyListenerNode_Create
 +---------------------------------------------------------------------*/
 static PropertyListenerNode*
 PropertyListenerNode_Create(ATX_CString           name, 
@@ -283,7 +281,7 @@ PropertyListenerNode_Create(ATX_CString           name,
 }
 
 /*----------------------------------------------------------------------
-|       PropertyListenerNode_Destroy
+|   PropertyListenerNode_Destroy
 +---------------------------------------------------------------------*/
 static void
 PropertyListenerNode_Destroy(PropertyListenerNode* node)
@@ -298,7 +296,7 @@ PropertyListenerNode_Destroy(PropertyListenerNode* node)
 }
 
 /*----------------------------------------------------------------------
-|       Properties_NotifyListeners
+|   Properties_NotifyListeners
 +---------------------------------------------------------------------*/
 static void
 Properties_NotifyListeners(Properties*              self,
@@ -322,7 +320,7 @@ Properties_NotifyListeners(Properties*              self,
 }
 
 /*----------------------------------------------------------------------
-|       Properties_FindProperty
+|   Properties_FindProperty
 +---------------------------------------------------------------------*/
 static PropertyNode*
 Properties_FindProperty(Properties* self, ATX_CString name)
@@ -344,7 +342,7 @@ Properties_FindProperty(Properties* self, ATX_CString name)
 }
 
 /*----------------------------------------------------------------------
-|       Properties_GetProperty
+|   Properties_GetProperty
 +---------------------------------------------------------------------*/
 ATX_METHOD
 Properties_GetProperty(ATX_Properties* _self,
@@ -365,7 +363,7 @@ Properties_GetProperty(ATX_Properties* _self,
 }
 
 /*----------------------------------------------------------------------
-|       Properties_SetProperty
+|   Properties_SetProperty
 +---------------------------------------------------------------------*/
 ATX_METHOD
 Properties_SetProperty(ATX_Properties*          _self,
@@ -407,7 +405,7 @@ Properties_SetProperty(ATX_Properties*          _self,
 }
 
 /*----------------------------------------------------------------------
-|       Properties_UnsetProperty
+|   Properties_UnsetProperty
 +---------------------------------------------------------------------*/
 ATX_METHOD
 Properties_UnsetProperty(ATX_Properties* _self, ATX_CString name)
@@ -446,7 +444,7 @@ Properties_UnsetProperty(ATX_Properties* _self, ATX_CString name)
 }
 
 /*----------------------------------------------------------------------
-|       Properties_Clear
+|   Properties_Clear
 +---------------------------------------------------------------------*/
 ATX_METHOD
 Properties_Clear(ATX_Properties* _self)
@@ -479,7 +477,7 @@ Properties_Clear(ATX_Properties* _self)
 }
 
 /*----------------------------------------------------------------------
-|       Properties_GetIterator
+|   Properties_GetIterator
 +---------------------------------------------------------------------*/
 ATX_METHOD
 Properties_GetIterator(ATX_Properties* _self,
@@ -491,7 +489,7 @@ Properties_GetIterator(ATX_Properties* _self,
 }
 
 /*----------------------------------------------------------------------
-|       Properties_AddListener
+|   Properties_AddListener
 +---------------------------------------------------------------------*/
 ATX_METHOD
 Properties_AddListener(ATX_Properties*             _self,
@@ -517,7 +515,7 @@ Properties_AddListener(ATX_Properties*             _self,
 }
 
 /*----------------------------------------------------------------------
-|       Properties_RemoveListener
+|   Properties_RemoveListener
 +---------------------------------------------------------------------*/
 ATX_METHOD
 Properties_RemoveListener(ATX_Properties*            _self,
@@ -549,7 +547,7 @@ Properties_RemoveListener(ATX_Properties*            _self,
 }
 
 /*----------------------------------------------------------------------
-|       Properties_Create
+|   Properties_Create
 +---------------------------------------------------------------------*/
 ATX_Result 
 ATX_Properties_Create(ATX_Properties** object)
@@ -576,7 +574,7 @@ ATX_Properties_Create(ATX_Properties** object)
 }
 
 /*----------------------------------------------------------------------
-|       Properties_Destroy
+|   Properties_Destroy
 +---------------------------------------------------------------------*/
 ATX_METHOD
 Properties_Destroy(ATX_Destroyable* _self)
@@ -608,7 +606,7 @@ Properties_Destroy(ATX_Destroyable* _self)
 }
 
 /*----------------------------------------------------------------------
-|       GetInterface implementation
+|   GetInterface implementation
 +---------------------------------------------------------------------*/
 ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(Properties) 
     ATX_GET_INTERFACE_ACCEPT(Properties, ATX_Properties)

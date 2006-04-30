@@ -1,14 +1,14 @@
 /*****************************************************************
 |
-|      Atomix - String Objects
+|   Atomix - String Objects
 |
-|      (c) 2001-2006 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
 ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "AtxConfig.h"
 #include "AtxTypes.h"
@@ -18,24 +18,24 @@
 #include "AtxDebug.h"
 
 /*----------------------------------------------------------------------
-|       constants
+|   constants
 +---------------------------------------------------------------------*/
 #define ATX_STRINGS_WHITESPACE_CHARS "\r\n\t "
 
 /*----------------------------------------------------------------------
-|       helpers
+|   helpers
 +---------------------------------------------------------------------*/
 #define ATX_UPPERCASE(x) (((x) >= 'a' && (x) <= 'z') ? (x)&0xdf : (x))
 #define ATX_LOWERCASE(x) (((x) >= 'A' && (x) <= 'Z') ? (x)^32   : (x))
 #define ATX_STRING_BUFFER_CHARS(b) ((char*)((b)+1))
 
 /*----------------------------------------------------------------------
-|       ATX_String_EmptyString
+|   ATX_String_EmptyString
 +---------------------------------------------------------------------*/
 const char* const ATX_String_EmptyString = "";
 
 /*----------------------------------------------------------------------
-|       ATX_StringBuffer_Allocate
+|   ATX_StringBuffer_Allocate
 +---------------------------------------------------------------------*/
 static ATX_StringBuffer*
 ATX_StringBuffer_Allocate(ATX_Size allocated, ATX_Size length) 
@@ -50,7 +50,7 @@ ATX_StringBuffer_Allocate(ATX_Size allocated, ATX_Size length)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_StringBuffer_Create
+|   ATX_StringBuffer_Create
 +---------------------------------------------------------------------*/
 static char* 
 ATX_StringBuffer_Create(ATX_Size length)
@@ -61,7 +61,7 @@ ATX_StringBuffer_Create(ATX_Size length)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_StringBuffer_CreateFromString
+|   ATX_StringBuffer_CreateFromString
 +---------------------------------------------------------------------*/
 static char* 
 ATX_StringBuffer_CreateFromString(const char* str)
@@ -78,7 +78,7 @@ ATX_StringBuffer_CreateFromString(const char* str)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_StringBuffer_CreateFromStringN
+|   ATX_StringBuffer_CreateFromStringN
 +---------------------------------------------------------------------*/
 static char* 
 ATX_StringBuffer_CreateFromStringN(const char* str, ATX_Size length)
@@ -97,13 +97,13 @@ ATX_StringBuffer_CreateFromStringN(const char* str, ATX_Size length)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_Create
+|   ATX_String_Create
 +---------------------------------------------------------------------*/
 ATX_String
 ATX_String_Create(const char* str)
 {
     ATX_String result;
-    if (str == NULL) {
+    if (str == NULL || str[0] == '\0') {
         result.chars = NULL;
     } else {
         result.chars = ATX_StringBuffer_CreateFromString(str);
@@ -113,7 +113,7 @@ ATX_String_Create(const char* str)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_CreateFromSubString
+|   ATX_String_CreateFromSubString
 +---------------------------------------------------------------------*/
 ATX_String
 ATX_String_CreateFromSubString(const char* str,
@@ -142,7 +142,7 @@ ATX_String_CreateFromSubString(const char* str,
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_Clone
+|   ATX_String_Clone
 +---------------------------------------------------------------------*/
 ATX_String
 ATX_String_Clone(const ATX_String* self)
@@ -161,7 +161,7 @@ ATX_String_Clone(const ATX_String* self)
 
 
 /*----------------------------------------------------------------------
-|       ATX_String_Reset
+|   ATX_String_Reset
 +---------------------------------------------------------------------*/
 static void
 ATX_String_Reset(ATX_String* self)
@@ -173,12 +173,11 @@ ATX_String_Reset(ATX_String* self)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_PrepareToWrite
+|   ATX_String_PrepareToWrite
 +---------------------------------------------------------------------*/
 static char*
 ATX_String_PrepareToWrite(ATX_String* self, ATX_Size length)
 {
-    ATX_ASSERT(length != 0);
     if (self->chars == NULL || ATX_String_GetBuffer(self)->allocated < length) {
         /* the buffer is too small, we need to allocate a new one */
         ATX_Size needed = length;
@@ -187,19 +186,20 @@ ATX_String_PrepareToWrite(ATX_String* self, ATX_Size length)
             if (grow > length) needed = grow;
             ATX_FreeMemory((void*)ATX_String_GetBuffer(self));
         }
-        self->chars = ATX_StringBuffer_Create(needed);
-    }    
-    ATX_String_GetBuffer(self)->length = length;
+        self->chars = ATX_STRING_BUFFER_CHARS(
+            ATX_StringBuffer_Allocate(needed, length));
+    } else {   
+        ATX_String_GetBuffer(self)->length = length;
+    }
     return self->chars;
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_PrepareToAppend
+|   ATX_String_Reserve
 +---------------------------------------------------------------------*/
-static ATX_Result
-ATX_String_PrepareToAppend(ATX_String* self, ATX_Size length, ATX_Size allocate)
+ATX_Result
+ATX_String_Reserve(ATX_String* self, ATX_Size allocate)
 {
-    ATX_ASSERT(allocate >= length);
     if (self->chars == NULL || ATX_String_GetBuffer(self)->allocated < allocate) {
         /* the buffer is too small, we need to allocate a new one */
         ATX_Size needed = allocate;
@@ -208,7 +208,9 @@ ATX_String_PrepareToAppend(ATX_String* self, ATX_Size length, ATX_Size allocate)
             if (grow > allocate) needed = grow;
         }
         {
-            char* copy = ATX_StringBuffer_Create(needed);
+            ATX_Size length = ATX_String_GetLength(self);
+            char* copy = ATX_STRING_BUFFER_CHARS(
+                ATX_StringBuffer_Allocate(needed, length));
             if (copy == NULL) return ATX_ERROR_OUT_OF_MEMORY;
             if (self->chars != NULL) {
                 ATX_CopyString(copy, self->chars);
@@ -219,22 +221,12 @@ ATX_String_PrepareToAppend(ATX_String* self, ATX_Size length, ATX_Size allocate)
             self->chars = copy;
         }
     }
-    ATX_String_GetBuffer(self)->length = length;
 
     return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_Reserve
-+---------------------------------------------------------------------*/
-ATX_Result
-ATX_String_Reserve(ATX_String* self, ATX_Size length)
-{
-    return ATX_String_PrepareToAppend(self, ATX_String_GetLength(self), length);
-}
-
-/*----------------------------------------------------------------------
-|       ATX_String_Assign
+|   ATX_String_Assign
 +---------------------------------------------------------------------*/
 ATX_Result
 ATX_String_Assign(ATX_String* self, const char* str)
@@ -248,7 +240,7 @@ ATX_String_Assign(ATX_String* self, const char* str)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_AssignN
+|   ATX_String_AssignN
 +---------------------------------------------------------------------*/
 ATX_Result
 ATX_String_AssignN(ATX_String* self, const char* str, ATX_Size length)
@@ -265,7 +257,7 @@ ATX_String_AssignN(ATX_String* self, const char* str, ATX_Size length)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_Copy
+|   ATX_String_Copy
 +---------------------------------------------------------------------*/
 void
 ATX_String_Copy(ATX_String* self, const ATX_String* str)
@@ -284,7 +276,7 @@ ATX_String_Copy(ATX_String* self, const ATX_String* str)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_SetLength
+|   ATX_String_SetLength
 +---------------------------------------------------------------------*/
 ATX_Result
 ATX_String_SetLength(ATX_String* self, ATX_Size length)
@@ -303,7 +295,7 @@ ATX_String_SetLength(ATX_String* self, ATX_Size length)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_Append
+|   ATX_String_Append
 +---------------------------------------------------------------------*/
 ATX_Result
 ATX_String_Append(ATX_String* self, const char* str)
@@ -314,7 +306,7 @@ ATX_String_Append(ATX_String* self, const char* str)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_AppendChar
+|   ATX_String_AppendChar
 +---------------------------------------------------------------------*/
 ATX_Result
 ATX_String_AppendChar(ATX_String* self, char c)
@@ -323,7 +315,7 @@ ATX_String_AppendChar(ATX_String* self, char c)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_AppendSubString
+|   ATX_String_AppendSubString
 +---------------------------------------------------------------------*/
 ATX_Result
 ATX_String_AppendSubString(ATX_String* self, const char* str, ATX_Size length)
@@ -351,7 +343,7 @@ ATX_String_AppendSubString(ATX_String* self, const char* str, ATX_Size length)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_Compare
+|   ATX_String_Compare
 +---------------------------------------------------------------------*/
 int 
 ATX_String_Compare(const ATX_String* self, const char *s, ATX_Boolean ignore_case)
@@ -379,7 +371,7 @@ ATX_String_Compare(const ATX_String* self, const char *s, ATX_Boolean ignore_cas
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_Equals
+|   ATX_String_Equals
 +---------------------------------------------------------------------*/
 ATX_Boolean
 ATX_String_Equals(const ATX_String* self, const char *s, ATX_Boolean ignore_case)
@@ -388,7 +380,7 @@ ATX_String_Equals(const ATX_String* self, const char *s, ATX_Boolean ignore_case
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_SubString
+|   ATX_String_SubString
 +---------------------------------------------------------------------*/
 ATX_String
 ATX_String_SubString(const ATX_String* self, ATX_Ordinal first, ATX_Size length)
@@ -399,7 +391,7 @@ ATX_String_SubString(const ATX_String* self, ATX_Ordinal first, ATX_Size length)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_StringStartsWith
+|   ATX_StringStartsWith
 |
 |    returns:
 |      1 if str starts with sub,
@@ -419,7 +411,7 @@ ATX_StringStartsWith(const char* str, const char* sub)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_StartsWith
+|   ATX_String_StartsWith
 +---------------------------------------------------------------------*/
 ATX_Boolean 
 ATX_String_StartsWith(const ATX_String* self, const char *s)
@@ -428,7 +420,7 @@ ATX_String_StartsWith(const ATX_String* self, const char *s)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_EndsWith
+|   ATX_String_EndsWith
 +---------------------------------------------------------------------*/
 ATX_Boolean 
 ATX_String_EndsWith(const ATX_String* self, const char *s)
@@ -442,7 +434,7 @@ ATX_String_EndsWith(const ATX_String* self, const char *s)
 
 
 /*----------------------------------------------------------------------
-|       ATX_String_FindStringFrom
+|   ATX_String_FindStringFrom
 +---------------------------------------------------------------------*/
 int
 ATX_String_FindStringFrom(const ATX_String* self, 
@@ -475,7 +467,7 @@ ATX_String_FindStringFrom(const ATX_String* self,
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_FindString
+|   ATX_String_FindString
 +---------------------------------------------------------------------*/
 int
 ATX_String_FindString(const ATX_String* self, const char* str)
@@ -484,7 +476,7 @@ ATX_String_FindString(const ATX_String* self, const char* str)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_FindCharFrom
+|   ATX_String_FindCharFrom
 +---------------------------------------------------------------------*/
 int
 ATX_String_FindCharFrom(const ATX_String* self, char c, ATX_Ordinal start)
@@ -507,7 +499,7 @@ ATX_String_FindCharFrom(const ATX_String* self, char c, ATX_Ordinal start)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_FindChar
+|   ATX_String_FindChar
 +---------------------------------------------------------------------*/
 int
 ATX_String_FindChar(const ATX_String* self, char c)
@@ -516,7 +508,7 @@ ATX_String_FindChar(const ATX_String* self, char c)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_ReverseFindCharFrom
+|   ATX_String_ReverseFindCharFrom
 +---------------------------------------------------------------------*/
 int
 ATX_String_ReverseFindCharFrom(const ATX_String* self, char c, ATX_Ordinal start)
@@ -537,7 +529,7 @@ ATX_String_ReverseFindCharFrom(const ATX_String* self, char c, ATX_Ordinal start
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_ReverseFindChar
+|   ATX_String_ReverseFindChar
 +---------------------------------------------------------------------*/
 int
 ATX_String_ReverseFindChar(const ATX_String* self, char c)
@@ -546,7 +538,7 @@ ATX_String_ReverseFindChar(const ATX_String* self, char c)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_MakeLowercase
+|   ATX_String_MakeLowercase
 +---------------------------------------------------------------------*/
 void
 ATX_String_MakeLowercase(ATX_String* self)
@@ -563,7 +555,7 @@ ATX_String_MakeLowercase(ATX_String* self)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_MakeUppercase
+|   ATX_String_MakeUppercase
 +---------------------------------------------------------------------*/
 void
 ATX_String_MakeUppercase(ATX_String* self) 
@@ -580,7 +572,7 @@ ATX_String_MakeUppercase(ATX_String* self)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_ToLowercase
+|   ATX_String_ToLowercase
 +---------------------------------------------------------------------*/
 ATX_String
 ATX_String_ToLowercase(const ATX_String* self)
@@ -591,7 +583,7 @@ ATX_String_ToLowercase(const ATX_String* self)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_ToUppercase
+|   ATX_String_ToUppercase
 +---------------------------------------------------------------------*/
 ATX_String
 ATX_String_ToUppercase(const ATX_String* self)
@@ -602,7 +594,7 @@ ATX_String_ToUppercase(const ATX_String* self)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_Replace
+|   ATX_String_Replace
 +---------------------------------------------------------------------*/
 void
 ATX_String_Replace(ATX_String* self, char a, char b) 
@@ -623,7 +615,7 @@ ATX_String_Replace(ATX_String* self, char a, char b)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_Insert
+|   ATX_String_Insert
 +---------------------------------------------------------------------*/
 ATX_Result
 ATX_String_Insert(ATX_String* self, const char* str, ATX_Ordinal where)
@@ -696,7 +688,7 @@ ATX_String_ToFloat(const ATX_String* self, float* value, ATX_Boolean relaxed)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_TrimWhitespaceLeft
+|   ATX_String_TrimWhitespaceLeft
 +---------------------------------------------------------------------*/
 void 
 ATX_String_TrimWhitespaceLeft(ATX_String* self)
@@ -705,7 +697,7 @@ ATX_String_TrimWhitespaceLeft(ATX_String* self)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_TrimCharLeft
+|   ATX_String_TrimCharLeft
 +---------------------------------------------------------------------*/
 void 
 ATX_String_TrimCharLeft(ATX_String* self, char c)
@@ -717,7 +709,7 @@ ATX_String_TrimCharLeft(ATX_String* self, char c)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_TrimCharsLeft
+|   ATX_String_TrimCharsLeft
 +---------------------------------------------------------------------*/
 void 
 ATX_String_TrimCharsLeft(ATX_String* self, const char* chars)
@@ -750,7 +742,7 @@ ATX_String_TrimCharsLeft(ATX_String* self, const char* chars)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_TrimWhitespaceRight
+|   ATX_String_TrimWhitespaceRight
 +---------------------------------------------------------------------*/
 void 
 ATX_String_TrimWhitespaceRight(ATX_String* self)
@@ -759,7 +751,7 @@ ATX_String_TrimWhitespaceRight(ATX_String* self)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_TrimCharRight
+|   ATX_String_TrimCharRight
 +---------------------------------------------------------------------*/
 void 
 ATX_String_TrimCharRight(ATX_String* self, char c)
@@ -771,7 +763,7 @@ ATX_String_TrimCharRight(ATX_String* self, char c)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_TrimCharsRight
+|   ATX_String_TrimCharsRight
 +---------------------------------------------------------------------*/
 void 
 ATX_String_TrimCharsRight(ATX_String* self, const char* chars)
@@ -802,7 +794,7 @@ ATX_String_TrimCharsRight(ATX_String* self, const char* chars)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_TrimWhitespace
+|   ATX_String_TrimWhitespace
 +---------------------------------------------------------------------*/
 void 
 ATX_String_TrimWhitespace(ATX_String* self)
@@ -812,7 +804,7 @@ ATX_String_TrimWhitespace(ATX_String* self)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_TrimChar
+|   ATX_String_TrimChar
 +---------------------------------------------------------------------*/
 void 
 ATX_String_TrimChar(ATX_String* self, char c)
@@ -825,7 +817,7 @@ ATX_String_TrimChar(ATX_String* self, char c)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_TrimChars
+|   ATX_String_TrimChars
 +---------------------------------------------------------------------*/
 void 
 ATX_String_TrimChars(ATX_String* self, const char* chars)
@@ -835,13 +827,13 @@ ATX_String_TrimChars(ATX_String* self, const char* chars)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_String_Add
+|   ATX_String_Add
 +---------------------------------------------------------------------*/
 ATX_String 
 ATX_String_Add(const ATX_String* s1, const char* s2)
 {
     /* shortcut */
-    if (s2 == NULL) return ATX_String_Clone(s1);
+    if (s2 == NULL || s2[0] == '\0') return ATX_String_Clone(s1);
 
     {
         /* measure strings */
