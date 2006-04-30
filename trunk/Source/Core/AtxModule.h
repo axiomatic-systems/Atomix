@@ -1,11 +1,9 @@
 /*****************************************************************
 |
-|      File: AtxModule.h
+|   Atomix - Module Interface
 |
-|      Atomix - Module Interface
-|
-|      (c) 2002-2006 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2002-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 /** @file 
@@ -16,7 +14,7 @@
 #define _ATX_MODULE_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "AtxDefs.h"
 #include "AtxTypes.h"
@@ -24,7 +22,7 @@
 #include "AtxProperties.h"
 
 /*----------------------------------------------------------------------
-|       ATX_Module interface
+|   ATX_Module interface
 +---------------------------------------------------------------------*/
 ATX_DECLARE_INTERFACE(ATX_Module)
 /**
@@ -50,7 +48,7 @@ ATX_BEGIN_INTERFACE_DEFINITION(ATX_Module)
 ATX_END_INTERFACE_DEFINITION
 
 /*----------------------------------------------------------------------
-|       convenience macros
+|   convenience macros
 +---------------------------------------------------------------------*/
 /** 
  * Convenience macro for calling the CreateObject method of the 
@@ -63,7 +61,7 @@ ATX_INTERFACE(object)->CreateObject(self,                                 \
                                     result)
 
 /*----------------------------------------------------------------------
-|       macros and templates
+|   macros and templates
 +---------------------------------------------------------------------*/
 #define ATX_DEFINE_NULL_MODULE_INSTANCE(_prefix) \
 static ATX_ModuleInstance* const _prefix##ModuleInstance = NULL;

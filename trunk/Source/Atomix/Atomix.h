@@ -1,7 +1,5 @@
 /*****************************************************************
 |
-|   File: Atomix.h
-|
 |   Atomix - Top Level Header
 |
 |   (c) 2002-2006 Gilles Boccon-Gibod

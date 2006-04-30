@@ -1,11 +1,9 @@
 /*****************************************************************
 |
-|      File: AtxFile.h
+|   Atomix - File Storage
 |
-|      Atomix - File Storage
-|
-|      (c) 2002-2006 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2002-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
 ****************************************************************/
 

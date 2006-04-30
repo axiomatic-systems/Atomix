@@ -1,16 +1,14 @@
 /*****************************************************************
 |
-|      File: AtxUtils.c
+|   Atomix - Utils
 |
-|      Atomix - Utils
-|
-|      (c) 2002-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2002-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "AtxUtils.h"
 #include "AtxResults.h"
@@ -291,7 +289,7 @@ ATX_IntegerToString(long value, char* buffer, ATX_Size buffer_size)
     }
 
     /* check that the string fits */
-    if (ATX_StringLength(s)+1 > buffer_size) return ATX_ERROR_OUT_OF_RANGE;
+    if ((ATX_Size)(&s[31]-c)+1 > buffer_size) return ATX_ERROR_OUT_OF_RANGE;
 
     /* copy the string */
     ATX_CopyString(buffer, c);
@@ -318,7 +316,7 @@ ATX_IntegerToStringU(unsigned long value, char* buffer, ATX_Size buffer_size)
     ++c;
 
     /* check that the string fits */
-    if (ATX_StringLength(c)+1 > buffer_size) return ATX_ERROR_OUT_OF_RANGE;
+    if ((ATX_Size)(&s[31]-c)+1 > buffer_size) return ATX_ERROR_OUT_OF_RANGE;
 
     /* copy the string */
     ATX_CopyString(buffer, c);

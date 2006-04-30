@@ -1,11 +1,9 @@
 /*****************************************************************
 |
-|      File: AtxDebug.h
+|   Atomix - Common Definitions
 |
-|      Atomix - Common Definitions
-|
-|      (c) 2002-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2002-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 /** @file
@@ -16,14 +14,14 @@
 #define _ATX_DEBUG_H_
 
 /*----------------------------------------------------------------------
-|    includes
+|   includes
 +---------------------------------------------------------------------*/
 #if defined(ATX_CONFIG_HAVE_ASSERT_H)
 #include <assert.h>
 #endif
 
 /*----------------------------------------------------------------------
-|    prototypes
+|   prototypes
 +---------------------------------------------------------------------*/
 #ifdef __cplusplus
 extern "C" {

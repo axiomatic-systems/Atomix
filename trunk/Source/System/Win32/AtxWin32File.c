@@ -1,7 +1,5 @@
 /*****************************************************************
-|
-|   File: AtxWin32File.c
-|
+||
 |   Atomix - File Streams: Win32 Implementation
 |
 |   (c) 2002-2006 Gilles Boccon-Gibod

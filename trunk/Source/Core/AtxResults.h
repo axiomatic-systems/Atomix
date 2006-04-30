@@ -1,11 +1,9 @@
 /*****************************************************************
 |
-|      File: AtxResults.h
+|   Atomix - Result Codes
 |
-|      Atomix - Result Codes
-|
-|      (c) 2002-2006 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2002-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 /** @file 
@@ -92,6 +90,7 @@
 #define ATX_ERROR_INVALID_SYNTAX        (ATX_ERROR_BASE_GENERAL - 8)
 #define ATX_ERROR_NOT_SUPPORTED         (ATX_ERROR_BASE_GENERAL -  9)
 #define ATX_ERROR_INVALID_FORMAT        (ATX_ERROR_BASE_GENERAL - 10)
+#define ATX_ERROR_NOT_ENOUGH_SPACE      (ATX_ERROR_BASE_GENERAL - 11)
 
 /* device and i/o errors */
 #define ATX_ERROR_BASE_DEVICE           (ATX_ERROR_BASE-100)

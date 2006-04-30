@@ -1,14 +1,14 @@
 /*****************************************************************
 |
-|      Atomix - System, Win32 Implementation
+|   Atomix - System, Win32 Implementation
 |
-|      (c) 2001-2006 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include <windows.h>
 #include <sys/timeb.h>
@@ -20,7 +20,7 @@
 #include "AtxDebug.h"
 
 /*----------------------------------------------------------------------
-|       ATX_System_GetCurrentTimeStamp
+|   ATX_System_GetCurrentTimeStamp
 +---------------------------------------------------------------------*/
 ATX_Result
 ATX_System_GetCurrentTimeStamp(ATX_TimeStamp* now)
@@ -39,7 +39,7 @@ ATX_System_GetCurrentTimeStamp(ATX_TimeStamp* now)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_System_Sleep
+|   ATX_System_Sleep
 +---------------------------------------------------------------------*/
 ATX_Result
 ATX_System_Sleep(const ATX_TimeInterval* duration)
@@ -51,7 +51,7 @@ ATX_System_Sleep(const ATX_TimeInterval* duration)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_System_SleepUntil
+|   ATX_System_SleepUntil
 +---------------------------------------------------------------------*/
 ATX_Result
 ATX_System_SleepUntil(const ATX_TimeStamp* when)
@@ -68,7 +68,7 @@ ATX_System_SleepUntil(const ATX_TimeStamp* when)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_System_SetRandomSeed
+|   ATX_System_SetRandomSeed
 +---------------------------------------------------------------------*/
 ATX_Result  
 ATX_System_SetRandomSeed(unsigned int seed)
@@ -78,7 +78,7 @@ ATX_System_SetRandomSeed(unsigned int seed)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_System::ATX_System
+|   ATX_System::ATX_System
 +---------------------------------------------------------------------*/
 ATX_Int32 
 ATX_System_GetRandomInteger()

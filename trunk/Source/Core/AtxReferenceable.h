@@ -1,11 +1,9 @@
 /*****************************************************************
 |
-|      File: AtxReferenceable.h
+|   Atomix - Referenceable Interface
 |
-|      Atomix - Referenceable Interface
-|
-|      (c) 2002-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2002-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 /** @file 
@@ -16,7 +14,7 @@
 #define _ATX_REFERENCEABLE_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "AtxInterfaces.h"
 #include "AtxDefs.h"
@@ -24,7 +22,7 @@
 #include "AtxDebug.h"
 
 /*----------------------------------------------------------------------
-|       ATX_Referenceable interface
+|   ATX_Referenceable interface
 +---------------------------------------------------------------------*/
 ATX_DECLARE_INTERFACE(ATX_Referenceable)
 /**
@@ -50,7 +48,7 @@ ATX_BEGIN_INTERFACE_DEFINITION(ATX_Referenceable)
 ATX_END_INTERFACE_DEFINITION
 
 /*----------------------------------------------------------------------
-|       convenience macros
+|   convenience macros
 +---------------------------------------------------------------------*/
 /**
  * Convenience macro used to call the AddReference() method on objects 
@@ -67,7 +65,7 @@ ATX_INTERFACE(object)->AddReference(object)
 ATX_INTERFACE(object)->Release(object)
 
 /*----------------------------------------------------------------------
-|       macros
+|   macros
 +---------------------------------------------------------------------*/
 /**
  * Macro used to safely release a reference on an object.

@@ -1,11 +1,9 @@
 /*****************************************************************
 |
-|      File: AtxStreams.h
+|   Atomix - Byte Streams
 |
-|      Atomix - Byte Streams
-|
-|      (c) 2002-2004 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2002-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
@@ -13,7 +11,7 @@
 #define _ATX_STREAMS_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "AtxInterfaces.h"
 #include "AtxTypes.h"
@@ -22,12 +20,12 @@
 #include "AtxString.h"
 
 /*----------------------------------------------------------------------
-|       error codes
+|   error codes
 +---------------------------------------------------------------------*/
 #define ATX_ERROR_EOS (ATX_ERROR_BASE_BYTE_STREAM - 0)
 
 /*----------------------------------------------------------------------
-|       ATX_InputStream
+|   ATX_InputStream
 +---------------------------------------------------------------------*/
 ATX_DECLARE_INTERFACE(ATX_InputStream)
 ATX_BEGIN_INTERFACE_DEFINITION(ATX_InputStream)
@@ -43,7 +41,7 @@ ATX_BEGIN_INTERFACE_DEFINITION(ATX_InputStream)
 ATX_END_INTERFACE_DEFINITION
 
 /*----------------------------------------------------------------------
-|       ATX_OutputStream
+|   ATX_OutputStream
 +---------------------------------------------------------------------*/
 ATX_DECLARE_INTERFACE(ATX_OutputStream)
 ATX_BEGIN_INTERFACE_DEFINITION(ATX_OutputStream)
@@ -57,7 +55,7 @@ ATX_BEGIN_INTERFACE_DEFINITION(ATX_OutputStream)
 ATX_END_INTERFACE_DEFINITION
 
 /*----------------------------------------------------------------------
-|       base class implementations
+|   base class implementations
 +---------------------------------------------------------------------*/
 ATX_Result ATX_OutputStream_WriteFully(ATX_OutputStream* stream,
                                        ATX_AnyConst      buffer,
@@ -87,7 +85,7 @@ ATX_Result ATX_InputStream_Load(ATX_InputStream* stream,
                                 ATX_DataBuffer** buffer);
 
 /*----------------------------------------------------------------------
-|       convenience macros
+|   convenience macros
 +---------------------------------------------------------------------*/
 #define ATX_InputStream_Read(object, buffer, bytes_to_read, bytes_read)\
 ATX_INTERFACE(object)->Read(object,                                    \
@@ -123,7 +121,7 @@ ATX_INTERFACE(object)->Tell(object, where)
 ATX_INTERFACE(object)->Flush(object, where)
 
 /*----------------------------------------------------------------------
-|       ATX_StreamTransformer
+|   ATX_StreamTransformer
 +---------------------------------------------------------------------*/
 ATX_DECLARE_INTERFACE(ATX_StreamTransformer)
 ATX_BEGIN_INTERFACE_DEFINITION(ATX_StreamTransformer)
@@ -136,7 +134,7 @@ ATX_END_INTERFACE_DEFINITION
 ATX_INTERFACE(object)->Transform(object, buffer, size)
 
 /*----------------------------------------------------------------------
-|       ATX_MemoryStream
+|   ATX_MemoryStream
 +---------------------------------------------------------------------*/
 typedef struct ATX_MemoryStream ATX_MemoryStream;
 ATX_Result ATX_MemoryStream_Create(ATX_Size           size, 
@@ -150,7 +148,7 @@ ATX_Result ATX_MemoryStream_GetOutputStream(ATX_MemoryStream* self,
                                             ATX_OutputStream** stream);
 
 /*----------------------------------------------------------------------
-|       functions
+|   functions
 +---------------------------------------------------------------------*/
 #ifdef __cplusplus
 extern "C" {

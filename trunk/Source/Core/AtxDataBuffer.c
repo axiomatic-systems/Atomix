@@ -1,9 +1,9 @@
 /*****************************************************************
 |
-|      Atomix - Data Buffers
+|   Atomix - Data Buffers
 |
-|      (c) 2001-2006 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
