@@ -295,3 +295,12 @@ ATX_RingBuffer_MoveOut(ATX_RingBuffer* ring, ATX_Size offset)
     return ATX_SUCCESS;
 }
 
+/*----------------------------------------------------------------------+
+|    ATX_RingBuffer_Reset
++----------------------------------------------------------------------*/
+ATX_Result
+ATX_RingBuffer_Reset(ATX_RingBuffer* ring)
+{
+    ring->in = ring->out = ring->data.start;
+    return ATX_SUCCESS;
+}

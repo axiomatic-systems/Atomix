@@ -15,7 +15,7 @@
 +---------------------------------------------------------------------*/
 #include <stdarg.h>
 #include "AtxConfig.h"
-#include "AtxDebug.h"
+#include "AtxConsole.h"
 #include "AtxTypes.h"
 #include "AtxUtils.h"
 #include "AtxResults.h"
@@ -47,6 +47,7 @@ typedef struct {
 
 typedef struct {
     ATX_Boolean use_colors;
+    ATX_Flags   format_filter;
 } ATX_LogConsoleHandler;
 
 typedef struct {
@@ -89,6 +90,9 @@ typedef struct {
 #else
 #define ATX_LOG_CONSOLE_HANDLER_DEFAULT_COLOR_MODE ATX_TRUE
 #endif
+
+#define ATX_LOG_FORMAT_FILTER_NO_SOURCE      1
+#define ATX_LOG_FORMAT_FILTER_NO_TIMESTAMP   2
 
 /*----------------------------------------------------------------------
 |   globals
@@ -136,8 +140,10 @@ ATX_LogHandler_Create(const char*     logger_name,
 int 
 ATX_Log_GetLogLevel(const char* name)
 {
-    if (       ATX_StringsEqual(name, "SEVERE")) {
+    if (       ATX_StringsEqual(name, "FATAL")) {
         return ATX_LOG_LEVEL_SEVERE;
+    } else if (ATX_StringsEqual(name, "SEVERE")) {
+        return ATX_LOG_LEVEL_WARNING;
     } else if (ATX_StringsEqual(name, "WARNING")) {
         return ATX_LOG_LEVEL_WARNING;
     } else if (ATX_StringsEqual(name, "INFO")) {
@@ -164,6 +170,7 @@ const char*
 ATX_Log_GetLogLevelName(int level)
 {
     switch (level) {
+        case ATX_LOG_LEVEL_FATAL:   return "FATAL";
         case ATX_LOG_LEVEL_SEVERE:  return "SEVERE";
         case ATX_LOG_LEVEL_WARNING: return "WARNING";
         case ATX_LOG_LEVEL_INFO:    return "INFO";
@@ -182,6 +189,7 @@ static const char*
 ATX_Log_GetLogLevelAnsiColor(int level)
 {
     switch (level) {
+        case ATX_LOG_LEVEL_FATAL:   return "31";
         case ATX_LOG_LEVEL_SEVERE:  return "31";
         case ATX_LOG_LEVEL_WARNING: return "33";
         case ATX_LOG_LEVEL_INFO:    return "32";
@@ -299,9 +307,11 @@ static ATX_Result
 ATX_LogManager_ParseConfig(const char* config,
                            ATX_Size    config_size) 
 {
-    const char* cursor = config;
-    const char* line = config;
+    const char* cursor    = config;
+    const char* line      = config;
     const char* separator = NULL;
+    ATX_String  key       = ATX_EMPTY_STRING;
+    ATX_String  value     = ATX_EMPTY_STRING;
 
     /* parse all entries */
     while (cursor <= config+config_size) {
@@ -313,8 +323,8 @@ ATX_LogManager_ParseConfig(const char* config,
             /* newline or end of buffer */
             if (separator && line[0] != '#') {
                 /* we have a property */
-                ATX_String key   = ATX_String_CreateFromSubString(line, 0, (ATX_Size)(separator-line));
-                ATX_String value = ATX_String_CreateFromSubString(line, (ATX_Size)(separator+1-line), (ATX_Size)(cursor-(separator+1)));
+                ATX_String_AssignN(&key,   line,                    (ATX_Size)(separator-line));
+                ATX_String_AssignN(&value, line+(separator+1-line), (ATX_Size)(cursor-(separator+1)));
                 ATX_String_TrimWhitespace(&key);
                 ATX_String_TrimWhitespace(&value);
             
@@ -327,6 +337,10 @@ ATX_LogManager_ParseConfig(const char* config,
         }
         cursor++;
     }
+
+    /* cleanup */
+    ATX_String_Destruct(&key);
+    ATX_String_Destruct(&value);
 
     return ATX_SUCCESS;
 }
@@ -475,12 +489,16 @@ ATX_LogManager_ConfigureLogger(ATX_Logger* logger)
 /*----------------------------------------------------------------------
 |   ATX_LogManager_Terminate
 +---------------------------------------------------------------------*/
-static void
+ATX_Result
 ATX_LogManager_Terminate(void)
 {
+    /* check if we're initialized */
+    if (!LogManager.initialized) return ATX_ERROR_INVALID_STATE;
+
     /* destroy everything we've created */
     ATX_LogManager_ClearConfig();
     ATX_List_Destroy(LogManager.config);
+    LogManager.config = NULL;
 
     {
         ATX_ListItem* item = ATX_List_GetFirstItem(LogManager.loggers);
@@ -491,20 +509,40 @@ ATX_LogManager_Terminate(void)
         }
     }
 
+    /* destroy the logger list */
     ATX_List_Destroy(LogManager.loggers);
+    LogManager.loggers = NULL;
+
+    /* destroy the root logger */
     ATX_Logger_Destroy(LogManager.root);
+    LogManager.root = NULL;
+
+    /* we are no longer initialized */
+    LogManager.initialized = ATX_FALSE;
+
+    return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|   ATX_LogManager_Init
+|   ATX_LogManager_AtExitHandler
 +---------------------------------------------------------------------*/
-static void
-ATX_LogManager_Init(void) 
+static void 
+ATX_LogManager_AtExitHandler(void)
+{
+    ATX_LogManager_Terminate();
+}
+
+/*----------------------------------------------------------------------
+|   ATX_LogManager_Initialize
++---------------------------------------------------------------------*/
+ATX_Result
+ATX_LogManager_Initialize(void) 
 {
     char* config_sources;
 
-    /* register a function to be called when the program exits */
-    ATX_AtExit(ATX_LogManager_Terminate);
+    if (LogManager.initialized) {
+        return ATX_SUCCESS;
+    }
 
     /* create a logger list */
     ATX_List_Create(&LogManager.loggers);
@@ -547,6 +585,8 @@ ATX_LogManager_Init(void)
 
     /* we are now initialized */
     LogManager.initialized = ATX_TRUE;
+
+    return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
@@ -743,8 +783,11 @@ ATX_Log_GetLogger(const char* name)
     /* check that the manager is initialized */
     if (!LogManager.initialized) {
         /* init the manager */
-        ATX_LogManager_Init();
+        ATX_LogManager_Initialize();
         ATX_ASSERT(LogManager.initialized);
+
+        /* register a function to be called when the program exits */
+        ATX_AtExit(ATX_LogManager_AtExitHandler);
     }
 
     /* check if this logger is already configured */
@@ -849,7 +892,8 @@ ATX_LogNullHandler_Interface = {
 static void
 ATX_Log_FormatRecordToStream(const ATX_LogRecord* record,
                              ATX_OutputStream*    stream,
-                             ATX_Boolean          use_colors)
+                             ATX_Boolean          use_colors,
+                             ATX_Flags            format_filter)
 {
     const char* level_name = ATX_Log_GetLogLevelName(record->level);
     char        level_string[16];
@@ -861,20 +905,24 @@ ATX_Log_FormatRecordToStream(const ATX_LogRecord* record,
         ATX_IntegerToString(record->level, level_string, sizeof(level_string));
         level_name = level_string;
     }
+    if ((format_filter & ATX_LOG_FORMAT_FILTER_NO_SOURCE) == 0) {
+        ATX_OutputStream_WriteString(stream, record->source_file);
+        ATX_OutputStream_Write(stream, "(", 1, NULL);
+        ATX_IntegerToStringU(record->source_line, buffer, sizeof(buffer));
+        ATX_OutputStream_WriteString(stream, buffer);
+        ATX_OutputStream_Write(stream, "): ", 3, NULL);
+    }
     ATX_OutputStream_Write(stream, "[", 1, NULL);
     ATX_OutputStream_WriteString(stream, record->logger_name);
     ATX_OutputStream_Write(stream, "] ", 2, NULL);
-    ATX_OutputStream_WriteString(stream, record->source_file);
-    ATX_OutputStream_Write(stream, ":", 1, NULL);
-    ATX_IntegerToStringU(record->source_line, buffer, sizeof(buffer));
-    ATX_OutputStream_WriteString(stream, buffer);
-    ATX_OutputStream_Write(stream, " ", 1, NULL);
-    ATX_IntegerToStringU(record->timestamp.seconds, buffer, sizeof(buffer));
-    ATX_OutputStream_WriteString(stream, buffer);
-    ATX_OutputStream_WriteString(stream, ":");
-    ATX_IntegerToStringU(record->timestamp.nanoseconds/1000000L, buffer, sizeof(buffer));
-    ATX_OutputStream_WriteString(stream, buffer);
-    ATX_OutputStream_Write(stream, " ", 1, NULL);
+    if ((format_filter & ATX_LOG_FORMAT_FILTER_NO_TIMESTAMP) == 0) {
+        ATX_IntegerToStringU(record->timestamp.seconds, buffer, sizeof(buffer));
+        ATX_OutputStream_WriteString(stream, buffer);
+        ATX_OutputStream_WriteString(stream, ":");
+        ATX_IntegerToStringU(record->timestamp.nanoseconds/1000000L, buffer, sizeof(buffer));
+        ATX_OutputStream_WriteString(stream, buffer);
+        ATX_OutputStream_Write(stream, " ", 1, NULL);
+    }
     if (use_colors) {
         ansi_color = ATX_Log_GetLogLevelAnsiColor(record->level);
         if (ansi_color) {
@@ -903,17 +951,17 @@ static const ATX_LogHandlerInterface ATX_LogConsoleHandler_Interface;
 static void
 ATX_LogConsoleHandler_Log(ATX_LogHandler* _self, const ATX_LogRecord* record)
 {
-    ATX_LogFileHandler* self = (ATX_LogFileHandler*)_self->instance;
-    ATX_MemoryStream*   memory_stream;
-    ATX_OutputStream*   output_stream;
+    ATX_LogConsoleHandler* self = (ATX_LogConsoleHandler*)_self->instance;
+    ATX_MemoryStream*      memory_stream;
+    ATX_OutputStream*      output_stream;
 
     if (ATX_FAILED(ATX_MemoryStream_Create(4096, &memory_stream))) return;
     if (ATX_SUCCEEDED(ATX_MemoryStream_GetOutputStream(memory_stream, &output_stream))) {
         const ATX_DataBuffer* buffer;
-        ATX_Log_FormatRecordToStream(record, output_stream, self->use_colors);
+        ATX_Log_FormatRecordToStream(record, output_stream, self->use_colors, self->format_filter);
         ATX_OutputStream_Write(output_stream, "\0", 1, NULL);
         ATX_MemoryStream_GetBuffer(memory_stream, &buffer);
-        ATX_Debug("%s", (const char*)ATX_DataBuffer_GetData(buffer));
+        ATX_ConsolePrint((const char*)ATX_DataBuffer_GetData(buffer));
         ATX_RELEASE_OBJECT(output_stream);
     }
     ATX_MemoryStream_Destroy(memory_stream);
@@ -938,9 +986,9 @@ static ATX_Result
 ATX_LogConsoleHandler_Create(const char*     logger_name,
                              ATX_LogHandler* handler)
 {
-    ATX_LogFileHandler* instance;
-    const char*         filename;
-    ATX_Result          result = ATX_SUCCESS;
+    ATX_LogConsoleHandler* instance;
+    const char*            filename;
+    ATX_Result             result = ATX_SUCCESS;
 
     /* compute a prefix for the configuration of this handler */
     ATX_String logger_prefix = ATX_String_Create(logger_name);
@@ -961,6 +1009,16 @@ ATX_LogConsoleHandler_Create(const char*     logger_name,
             } else if (ATX_LogManager_ConfigValueIsBooleanFalse(colors)) {
                 instance->use_colors = ATX_FALSE;
             }
+        }
+    }
+    {
+        ATX_String* filter;
+        instance->format_filter = 0;
+        filter = ATX_LogManager_GetConfigValue(ATX_CSTR(logger_prefix),".filter");
+        if (filter) {
+            long flags;
+            ATX_String_ToInteger(filter, &flags, ATX_TRUE);
+            instance->format_filter = flags;
         }
     } 
 
@@ -995,7 +1053,7 @@ static void
 ATX_LogFileHandler_Log(ATX_LogHandler* _self, const ATX_LogRecord* record)
 {
     ATX_LogFileHandler* self = (ATX_LogFileHandler*)_self->instance;
-    ATX_Log_FormatRecordToStream(record, self->stream, ATX_FALSE);
+    ATX_Log_FormatRecordToStream(record, self->stream, ATX_FALSE, 0);
 }
 
 /*----------------------------------------------------------------------
@@ -1024,6 +1082,7 @@ ATX_LogFileHandler_Create(const char*     logger_name,
     const char*         filename;
     ATX_String          filename_synth = ATX_EMPTY_STRING;
     ATX_File*           file;
+    ATX_Boolean         append = ATX_TRUE;
     ATX_Result          result = ATX_SUCCESS;
 
     /* compute a prefix for the configuration of this handler */
@@ -1035,6 +1094,7 @@ ATX_LogFileHandler_Create(const char*     logger_name,
     
     /* configure the object */
     {
+        /* filename */
         ATX_String* filename_conf = ATX_LogManager_GetConfigValue(ATX_CSTR(logger_prefix), ".filename");
         if (filename_conf) {
             filename = ATX_CSTR(*filename_conf);
@@ -1048,13 +1108,22 @@ ATX_LogFileHandler_Create(const char*     logger_name,
             filename = ATX_LOG_ROOT_DEFAULT_FILE_HANDLER_FILENAME;
         }
     }
+    {
+        /* append mode */
+        ATX_String* append_mode = ATX_LogManager_GetConfigValue(ATX_CSTR(logger_prefix),".append");
+        if (append_mode && !ATX_LogManager_ConfigValueIsBooleanFalse(append_mode)) {
+            append = ATX_FALSE;
+        }
+
+    }
 
     /* open the log file */
     if (ATX_SUCCEEDED(ATX_File_Create(filename, &file))) {
         result = ATX_File_Open(file, 
-                                ATX_FILE_OPEN_MODE_CREATE   |
-                                ATX_FILE_OPEN_MODE_TRUNCATE |
-                                ATX_FILE_OPEN_MODE_WRITE);
+                               ATX_FILE_OPEN_MODE_CREATE |
+                               ATX_FILE_OPEN_MODE_APPEND |
+                               ATX_FILE_OPEN_MODE_WRITE  |
+                               (append?ATX_FILE_OPEN_MODE_APPEND:0));
         if (ATX_SUCCEEDED(result)) {
             result = ATX_File_GetOutputStream(file, &instance->stream);
             if (ATX_FAILED(result)) {

@@ -38,7 +38,7 @@
 typedef struct {
     ATX_Cardinal reference_count;
     FILE*        file;
-    ATX_Offset   position;
+    ATX_Position position;
     ATX_Size     size;
 } StdcFileWrapper;
 
@@ -169,7 +169,7 @@ StdcFileStream_Destroy(StdcFileStream* self)
 |       StdcFileStream_Seek
 +---------------------------------------------------------------------*/
 ATX_METHOD
-StdcFileStream_Seek(StdcFileStream* self, ATX_Offset where)
+StdcFileStream_Seek(StdcFileStream* self, ATX_Position where)
 {
     if (fseek(self->file->file, where, SEEK_SET) == 0) {
         self->file->position = where;
@@ -183,7 +183,7 @@ StdcFileStream_Seek(StdcFileStream* self, ATX_Offset where)
 |       StdcFileStream_Tell
 +---------------------------------------------------------------------*/
 ATX_METHOD
-StdcFileStream_Tell(StdcFileStream* self, ATX_Offset* where)
+StdcFileStream_Tell(StdcFileStream* self, ATX_Position* where)
 {
     if (where) *where = self->file->position;
     return ATX_SUCCESS;
@@ -236,8 +236,8 @@ StdcFileInputStream_Read(ATX_InputStream* _self,
 
     nb_read = fread(buffer, 1, (size_t)bytes_to_read, self->file->file);
     if (nb_read > 0 || bytes_to_read == 0) {
-        if (bytes_read) *bytes_read = nb_read;
-        self->file->position += nb_read;
+        if (bytes_read) *bytes_read = (ATX_Size)nb_read;
+        self->file->position += (ATX_Size)nb_read;
         return ATX_SUCCESS;
     } else {
         if (bytes_read) *bytes_read = 0;
@@ -256,7 +256,7 @@ StdcFileInputStream_Read(ATX_InputStream* _self,
 +---------------------------------------------------------------------*/
 ATX_METHOD
 StdcFileInputStream_Seek(ATX_InputStream* _self, 
-                         ATX_Offset       where)
+                         ATX_Position     where)
 {
     return StdcFileStream_Seek(ATX_SELF(StdcFileStream, ATX_InputStream), 
                                where);
@@ -267,7 +267,7 @@ StdcFileInputStream_Seek(ATX_InputStream* _self,
 +---------------------------------------------------------------------*/
 ATX_METHOD
 StdcFileInputStream_Tell(ATX_InputStream* _self, 
-                         ATX_Offset*      where)
+                         ATX_Position*    where)
 {
     return StdcFileStream_Tell(ATX_SELF(StdcFileStream, ATX_InputStream), 
                                where);
@@ -334,8 +334,8 @@ StdcFileOutputStream_Write(ATX_OutputStream* _self,
 
     nb_written = fwrite(buffer, 1, (size_t)bytes_to_write, self->file->file);
     if (nb_written > 0 || bytes_to_write == 0) {
-        if (bytes_written) *bytes_written = nb_written;
-        self->file->position += nb_written;
+        if (bytes_written) *bytes_written = (ATX_Size)nb_written;
+        self->file->position += (ATX_Size)nb_written;
         return ATX_SUCCESS;
     } else {
         if (bytes_written) *bytes_written = 0;
@@ -350,7 +350,7 @@ StdcFileOutputStream_Write(ATX_OutputStream* _self,
 +---------------------------------------------------------------------*/
 ATX_METHOD
 StdcFileOutputStream_Seek(ATX_OutputStream* _self, 
-                          ATX_Offset        where)
+                          ATX_Position      where)
 {
     return StdcFileStream_Seek(ATX_SELF(StdcFileStream, ATX_OutputStream), 
                                where);
@@ -361,7 +361,7 @@ StdcFileOutputStream_Seek(ATX_OutputStream* _self,
 +---------------------------------------------------------------------*/
 ATX_METHOD
 StdcFileOutputStream_Tell(ATX_OutputStream* _self, 
-                          ATX_Offset*       where)
+                          ATX_Position*     where)
 {
     return StdcFileStream_Tell(ATX_SELF(StdcFileStream, ATX_OutputStream), 
                                where);
@@ -377,7 +377,7 @@ StdcFileOutputStream_Flush(ATX_OutputStream* _self)
 }
 
 /*----------------------------------------------------------------------
-|   Win32FileStream_GetInterface
+|   GetInterface implementation
 +---------------------------------------------------------------------*/
 ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(StdcFileStream)
     ATX_GET_INTERFACE_ACCEPT(StdcFileStream, ATX_InputStream)

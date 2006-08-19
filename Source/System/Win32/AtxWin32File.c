@@ -27,8 +27,9 @@
 typedef struct {
     ATX_Cardinal reference_count;
     HANDLE       handle;
-    ATX_Offset   position;
+    ATX_Position position;
     ATX_Size     size;
+    ATX_Boolean  append_mode;
 } Win32FileHandleWrapper;
 
 typedef struct {
@@ -60,6 +61,7 @@ typedef struct {
 static ATX_Result
 Win32FileHandleWrapper_Create(HANDLE                   handle, 
                               ATX_Size                 size,
+                              ATX_Boolean              append_mode,
                               Win32FileHandleWrapper** wrapper)
 {
     /* allocate a new object */
@@ -70,6 +72,7 @@ Win32FileHandleWrapper_Create(HANDLE                   handle,
     (*wrapper)->handle          = handle;
     (*wrapper)->position        = 0;
     (*wrapper)->size            = size;
+    (*wrapper)->append_mode     = append_mode;
     (*wrapper)->reference_count = 1;
 
     return ATX_SUCCESS;
@@ -121,7 +124,8 @@ ATX_DECLARE_INTERFACE_MAP(Win32FileStream, ATX_Referenceable)
 |   Win32FileStream_Create
 +---------------------------------------------------------------------*/
 static ATX_Result
-Win32FileStream_Create(Win32FileHandleWrapper* file, Win32FileStream** stream)
+Win32FileStream_Create(Win32FileHandleWrapper* file,
+                       Win32FileStream**       stream)
 {
     /* create a new object */
     (*stream) = (Win32FileStream*)ATX_AllocateMemory(sizeof(Win32FileStream));
@@ -157,7 +161,7 @@ Win32FileStream_Destroy(Win32FileStream* self)
 |   Win32FileStream_Seek
 +---------------------------------------------------------------------*/
 ATX_METHOD
-Win32FileStream_Seek(Win32FileStream* self, ATX_Offset where)
+Win32FileStream_Seek(Win32FileStream* self, ATX_Position where)
 {
     SetFilePointer(self->file->handle, where, 0, FILE_BEGIN);
     self->file->position = where;
@@ -168,7 +172,7 @@ Win32FileStream_Seek(Win32FileStream* self, ATX_Offset where)
 |   Win32FileStream_Tell
 +---------------------------------------------------------------------*/
 ATX_METHOD
-Win32FileStream_Tell(Win32FileStream* self, ATX_Offset* where)
+Win32FileStream_Tell(Win32FileStream* self, ATX_Position* where)
 {
     if (where) *where = self->file->position;
     return ATX_SUCCESS;
@@ -238,7 +242,7 @@ Win32FileInputStream_Read(ATX_InputStream* _self,
 +---------------------------------------------------------------------*/
 ATX_METHOD
 Win32FileInputStream_Seek(ATX_InputStream* _self, 
-                          ATX_Offset       where)
+                          ATX_Position     where)
 {
     return Win32FileStream_Seek(ATX_SELF(Win32FileStream, ATX_InputStream), 
                                 where);
@@ -249,7 +253,7 @@ Win32FileInputStream_Seek(ATX_InputStream* _self,
 +---------------------------------------------------------------------*/
 ATX_METHOD
 Win32FileInputStream_Tell(ATX_InputStream* _self, 
-                          ATX_Offset*      where)
+                          ATX_Position*    where)
 {
     return Win32FileStream_Tell(ATX_SELF(Win32FileStream, ATX_InputStream), 
                                 where);
@@ -315,6 +319,15 @@ Win32FileOutputStream_Write(ATX_OutputStream* _self,
     DWORD            nb_written;
     BOOL             result;
 
+    /* in append mode, seek to the end of the file */
+    if (self->file->append_mode) {
+        DWORD file_size = 0;
+        SetFilePointer(self->file->handle, 0, 0, FILE_END);
+        GetFileSize(self->file->handle, &file_size);
+        self->file->position = file_size;
+    }
+
+    /* write to the file */
     result = WriteFile(self->file->handle, 
                        buffer, 
                        bytes_to_write, 
@@ -335,7 +348,7 @@ Win32FileOutputStream_Write(ATX_OutputStream* _self,
 +---------------------------------------------------------------------*/
 ATX_METHOD
 Win32FileOutputStream_Seek(ATX_OutputStream* _self, 
-                           ATX_Offset        where)
+                           ATX_Position      where)
 {
     return Win32FileStream_Seek(ATX_SELF(Win32FileStream, ATX_OutputStream), 
                                 where);
@@ -346,7 +359,7 @@ Win32FileOutputStream_Seek(ATX_OutputStream* _self,
 +---------------------------------------------------------------------*/
 ATX_METHOD
 Win32FileOutputStream_Tell(ATX_OutputStream* _self, 
-                           ATX_Offset*       where)
+                           ATX_Position*     where)
 {
     return Win32FileStream_Tell(ATX_SELF(Win32FileStream, ATX_OutputStream), 
                                 where);
@@ -527,7 +540,7 @@ Win32File_Open(ATX_File* _self, ATX_Flags mode)
     self->mode = mode;
 
     /* create a handle wrapper */
-    return Win32FileHandleWrapper_Create(handle, self->size, &self->file);
+    return Win32FileHandleWrapper_Create(handle, self->size, (mode&ATX_FILE_OPEN_MODE_APPEND)?ATX_TRUE:ATX_FALSE, &self->file);
 }
 
 /*----------------------------------------------------------------------

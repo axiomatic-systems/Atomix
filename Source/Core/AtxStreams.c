@@ -30,8 +30,8 @@ typedef struct {
     ATX_InputStream*       parent;
     ATX_StreamTransformer* transformer;
     ATX_Size               size;
-    ATX_Offset             offset;
-    ATX_Offset             position;
+    ATX_Position           offset;
+    ATX_Position           position;
 } ATX_SubInputStream;
 
 /*----------------------------------------------------------------------
@@ -127,7 +127,7 @@ ATX_InputStream_ReadLineString(ATX_InputStream* self,
         ATX_String_AppendChar(string, c);
     } while (ATX_String_GetLength(string)<max_length);
 
-    return ATX_FAILURE;
+    return ATX_ERROR_NOT_ENOUGH_SPACE;
 }
 
 /*----------------------------------------------------------------------
@@ -144,7 +144,7 @@ ATX_InputStream_ReadFully(ATX_InputStream* self,
     while (bytes_to_read) {
         result = ATX_InputStream_Read(self, buffer, bytes_to_read, &bytes_read);
         if (ATX_FAILED(result)) return result;
-        if (bytes_read == 0) return ATX_FAILURE;
+        if (bytes_read == 0) return ATX_ERROR_INTERNAL;
         bytes_to_read -= bytes_read;
         buffer = (ATX_Any)(((char*)buffer)+bytes_read);
     }
@@ -158,8 +158,8 @@ ATX_InputStream_ReadFully(ATX_InputStream* self,
 ATX_Result
 ATX_InputStream_Skip(ATX_InputStream* self, ATX_Size count)
 {
-    ATX_Offset position;
-    ATX_Result result;
+    ATX_Position position;
+    ATX_Result   result;
 
     /* get the current location */
     result = ATX_InputStream_Tell(self, &position);
@@ -195,7 +195,7 @@ ATX_InputStream_Load(ATX_InputStream* self, ATX_Size max_read, ATX_DataBuffer** 
     }
 
     /* pre-allocate the buffer */
-    if (size) ATX_CHECK(ATX_DataBuffer_GrowBuffer(*buffer, size));
+    if (size) ATX_CHECK(ATX_DataBuffer_Reserve(*buffer, size));
 
     /* read the data from the file */
     total_bytes_read = 0;
@@ -223,7 +223,7 @@ ATX_InputStream_Load(ATX_InputStream* self, ATX_Size max_read, ATX_DataBuffer** 
         if (bytes_to_read == 0) break;
 
         /* allocate space in the buffer */
-        ATX_CHECK(ATX_DataBuffer_GrowBuffer(*buffer, total_bytes_read+bytes_to_read));
+        ATX_CHECK(ATX_DataBuffer_Reserve(*buffer, total_bytes_read+bytes_to_read));
 
         /* read the data */
         data = ATX_DataBuffer_UseData(*buffer)+total_bytes_read;
@@ -257,7 +257,7 @@ ATX_OutputStream_WriteFully(ATX_OutputStream* self,
         ATX_Size bytes_written;
         ATX_Result result = ATX_OutputStream_Write(self, buffer, bytes_to_write, &bytes_written);
         if (ATX_FAILED(result)) return result;
-        if (bytes_written == 0) return ATX_FAILURE;
+        if (bytes_written == 0) return ATX_ERROR_INTERNAL;
         ATX_ASSERT(bytes_written <= bytes_to_write);
         bytes_to_write -= bytes_written;
         buffer = (const void*)(((const ATX_Byte*)buffer)+bytes_written);
@@ -310,16 +310,13 @@ ATX_DECLARE_INTERFACE_MAP(ATX_SubInputStream, ATX_Referenceable)
 +---------------------------------------------------------------------*/
 ATX_Result
 ATX_SubInputStream_Create(ATX_InputStream*       parent, 
-                          ATX_Offset             offset,
+                          ATX_Position           offset,
                           ATX_Size               size,
                           ATX_StreamTransformer* transformer,
                           ATX_InputStream**      object)
 { 
     ATX_SubInputStream* stream;
     ATX_Result          result;
-
-    /* check parameters */
-    if (offset < 0) return ATX_ERROR_INVALID_PARAMETERS;
 
     /* allocate new object */
     stream = (ATX_SubInputStream*)ATX_AllocateZeroMemory(sizeof(ATX_SubInputStream));
@@ -444,10 +441,10 @@ ATX_SubInputStream_Read(ATX_InputStream* _self,
 +---------------------------------------------------------------------*/
 ATX_METHOD
 ATX_SubInputStream_Seek(ATX_InputStream* _self, 
-                        ATX_Offset       where)
+                        ATX_Position     where)
 {
     ATX_SubInputStream* self = ATX_SELF(ATX_SubInputStream, ATX_InputStream);
-    ATX_Offset          parent_offset;
+    ATX_Position        parent_offset;
     ATX_Result          result;
 
     /* shortcut */
@@ -469,7 +466,7 @@ ATX_SubInputStream_Seek(ATX_InputStream* _self,
 +---------------------------------------------------------------------*/
 ATX_METHOD
 ATX_SubInputStream_Tell(ATX_InputStream* _self, 
-                        ATX_Offset*      where)
+                        ATX_Position*    where)
 {
     ATX_SubInputStream* self = ATX_SELF(ATX_SubInputStream, ATX_InputStream);
     if (where) *where = self->position;
@@ -553,8 +550,8 @@ struct ATX_MemoryStream {
     /* members */
     ATX_Cardinal    reference_count;
     ATX_DataBuffer* buffer;
-    ATX_Offset      read_offset;
-    ATX_Offset      write_offset;
+    ATX_Position    read_offset;
+    ATX_Position    write_offset;
 };
 
 /*----------------------------------------------------------------------
@@ -703,7 +700,7 @@ ATX_MemoryStream_Read(ATX_InputStream* _self,
 +---------------------------------------------------------------------*/
 ATX_METHOD
 ATX_MemoryStream_InputSeek(ATX_InputStream* _self, 
-                           ATX_Offset       offset)
+                           ATX_Position     offset)
 {
     ATX_MemoryStream* self = ATX_SELF(ATX_MemoryStream, ATX_InputStream);
     if ((ATX_Size)offset > ATX_DataBuffer_GetDataSize(self->buffer)) {
@@ -719,7 +716,7 @@ ATX_MemoryStream_InputSeek(ATX_InputStream* _self,
 +---------------------------------------------------------------------*/
 ATX_METHOD
 ATX_MemoryStream_InputTell(ATX_InputStream* _self, 
-                           ATX_Offset*      where)
+                           ATX_Position*    where)
 {
     ATX_MemoryStream* self = ATX_SELF(ATX_MemoryStream, ATX_InputStream);
     if (where) *where = self->read_offset;
@@ -761,7 +758,7 @@ ATX_MemoryStream_Write(ATX_OutputStream* _self,
 {
     ATX_MemoryStream* self = ATX_SELF(ATX_MemoryStream, ATX_OutputStream);
 
-    ATX_CHECK(ATX_DataBuffer_GrowBuffer(self->buffer, self->write_offset+bytes_to_write));
+    ATX_CHECK(ATX_DataBuffer_Reserve(self->buffer, self->write_offset+bytes_to_write));
 
     ATX_CopyMemory(ATX_DataBuffer_UseData(self->buffer)+self->write_offset, data, bytes_to_write);
     self->write_offset += bytes_to_write;
@@ -778,7 +775,7 @@ ATX_MemoryStream_Write(ATX_OutputStream* _self,
 +---------------------------------------------------------------------*/
 ATX_METHOD
 ATX_MemoryStream_OutputSeek(ATX_OutputStream* _self, 
-                            ATX_Offset        offset)
+                            ATX_Position      offset)
 {
     ATX_MemoryStream* self = ATX_SELF(ATX_MemoryStream, ATX_OutputStream);
     if ((ATX_Size)offset <= ATX_DataBuffer_GetDataSize(self->buffer)) {
@@ -794,7 +791,7 @@ ATX_MemoryStream_OutputSeek(ATX_OutputStream* _self,
 +---------------------------------------------------------------------*/
 ATX_METHOD
 ATX_MemoryStream_OutputTell(ATX_OutputStream* _self, 
-                            ATX_Offset*       where)
+                            ATX_Position*     where)
 {
     ATX_MemoryStream* self = ATX_SELF(ATX_MemoryStream, ATX_OutputStream);
     if (where) *where = self->write_offset;

@@ -28,6 +28,10 @@
 #include <stdio.h>
 #endif /* ATX_CONFIG_HAVE_STDIO_H */
 
+#if defined(ATX_CONFIG_HAVE_STDARG_H)
+#include <stdarg.h>
+#endif /* ATX_CONFIG_HAVE_STDARG_H */
+
 #if defined(ATX_CONFIG_HAVE_CTYPE_H)
 #include <ctype.h>
 #endif
@@ -48,6 +52,7 @@
 do {                                    \
     if ((s) != (ATX_CString)(0)) {      \
         ATX_FreeMemory((void*)(s));     \
+        (s) = 0;                     \
     }                                   \
     if ((n) != (ATX_CString)(0)) {      \
         (s) = ATX_DuplicateString(n);   \
@@ -75,6 +80,18 @@ ATX_ParseFloat(const char* str, float* result, ATX_Boolean relaxed);
 extern ATX_Result 
 ATX_ParseInteger(const char* str, long* result, ATX_Boolean relaxed);
 
+extern ATX_Result 
+ATX_ParseIntegerU(const char* str, unsigned long* result, ATX_Boolean relaxed);
+
+extern ATX_Result 
+ATX_ParseInteger32(const char* str, ATX_Int32* result, ATX_Boolean relaxed);
+
+extern ATX_Result 
+ATX_ParseInteger32U(const char* str, ATX_UInt32* result, ATX_Boolean relaxed);
+
+extern ATX_Result
+ATX_FloatToString(float value, char* buffer, ATX_Size buffer_size);
+
 extern ATX_Result
 ATX_IntegerToString(long value, char* buffer, ATX_Size buffer_size);
 
@@ -93,6 +110,15 @@ extern void ATX_BytesFromInt32Le(unsigned char* buffer, ATX_UInt32 value);
 extern void ATX_BytesFromInt16Le(unsigned char* buffer, ATX_UInt16 value);
 extern ATX_UInt32 ATX_BytesToInt32Le(const unsigned char* buffer);
 extern ATX_UInt16 ATX_BytesToInt16Le(const unsigned char* buffer);
+
+/*----------------------------------------------------------------------
+|    formatting
++---------------------------------------------------------------------*/
+extern void
+ATX_FormatOutput(void        (*function)(void* parameter, const char* message),
+                 void*       function_parameter,
+                 const char* format, 
+                 va_list     args);
 
 /*----------------------------------------------------------------------
 |    C Runtime
@@ -140,21 +166,29 @@ extern char* ATX_CopyString(char* dst, const char* src);
 #endif
 
 #if defined(ATX_CONFIG_HAVE_STRNCPY)
-#define ATX_CopyStringN(dst, src, n) strncpy((dst), (src), n)
+#define ATX_CopyStringN(dst, src, n) ATX_strncpy((dst), (src), n)
 #else
 extern int ATX_CopyStringN(char* dst, const char* src, unsigned long n);
 #endif
 
 #if defined(ATX_CONFIG_HAVE_STRCMP)
 #define ATX_StringsEqual(s1, s2) (strcmp((s1), (s2)) == 0)
+#define ATX_CompareStrings(s1, s2) strcmp(s1, s2)
 #else
 extern int ATX_StringsEqual(const char* s1, const char* s2);
+extern int ATX_CompareStrings(const char* s1, const char* s2);
 #endif
 
 #if defined(ATX_CONFIG_HAVE_STRNCMP)
 #define ATX_StringsEqualN(s1, s2, n) (strncmp((s1), (s2), (n)) == 0)
 #else
 extern int ATX_StringsEqualN(const char* s1, const char* s2, unsigned long size);
+#endif
+
+#if defined(ATX_CONFIG_HAVE_STRCHR)
+#define ATX_FindChar(s, c) strchr(s, c)
+#else
+extern int ATX_FindChar(const char* s, char c);
 #endif
 
 #if defined(ATX_CONFIG_HAVE_STRDUP)
@@ -185,6 +219,12 @@ extern int ATX_FormatStringVN(char *buffer, size_t count, const char *format, va
 #define ATX_IsSpace(c) isspace(c)
 #else
 extern int ATX_IsSpace(int c);
+#endif
+
+#if defined(ATX_CONFIG_HAVE_IS_ALNUM)
+#define ATX_IsAlphaNumeric(c) isalnum(c)
+#else
+extern int ATX_IsAlphaNumeric(int c);
 #endif
 
 #if defined(ATX_CONFIG_HAVE_MEMCMP)

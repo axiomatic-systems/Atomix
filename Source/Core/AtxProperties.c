@@ -140,12 +140,12 @@ ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(PropertiesIterator)
 ATX_END_GET_INTERFACE_IMPLEMENTATION
 
 /*----------------------------------------------------------------------
-|      ATX_Destroyable interface
+|   ATX_Destroyable interface
 +---------------------------------------------------------------------*/
 ATX_IMPLEMENT_DESTROYABLE_INTERFACE(PropertiesIterator)
 
 /*----------------------------------------------------------------------
-|      ATX_Iterator interface
+|   ATX_Iterator interface
 +---------------------------------------------------------------------*/
 ATX_BEGIN_INTERFACE_MAP(PropertiesIterator, ATX_Iterator)
     PropertiesIterator_GetNext,
@@ -614,12 +614,12 @@ ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(Properties)
 ATX_END_GET_INTERFACE_IMPLEMENTATION
 
 /*----------------------------------------------------------------------
-|      ATX_Destroyable interface
+|   ATX_Destroyable interface
 +---------------------------------------------------------------------*/
 ATX_IMPLEMENT_DESTROYABLE_INTERFACE(Properties)
 
 /*----------------------------------------------------------------------
-|      ATX_Properties interface
+|   ATX_Properties interface
 +---------------------------------------------------------------------*/
 ATX_BEGIN_INTERFACE_MAP(Properties, ATX_Properties)
     Properties_GetProperty,

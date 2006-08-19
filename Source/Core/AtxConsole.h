@@ -1,27 +1,24 @@
 /*****************************************************************
 |
-|   Atomix - Common Definitions
+|   Atomix - Console
 |
 |   (c) 2002-2006 Gilles Boccon-Gibod
 |   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
- ****************************************************************/
+****************************************************************/
 /** @file
- * Header file for debug logging
- */
+* Header file for console support
+*/
 
-#ifndef _ATX_DEBUG_H_
-#define _ATX_DEBUG_H_
+#ifndef _ATX_CONSOLE_H_
+#define _ATX_CONSOLE_H_
 
 /*----------------------------------------------------------------------
 |   includes
 +---------------------------------------------------------------------*/
-#if defined(ATX_CONFIG_HAVE_ASSERT_H) && defined(ATX_DEBUG)
-#include <assert.h>
-#define ATX_ASSERT(_x) assert(_x)
-#else
-#define ATX_ASSERT(_x) ((void)0)
-#endif
+#include "AtxTypes.h"
+#include "AtxResults.h"
+#include "AtxUtils.h"
 
 /*----------------------------------------------------------------------
 |   prototypes
@@ -30,11 +27,11 @@
 extern "C" {
 #endif /* __cplusplus */
 
-extern void ATX_Debug(const char* format, ...);
-extern void ATX_DebugOutput(const char* message);
+extern void ATX_ConsoleOutput(const char* message);
+extern void ATX_ConsoleOutputF(const char* format, ...);
 
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
 
-#endif /* _ATX_DEBUG_H_ */
+#endif /* _ATX_CONSOLE_H_ */

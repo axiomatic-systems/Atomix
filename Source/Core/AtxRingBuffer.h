@@ -50,6 +50,7 @@ ATX_Result     ATX_RingBuffer_Write(ATX_RingBuffer* ring,
                                     ATX_Size        size);
 ATX_Result     ATX_RingBuffer_MoveIn(ATX_RingBuffer* ring, ATX_Size size);
 ATX_Result     ATX_RingBuffer_MoveOut(ATX_RingBuffer* ring, ATX_Size size);
+ATX_Result     ATX_RingBuffer_Reset(ATX_RingBuffer* ring);
 
 #ifdef __cplusplus
 }
