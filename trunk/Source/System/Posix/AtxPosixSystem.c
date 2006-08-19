@@ -1,9 +1,9 @@
 /*****************************************************************
 |
-|      Atomix - System, Posix Implementation
+|   Atomix - System, Posix Implementation
 |
-|      (c) 2001-2006 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
@@ -24,7 +24,12 @@
 #include "AtxDebug.h"
 
 /*----------------------------------------------------------------------
-|       ATX_System_GetCurrentTimeStamp
+|   singleton
++---------------------------------------------------------------------*/
+static ATX_Boolean ATX_System_RandomGeneratorSeeded = ATX_FALSE;
+
+/*----------------------------------------------------------------------
+|   ATX_System_GetCurrentTimeStamp
 +---------------------------------------------------------------------*/
 ATX_Result
 ATX_System_GetCurrentTimeStamp(ATX_TimeStamp* now)
@@ -46,7 +51,7 @@ ATX_System_GetCurrentTimeStamp(ATX_TimeStamp* now)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_System_Sleep
+|   ATX_System_Sleep
 +---------------------------------------------------------------------*/
 ATX_Result
 ATX_System_Sleep(const ATX_TimeInterval* duration)
@@ -58,7 +63,7 @@ ATX_System_Sleep(const ATX_TimeInterval* duration)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_System_SleepUntil
+|   ATX_System_SleepUntil
 +---------------------------------------------------------------------*/
 ATX_Result
 ATX_System_SleepUntil(const ATX_TimeStamp* when)
@@ -75,27 +80,26 @@ ATX_System_SleepUntil(const ATX_TimeStamp* when)
 }
 
 /*----------------------------------------------------------------------
-|       ATX_System_SetRandomSeed
+|   ATX_System_SetRandomSeed
 +---------------------------------------------------------------------*/
 ATX_Result  
 ATX_System_SetRandomSeed(unsigned int seed)
 {
     srand(seed);
+    ATX_System_RandomGeneratorSeeded = ATX_TRUE;
     return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|       ATX_System_GetRandomInteger
+|   ATX_System::ATX_System
 +---------------------------------------------------------------------*/
-ATX_Int32 
-ATX_System_GetRandomInteger(void)
+ATX_UInt32 
+ATX_System_GetRandomInteger()
 {
-    static ATX_Boolean seeded = ATX_FALSE;
-    if (!seeded) {
+    if (!ATX_System_RandomGeneratorSeeded) {
         ATX_TimeStamp now;
         ATX_System_GetCurrentTimeStamp(&now);
-        srand(now.nanoseconds);
-        seeded = ATX_TRUE;
+        ATX_System_SetRandomSeed(now.nanoseconds);
     }
 
     return rand();

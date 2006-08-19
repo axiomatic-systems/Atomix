@@ -10,6 +10,8 @@
 /*----------------------------------------------------------------------
 |   includes
 +---------------------------------------------------------------------*/
+#include "AtxConfig.h"
+
 #if defined(WIN32)
 
 #define STRICT
@@ -590,7 +592,7 @@ BsdSocketStream_Write(ATX_OutputStream* _self,
 +---------------------------------------------------------------------*/
 ATX_METHOD
 BsdSocketInputStream_Seek(ATX_InputStream* self, 
-                          ATX_Offset       where)
+                          ATX_Position     where)
 {
     /* can't seek in socket streams */
     ATX_COMPILER_UNUSED(self);
@@ -603,7 +605,7 @@ BsdSocketInputStream_Seek(ATX_InputStream* self,
 +---------------------------------------------------------------------*/
 ATX_METHOD
 BsdSocketInputStream_Tell(ATX_InputStream* self, 
-                          ATX_Offset*      where)
+                          ATX_Position*    where)
 {
     ATX_COMPILER_UNUSED(self);
 
@@ -662,7 +664,7 @@ BsdSocketInputStream_GetAvailable(ATX_InputStream* _self,
 +---------------------------------------------------------------------*/
 ATX_METHOD
 BsdSocketOutputStream_Seek(ATX_OutputStream* self, 
-                           ATX_Offset        where)
+                           ATX_Position      where)
 {
     ATX_COMPILER_UNUSED(self);
     ATX_COMPILER_UNUSED(where);
@@ -676,7 +678,7 @@ BsdSocketOutputStream_Seek(ATX_OutputStream* self,
 +---------------------------------------------------------------------*/
 ATX_METHOD
 BsdSocketOutputStream_Tell(ATX_OutputStream* self, 
-                           ATX_Offset*       where)
+                           ATX_Position*     where)
 {
     ATX_COMPILER_UNUSED(self);
 

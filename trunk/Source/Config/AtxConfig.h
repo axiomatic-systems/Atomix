@@ -20,9 +20,11 @@
 #define ATX_CONFIG_HAVE_STDLIB_H
 #define ATX_CONFIG_HAVE_STRING_H
 #define ATX_CONFIG_HAVE_STDIO_H
+#define ATX_CONFIG_HAVE_STDARG_H
 #define ATX_CONFIG_HAVE_CTYPE_H
 #define ATX_CONFIG_HAVE_MATH_H
 #define ATX_CONFIG_HAVE_ASSERT_H
+#define ATX_CONFIG_HAVE_LIMITS_H
 
 /*----------------------------------------------------------------------
 |    CPU byte order
@@ -49,6 +51,7 @@
 #if defined(ATX_CONFIG_HAVE_STRING_H)
 #define ATX_CONFIG_HAVE_STRCMP
 #define ATX_CONFIG_HAVE_STRNCMP
+#define ATX_CONFIG_HAVE_STRCHR
 #define ATX_CONFIG_HAVE_STRDUP
 #define ATX_CONFIG_HAVE_STRLEN
 #define ATX_CONFIG_HAVE_STRCPY
@@ -62,7 +65,17 @@
 
 #if defined(ATX_CONFIG_HAVE_CTYPE_H)
 #define ATX_CONFIG_HAVE_IS_SPACE
+#define ATX_CONFIG_HAVE_IS_ALNUM
 #endif /* ATX_CONFIG_HAVE_CTYPE_H */
+
+#if defined(ATX_CONFIG_HAVE_LIMITS_H)
+#define ATX_CONFIG_HAVE_INT_MIN
+#define ATX_CONFIG_HAVE_INT_MAX
+#define ATX_CONFIG_HAVE_UINT_MAX
+#define ATX_CONFIG_HAVE_LONG_MIN
+#define ATX_CONFIG_HAVE_LONG_MAX
+#define ATX_CONFIG_HAVE_ULONG_MAX
+#endif
 
 /*----------------------------------------------------------------------
 |    compiler specifics
@@ -81,12 +94,21 @@
 #define ATX_CONFIG_HAVE_INT64
 #define ATX_CONFIG_INT64_TYPE __int64
 #define ATX_strdup     _strdup
+#if (_MSC_VER >= 1400)
+#define ATX_vsnprintf(s,c,f,a) _vsnprintf_s(s,c,_TRUNCATE,f,a)
+#define ATX_strncpy(d,s,c)     strncpy_s(d,c,s,_TRUNCATE)
+#else
 #define ATX_vsnprintf  _vsnprintf
+#define ATX_strncpy    _strncpy
+#endif
 #define ATX_snprintf   _snprintf
 #if (_MSC_VER >= 1300)
 typedef __w64 long ATX_PointerLong;
 #define ATX_POINTER_TO_LONG(_p) ((long)(ATX_PointerLong) (_p) )
 #undef ATX_CONFIG_HAVE_STRCPY
+#endif
+#if defined(_DEBUG)
+#define _CRTDBG_MAP_ALLOC
 #endif
 #endif
 

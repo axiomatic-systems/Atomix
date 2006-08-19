@@ -1,36 +1,31 @@
 /*****************************************************************
 |
-|      File: AtxStdcDebug.c
+|   Atomix - Debug Support
 |
-|      Atomix - Debug Support: StdC Implementation
+|   (c) 2002-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
-|      (c) 2002-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
-|
- ****************************************************************/
+****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
-#include <stdarg.h>
-#include <stdio.h>
-
 #include "AtxConfig.h"
-#include "AtxDefs.h"
-#include "AtxTypes.h"
 #include "AtxDebug.h"
+#include "AtxUtils.h"
 
 /*----------------------------------------------------------------------
-|       ATX_DebugPrint
+|   ATX_DebugOutputFunction
 +---------------------------------------------------------------------*/
-void
-ATX_DebugPrint(const char* message)
+static void
+ATX_DebugOutputFunction(void* parameter, const char* message)
 {
-    printf("%s", message);
+    ATX_COMPILER_UNUSED(parameter);
+    ATX_DebugOutput(message);
 }
 
 /*----------------------------------------------------------------------
-|       ATX_Debug
+|   ATX_Debug
 +---------------------------------------------------------------------*/
 void
 ATX_Debug(const char* format, ...)
@@ -38,9 +33,7 @@ ATX_Debug(const char* format, ...)
 #if defined(ATX_DEBUG)
     va_list args;
     va_start(args, format);
-
-    vprintf(format, args);
-
+    ATX_FormatOutput(ATX_DebugOutputFunction, NULL, format, args);
     va_end(args);
 #else
     ATX_COMPILER_UNUSED(format);

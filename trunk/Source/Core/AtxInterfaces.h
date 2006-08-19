@@ -27,14 +27,6 @@
 #define ATX_ERROR_NO_SUCH_CLASS     (ATX_ERROR_BASE_INTERFACES - 2)
 
 /*----------------------------------------------------------------------
-|   Win32 adaptation
-+---------------------------------------------------------------------*/
-#if defined(WIN32)
-#undef interface
-#define interface iface
-#endif /* WIN32 */
-
-/*----------------------------------------------------------------------
 |   types
 +---------------------------------------------------------------------*/
 /**
@@ -84,7 +76,7 @@ typedef struct {
 ATX_INTERFACE_ID_TYPE_MOD ATX_InterfaceId ATX_INTERFACE_ID__##_iface;   \
 typedef struct _iface##Interface _iface##Interface;                     \
 typedef struct {                                                        \
-    const _iface##Interface* interface;                                 \
+    const _iface##Interface* iface;                                     \
 } _iface;
 
 #define ATX_BEGIN_INTERFACE_DEFINITION(_iface) struct _iface##Interface { \
@@ -103,13 +95,13 @@ static const _iface##Interface _class##_##_class##Interface = { \
 /**
  * Returns the interface pointer of an object reference.
  */
-#define ATX_INTERFACE(_object) ((_object)->interface)
+#define ATX_INTERFACE(_object) ((_object)->iface)
 
 /**
  * Returns the interface pointer of a class that implements
  * multiple interfaces.
  */
-#define ATX_INTERFACE_C(_object,_iface) ((_object)->_iface##_Base.interface)
+#define ATX_INTERFACE_C(_object,_iface) ((_object)->_iface##_Base.iface)
 
 /**
  */
@@ -143,12 +135,12 @@ static ATX_Object* _class##_GetInterface(_class*                self,        \
 
 #define ATX_GET_INTERFACE_ACCEPT(_class, _iface)                             \
     else if (ATX_INTERFACE_IDS_EQUAL(id, &ATX_INTERFACE_ID__##_iface)) {     \
-        return (ATX_Object*)&(self->_iface##_Base);                          \
+        return (ATX_Object*)(void*)&(self->_iface##_Base);                   \
     }
 
 #define ATX_GET_INTERFACE_ACCEPT_EX(_class, _base, _iface)                   \
     else if (ATX_INTERFACE_IDS_EQUAL(id, &ATX_INTERFACE_ID__##_iface)) {     \
-        return (ATX_Object*)&(self->_base##_Base._iface##_Base);             \
+        return (ATX_Object*)(void*)&(self->_base##_Base._iface##_Base);      \
     }
 
 #define ATX_END_GET_INTERFACE_IMPLEMENTATION                                 \
@@ -194,10 +186,10 @@ ATX_INTERFACE_MAP(_class,_iface) = {                        \
 #define ATX_END_INTERFACE_MAP_EX };
 
 #define ATX_SET_INTERFACE(_object, _class, _iface) \
-(_object)->_iface##_Base.interface = & _class##_##_iface##Interface
+(_object)->_iface##_Base.iface = & _class##_##_iface##Interface
 
 #define ATX_SET_INTERFACE_EX(_object, _class, _base, _iface) \
-(_object)->_base##_Base._iface##_Base.interface = & _class##_##_iface##Interface
+(_object)->_base##_Base._iface##_Base.iface = & _class##_##_iface##Interface
 
 /*----------------------------------------------------------------------
 |   ATX_Object interface

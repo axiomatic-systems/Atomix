@@ -21,9 +21,16 @@
 #define ATX_CHECK(_result) do {\
     ATX_Result _x = (_result); \
     if (_x != ATX_SUCCESS) {   \
-        ATX_Debug("@@@ ATX_CHECK failed file %s line %d, result=%d [%s]\n", __FILE__, __LINE__, _x, #_result); \
+        ATX_Debug("%s(%d): @@@ ATX_CHECK failed, result=%d [%s]\n", __FILE__, __LINE__, _x, #_result); \
         return _x;             \
     }                          \
+} while(0)
+#define ATX_CHECK_LABEL(_result, _label) do {\
+    ATX_Result _x = (_result);               \
+    if (_x != ATX_SUCCESS) {                 \
+        ATX_Debug("%s(%d): @@@ ATX_CHECK failed, result=%d [%s]\n", __FILE__, __LINE__, _x, #_result); \
+        goto _label;                         \
+    }                                        \
 } while(0)
 #else
 #define ATX_CHECK(_result) do {\
@@ -32,34 +39,13 @@
         return _x;             \
     }                          \
 } while(0)
-#endif
-
-#if defined(ATX_CONFIG_ENABLE_LOGGING)
-#include "AtxLogging.h"
-#define ATX_CHECK_LL(_logger, _level, _result) do {                                    \
-    ATX_Result _x = (_result);                                                         \
-    if (_x != ATX_SUCCESS) {                                                           \
-        ATX_LOG_L2(_logger, _level, "ATX_CHECK failed, result=%d [%s]", _x, #_result); \
-        return _x;                                                                     \
-    }                                                                                  \
+#define ATX_CHECK_LABEL(_result, _label) do {\
+    ATX_Result _x = (_result);               \
+    if (_x != ATX_SUCCESS) {                 \
+        goto _label;                         \
+    }                                        \
 } while(0)
-#else
-#define ATX_CHECK_LL(_logger, _level, _result) ATX_CHECK(_result)
 #endif
-
-#define ATX_CHECK_L(_level, _result) ATX_CHECK_LL(_ATX_LocalLogger, _level, _result)
-#define ATX_CHECK_SEVERE_L(_logger, _result) ATX_CHECK_LL(_logger, ATX_LOG_LEVEL_SEVERE, _result)
-#define ATX_CHECK_SEVERE(_result) ATX_CHECK_L(ATX_LOG_LEVEL_SEVERE, _result)
-#define ATX_CHECK_WARNING_L(_logger, _result) ATX_CHECK_LL(_logger, ATX_LOG_LEVEL_WARNING, _result)
-#define ATX_CHECK_WARNING(_result) ATX_CHECK_L(ATX_LOG_LEVEL_WARNING, _result)
-#define ATX_CHECK_INFO_L(_logger, _result) ATX_CHECK_LL(_logger, ATX_LOG_LEVEL_INFO, _result)
-#define ATX_CHECK_INFO(_result) ATX_CHECK_L(ATX_LOG_LEVEL_INFO, _result)
-#define ATX_CHECK_FINE_L(_logger, _result) ATX_CHECK_LL(_logger, ATX_LOG_LEVEL_FINE, _result)
-#define ATX_CHECK_FINE(_result) ATX_CHECK_L(ATX_LOG_LEVEL_FINE, _result)
-#define ATX_CHECK_FINER_L(_logger, _result) ATX_CHECK_LL(_logger, ATX_LOG_LEVEL_FINER, _result)
-#define ATX_CHECK_FINER(_result) ATX_CHECK_L(ATX_LOG_LEVEL_FINER, _result)
-#define ATX_CHECK_FINEST_L(_logger, _result) ATX_CHECK_LL(_logger, ATX_LOG_LEVEL_FINEST, _result)
-#define ATX_CHECK_FINEST(_result) ATX_CHECK_L(ATX_LOG_LEVEL_FINEST, _result)
 
 #define ATX_FAILED(result)              ((result) != ATX_SUCCESS)
 #define ATX_SUCCEEDED(result)           ((result) == ATX_SUCCESS)
@@ -91,6 +77,8 @@
 #define ATX_ERROR_NOT_SUPPORTED         (ATX_ERROR_BASE_GENERAL -  9)
 #define ATX_ERROR_INVALID_FORMAT        (ATX_ERROR_BASE_GENERAL - 10)
 #define ATX_ERROR_NOT_ENOUGH_SPACE      (ATX_ERROR_BASE_GENERAL - 11)
+#define ATX_ERROR_NO_SUCH_ITEM          (ATX_ERROR_BASE_GENERAL - 12)
+#define ATX_ERROR_OVERFLOW              (ATX_ERROR_BASE_GENERAL - 13)
 
 /* device and i/o errors */
 #define ATX_ERROR_BASE_DEVICE           (ATX_ERROR_BASE-100)
@@ -116,9 +104,6 @@
 
 /* file error codes */
 #define ATX_ERROR_BASE_FILE             (ATX_ERROR_BASE-700)
-
-/* lists error codes */
-#define ATX_ERROR_BASE_LISTS            (ATX_ERROR_BASE-800)
 
 /* standard error codes                                  */
 /* these are special codes to convey an errno            */

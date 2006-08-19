@@ -20,11 +20,12 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\..\..\Source\Atomix;..\..\..\..\Source\Config;..\..\..\..\Source\Core"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB,ATX_DEBUG,ATX_CONFIG_ENABLE_LOGGING"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;ATX_DEBUG;ATX_CONFIG_ENABLE_LOGGING"
 				MinimalRebuild="TRUE"
 				ExceptionHandling="FALSE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
+				BufferSecurityCheck="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
@@ -68,7 +69,7 @@
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				ExceptionHandling="FALSE"
 				RuntimeLibrary="2"
-				BufferSecurityCheck="FALSE"
+				BufferSecurityCheck="TRUE"
 				EnableFunctionLevelLinking="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -129,6 +130,9 @@
 				RelativePath="..\..\..\..\Source\Core\AtxLogging.c">
 			</File>
 			<File
+				RelativePath="..\..\..\..\Source\Core\AtxMap.c">
+			</File>
+			<File
 				RelativePath="..\..\..\..\Source\Core\AtxProperties.c">
 			</File>
 			<File
@@ -159,6 +163,9 @@
 				RelativePath="..\..\..\..\Source\Core\AtxUtils.c">
 			</File>
 			<File
+				RelativePath="..\..\..\..\Source\System\Win32\AtxWin32Console.c">
+			</File>
+			<File
 				RelativePath="..\..\..\..\Source\System\Win32\AtxWin32Debug.c">
 			</File>
 			<File
@@ -177,6 +184,9 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Config\AtxConfig.h">
+			</File>
+			<File
+				RelativePath="..\..\..\..\Source\Core\AtxConsole.h">
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\AtxDataBuffer.h">
@@ -207,6 +217,9 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\AtxLogging.h">
+			</File>
+			<File
+				RelativePath="..\..\..\..\Source\Core\AtxMap.h">
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\AtxModule.h">

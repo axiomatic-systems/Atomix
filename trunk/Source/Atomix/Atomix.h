@@ -35,9 +35,11 @@
 #include "AtxFile.h"
 #include "AtxSockets.h"
 #include "AtxList.h"
+#include "AtxMap.h"
 #include "AtxRingBuffer.h"
 #include "AtxHttp.h"
 #include "AtxSystem.h"
 #include "AtxDataBuffer.h"
+#include "AtxConsole.h"
 
 #endif /* _ATOMIX_H_ */

@@ -1,6 +1,6 @@
 /*****************************************************************
 |
-|   Atomix - Debug Support: Win32 Implementation
+|   Atomix - Console Support: Win32 Implementation
 |
 |   (c) 2002-2006 Gilles Boccon-Gibod
 |   Author: Gilles Boccon-Gibod (bok@bok.net)
@@ -14,17 +14,16 @@
 #include <stdio.h>
 
 #include "AtxConfig.h"
-#include "AtxDefs.h"
-#include "AtxTypes.h"
-#include "AtxDebug.h"
+#include "AtxConsole.h"
 #include "AtxUtils.h"
 
 /*----------------------------------------------------------------------
-|   ATX_DebugOutput
+|   ATX_ConsoleOutput
 +---------------------------------------------------------------------*/
 void
-ATX_DebugOutput(const char* message)
+ATX_ConsoleOutput(const char* message)
 {
     OutputDebugString(message);
     printf("%s", message);
 }
+

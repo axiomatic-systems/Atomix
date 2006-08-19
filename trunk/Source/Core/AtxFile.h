@@ -24,7 +24,8 @@
 #define ATX_FILE_OPEN_MODE_WRITE      0x02
 #define ATX_FILE_OPEN_MODE_CREATE     0x04
 #define ATX_FILE_OPEN_MODE_TRUNCATE   0x08
-#define ATX_FILE_OPEN_MODE_UNBUFFERED 0x10
+#define ATX_FILE_OPEN_MODE_APPEND     0x10
+#define ATX_FILE_OPEN_MODE_UNBUFFERED 0x20
 
 #define ATX_ERROR_NO_SUCH_FILE       (ATX_ERROR_BASE_FILE - 0)
 #define ATX_ERROR_FILE_NOT_OPEN      (ATX_ERROR_BASE_FILE - 1)
@@ -76,9 +77,11 @@ extern "C" {
 
 extern ATX_Result ATX_File_Create(ATX_CString name, ATX_File** file);
 extern ATX_Result ATX_File_Load(ATX_File* file, ATX_DataBuffer** buffer);
+extern ATX_Result ATX_File_Save(ATX_File* file, ATX_DataBuffer* buffer);
 
 /* helper functions */
 extern ATX_Result ATX_LoadFile(ATX_CString filename, ATX_DataBuffer** buffer);
+extern ATX_Result ATX_SaveFile(ATX_CString filename, ATX_DataBuffer* buffer);
 
 #ifdef __cplusplus
 }

@@ -38,7 +38,7 @@ typedef ATX_TimeStamp ATX_TimeInterval;
 
 #define ATX_TimeStamp_IsLater(t0,t1)           \
 (                                              \
-    ((t0).seconds > (t1).seconds) ||           \
+    ((t0).seconds > (t1).seconds) ||    \
     (                                          \
         (t0).seconds == (t1).seconds &&        \
         (t0).nanoseconds > (t1).nanoseconds    \
@@ -47,7 +47,7 @@ typedef ATX_TimeStamp ATX_TimeInterval;
 
 #define ATX_TimeStamp_IsLaterOrEqual(t0,t1)   \
 (                                             \
-    ((t0).seconds > (t1).seconds) ||          \
+    ((t0).seconds > (t1).seconds) ||   \
     (                                         \
         (t0).seconds == (t1).seconds &&       \
         (t0).nanoseconds >= (t1).nanoseconds  \

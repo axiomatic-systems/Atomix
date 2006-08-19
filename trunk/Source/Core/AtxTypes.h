@@ -11,25 +11,24 @@
 #define _ATX_TYPES_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "AtxConfig.h"
 #include "AtxDefs.h"
 
 /*----------------------------------------------------------------------
-|       generic types
+|   generic types
 +---------------------------------------------------------------------*/
-typedef unsigned long  ATX_UInt32;
-typedef long           ATX_Int32;
+typedef unsigned int   ATX_UInt32;
+typedef int            ATX_Int32;
 typedef unsigned short ATX_UInt16;
 typedef short          ATX_Int16;
 typedef unsigned char  ATX_UInt8;
 typedef signed char    ATX_Int8;
-typedef int            ATX_Int;
 typedef float          ATX_Float;
 
 /*----------------------------------------------------------------------
-|       types
+|   types
 +---------------------------------------------------------------------*/
 /**
  * Boolean type used for variables that can be true (ATX_TRUE) or false
@@ -41,7 +40,7 @@ typedef enum {
 } ATX_Boolean;
 
 /**
- * Signed integer value represening a function or method result (return value)
+ * Signed integer value representing a function or method result (return value)
  *
  * When a function or method call succeeds, the return value is always 
  * ATX_SUCCESS unless otherwise documented. Error conditions are always
@@ -68,12 +67,17 @@ typedef ATX_UInt32 ATX_Mask;
  * An unsigned integer used to represent a measurable quantity (eg. the 
  * size of a file)
  */
-typedef ATX_UInt32 ATX_Size;
+typedef unsigned long ATX_Size;
 
 /**
- * A signed integer used to represent an offset from a base value of position.
+ * A signed integer used to represent an offset from a base value.
  */
-typedef ATX_Int32 ATX_Offset;
+typedef signed long ATX_Offset;
+
+/**
+* A signed integer used to represent a positive offset from a base value.
+*/
+typedef unsigned long ATX_Position;
 
 /**
  * An address as a generic pointer, that can be dereferenced as a byte address.
@@ -146,8 +150,27 @@ typedef struct {
 } ATX_Int64;
 #endif
 
+#if defined(ATX_CONFIG_HAVE_INT_MIN)
+#define ATX_INT_MIN INT_MIN
+#endif
+#if defined(ATX_CONFIG_HAVE_INT_MAX)
+#define ATX_INT_MAX INT_MAX
+#endif
+#if defined(ATX_CONFIG_HAVE_UINT_MAX)
+#define ATX_UINT_MAX UINT_MAX
+#endif
+#if defined(ATX_CONFIG_HAVE_LONG_MIN)
+#define ATX_LONG_MIN LONG_MIN
+#endif
+#if defined(ATX_CONFIG_HAVE_LONG_MAX)
+#define ATX_LONG_MAX LONG_MAX
+#endif
+#if defined(ATX_CONFIG_HAVE_ULONG_MAX)
+#define ATX_ULONG_MAX ULONG_MAX
+#endif
+
 /*----------------------------------------------------------------------
-|       functions
+|   functions
 +---------------------------------------------------------------------*/
 #if defined(ATX_CONFIG_HAVE_INT64)
 #define ATX_Int64_Zero(i) do {(i)=0;} while(0)

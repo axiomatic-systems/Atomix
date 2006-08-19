@@ -312,14 +312,14 @@ ATX_HttpClient_SendRequestOnce(ATX_HttpClient*    self,
     *response = NULL;
 
     /* resolve the host address */
-    ATX_LOG_INFO_1("ATX_HttpClient::SendRequest - resolving name [%s]...\n",
+    ATX_LOG_INFO_1("ATX_HttpClient::SendRequest - resolving name [%s]...",
                    ATX_CSTR(request->url.host));
     result = ATX_IpAddress_ResolveName(&address.ip_address, 
                                        ATX_CSTR(request->url.host),
                                        ATX_HTTP_RESOLVER_TIMEOUT);
     if (ATX_FAILED(result)) return result;
     address.port = request->url.port;
-    ATX_LOG_INFO("ATX_HttpClient::SendRequest - name resolved\n");
+    ATX_LOG_INFO("ATX_HttpClient::SendRequest - name resolved");
 
     /* setup some headers */
     ATX_HttpMessage_SetHeader((ATX_HttpMessage*)request,
@@ -337,7 +337,7 @@ ATX_HttpClient_SendRequestOnce(ATX_HttpClient*    self,
     if (ATX_FAILED(result)) return result;
 
     /* connect to the server */
-    ATX_LOG_INFO_1("ATX_HttpClient::SendRequest - connecting on port %d...\n",
+    ATX_LOG_INFO_1("ATX_HttpClient::SendRequest - connecting on port %d...",
                request->url.port);
     result = ATX_Socket_Connect(connection, &address, ATX_HTTP_CONNECT_TIMEOUT);
     if (ATX_FAILED(result)) goto end;
@@ -385,8 +385,9 @@ ATX_HttpClient_SendRequest(ATX_HttpClient*    self,
         keep_going = ATX_FALSE;
         result = ATX_HttpClient_SendRequestOnce(self, request, response);
         if (ATX_FAILED(result)) break;
-        if (*response && 
-            self->options.follow_redirect &&
+        if (*response && self->options.follow_redirect &&
+            (ATX_String_Equals(&request->method, ATX_HTTP_METHOD_GET, ATX_FALSE) ||
+             ATX_String_Equals(&request->method, ATX_HTTP_METHOD_HEAD, ATX_FALSE)) &&
             ((*response)->status_code == 301 ||
              (*response)->status_code == 302 ||
              (*response)->status_code == 303 ||
@@ -403,8 +404,9 @@ ATX_HttpClient_SendRequest(ATX_HttpClient*    self,
                     ATX_HttpUrl_Destruct(&request->url);
                     request->url = url;
                     keep_going = ATX_TRUE;
-
-                    ATX_LOG_INFO_1("ATX_HttpClient::SendRequest - redirecting to %s\n",
+                    ATX_HttpResponse_Destroy(*response);
+                    *response = NULL;
+                    ATX_LOG_INFO_1("ATX_HttpClient::SendRequest - redirecting to %s",
                                 ATX_String_GetChars(location));
                 }
             }
@@ -684,7 +686,7 @@ ATX_HttpMessage_Emit(const ATX_HttpMessage* message, ATX_OutputStream* stream)
             ATX_OutputStream_WriteString(stream, ATX_CSTR(header->name));
             ATX_OutputStream_Write(stream, ": ", 2, NULL);
             ATX_OutputStream_WriteLine(stream, ATX_CSTR(header->value));
-            ATX_LOG_FINE_2("ATX_HttpMessage::Emit - %s: %s\n", ATX_CSTR(header->name), ATX_CSTR(header->value));
+            ATX_LOG_FINE_2("ATX_HttpMessage::Emit - %s: %s", ATX_CSTR(header->name), ATX_CSTR(header->value));
         }
         item = ATX_ListItem_GetNext(item);
     }
@@ -762,7 +764,7 @@ ATX_HttpRequest_Emit(const ATX_HttpRequest* request, ATX_OutputStream* stream)
     /* check that we have all we need */
     if (ATX_String_IsEmpty(&request->method) || 
         ATX_String_IsEmpty(&request->base.protocol)) {
-        return ATX_FAILURE;
+        return ATX_ERROR_INVALID_PARAMETERS;
     }
 
     /* output the request line */
@@ -846,7 +848,7 @@ ATX_HttpResponse_Parse(ATX_HttpResponse* response, ATX_InputStream* stream)
                 ATX_HttpMessage_SetHeader((ATX_HttpMessage*)response, 
                                           ATX_CSTR(header_name), 
                                           ATX_CSTR(header_value));
-                ATX_LOG_FINE_2("ATX_HttpResponse::Parse - %s: %s\n",
+                ATX_LOG_FINE_2("ATX_HttpResponse::Parse - %s: %s",
                                ATX_CSTR(header_name),
                                ATX_CSTR(header_value));
             }
@@ -868,7 +870,7 @@ ATX_HttpResponse_Parse(ATX_HttpResponse* response, ATX_InputStream* stream)
                 ATX_HttpMessage_SetHeader((ATX_HttpMessage*)response, 
                                           ATX_CSTR(header_name), 
                                           ATX_CSTR(header_value));
-                ATX_LOG_FINE_2("ATX_HttpResponse::Parse - %s: %s\n",
+                ATX_LOG_FINE_2("ATX_HttpResponse::Parse - %s: %s",
                                ATX_CSTR(header_name),
                                ATX_CSTR(header_value));
             }
@@ -956,8 +958,8 @@ ATX_HttpResponse_Emit(const ATX_HttpResponse* response,
                       ATX_OutputStream*       stream)
 {
     /* check that we have what we need */
-    if (ATX_String_IsEmpty(&response->base.protocol)) return ATX_FAILURE;
-    if (response->status_code >= 1000) return ATX_FAILURE;
+    if (ATX_String_IsEmpty(&response->base.protocol)) return ATX_ERROR_INVALID_PARAMETERS;
+    if (response->status_code >= 1000) return ATX_ERROR_INVALID_PARAMETERS;
 
     /* output response line */
     ATX_OutputStream_WriteString(stream, ATX_CSTR(response->base.protocol));

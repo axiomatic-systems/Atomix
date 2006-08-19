@@ -20,6 +20,11 @@
 #include "AtxDebug.h"
 
 /*----------------------------------------------------------------------
+|   singleton
++---------------------------------------------------------------------*/
+static ATX_Boolean ATX_System_RandomGeneratorSeeded = ATX_FALSE;
+
+/*----------------------------------------------------------------------
 |   ATX_System_GetCurrentTimeStamp
 +---------------------------------------------------------------------*/
 ATX_Result
@@ -74,21 +79,20 @@ ATX_Result
 ATX_System_SetRandomSeed(unsigned int seed)
 {
     srand(seed);
+    ATX_System_RandomGeneratorSeeded = ATX_TRUE;
     return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
 |   ATX_System::ATX_System
 +---------------------------------------------------------------------*/
-ATX_Int32 
+ATX_UInt32 
 ATX_System_GetRandomInteger()
 {
-    static ATX_Boolean seeded = ATX_FALSE;
-    if (!seeded) {
+    if (!ATX_System_RandomGeneratorSeeded) {
         ATX_TimeStamp now;
         ATX_System_GetCurrentTimeStamp(&now);
-        srand(now.nanoseconds);
-        seeded = ATX_TRUE;
+        ATX_System_SetRandomSeed(now.nanoseconds);
     }
 
     return rand();

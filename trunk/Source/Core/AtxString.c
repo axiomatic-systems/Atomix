@@ -394,8 +394,8 @@ ATX_String_SubString(const ATX_String* self, ATX_Ordinal first, ATX_Size length)
 |   ATX_StringStartsWith
 |
 |    returns:
-|      1 if str starts with sub,
-|      0 if str is large enough but does not start with sub
+|   1 if str starts with sub,
+|   0 if str is large enough but does not start with sub
 |     -1 if str is too short to start with sub
 +---------------------------------------------------------------------*/
 static int

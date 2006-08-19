@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="Atomix"
-	ProjectGUID="{F1C5FF49-A3B3-47BC-B183-67BC5BAD3A81}"
+	ProjectGUID="{AB4D6E4D-790B-4851-8E5F-129AA6D7E56F}"
 	RootNamespace="Atomix"
 	Keyword="Win32Proj"
 	>
@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\..\..\Source\Atomix;..\..\..\..\Source\Config;..\..\..\..\source\Core"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;ATX_DEBUG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -160,6 +160,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\Source\Core\AtxConsole.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\Source\Core\AtxDataBuffer.c"
 				>
 				<FileConfiguration
@@ -178,6 +182,10 @@
 						Detect64BitPortabilityProblems="false"
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\..\Source\Core\AtxDebug.c"
+				>
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\AtxFile.c"
@@ -236,11 +244,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\Source\System\Win32\AtxWin32Console.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\Source\System\Win32\AtxWin32Debug.c"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\System\Win32\AtxWin32File.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\Source\System\Win32\AtxWin32System.c"
 				>
 			</File>
 		</Filter>
@@ -255,6 +271,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Config\AtxConfig.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\Source\Core\AtxConsole.h"
 				>
 			</File>
 			<File

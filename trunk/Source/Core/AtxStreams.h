@@ -33,8 +33,8 @@ ATX_BEGIN_INTERFACE_DEFINITION(ATX_InputStream)
                        ATX_Any          buffer,
                        ATX_Size         bytes_to_read,
                        ATX_Size*        bytes_read);
-    ATX_Result (*Seek)(ATX_InputStream* self, ATX_Offset  offset);
-    ATX_Result (*Tell)(ATX_InputStream* self, ATX_Offset* offset);
+    ATX_Result (*Seek)(ATX_InputStream* self, ATX_Position  offset);
+    ATX_Result (*Tell)(ATX_InputStream* self, ATX_Position* offset);
     ATX_Result (*GetSize)(ATX_InputStream* self, ATX_Size* size);
     ATX_Result (*GetAvailable)(ATX_InputStream* self, 
                                ATX_Size*        available);
@@ -49,14 +49,18 @@ ATX_BEGIN_INTERFACE_DEFINITION(ATX_OutputStream)
                         ATX_AnyConst      buffer,
                         ATX_Size          bytes_to_write,
                         ATX_Size*         bytes_written);
-    ATX_Result (*Seek)(ATX_OutputStream* self, ATX_Offset  offset);
-    ATX_Result (*Tell)(ATX_OutputStream* self, ATX_Offset* offset);
+    ATX_Result (*Seek)(ATX_OutputStream* self, ATX_Position  offset);
+    ATX_Result (*Tell)(ATX_OutputStream* self, ATX_Position* offset);
     ATX_Result (*Flush)(ATX_OutputStream* self);
 ATX_END_INTERFACE_DEFINITION
 
 /*----------------------------------------------------------------------
 |   base class implementations
 +---------------------------------------------------------------------*/
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 ATX_Result ATX_OutputStream_WriteFully(ATX_OutputStream* stream,
                                        ATX_AnyConst      buffer,
                                        ATX_Size          bytes_to_write);
@@ -83,6 +87,9 @@ ATX_Result ATX_InputStream_Skip(ATX_InputStream* stream,
 ATX_Result ATX_InputStream_Load(ATX_InputStream* stream, 
                                 ATX_Size         max_read, /* = 0 if no limit */
                                 ATX_DataBuffer** buffer);
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 /*----------------------------------------------------------------------
 |   convenience macros
@@ -137,15 +144,31 @@ ATX_INTERFACE(object)->Transform(object, buffer, size)
 |   ATX_MemoryStream
 +---------------------------------------------------------------------*/
 typedef struct ATX_MemoryStream ATX_MemoryStream;
-ATX_Result ATX_MemoryStream_Create(ATX_Size           size, 
-                                   ATX_MemoryStream** stream);
-ATX_Result ATX_MemoryStream_Destroy(ATX_MemoryStream* self);
-ATX_Result ATX_MemoryStream_GetBuffer(ATX_MemoryStream*       self, 
-                                      const ATX_DataBuffer**  buffer);
-ATX_Result ATX_MemoryStream_GetInputStream(ATX_MemoryStream* self,
-                                           ATX_InputStream** stream);
-ATX_Result ATX_MemoryStream_GetOutputStream(ATX_MemoryStream* self,
-                                            ATX_OutputStream** stream);
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
+ATX_Result 
+ATX_MemoryStream_Create(ATX_Size size, ATX_MemoryStream** stream);
+
+ATX_Result 
+ATX_MemoryStream_Destroy(ATX_MemoryStream* self);
+
+ATX_Result 
+ATX_MemoryStream_GetBuffer(ATX_MemoryStream*      self,
+                           const ATX_DataBuffer** buffer);
+
+ATX_Result 
+ATX_MemoryStream_GetInputStream(ATX_MemoryStream* self,
+                                ATX_InputStream** stream);
+
+ATX_Result 
+ATX_MemoryStream_GetOutputStream(ATX_MemoryStream* self,
+                                 ATX_OutputStream** stream);
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 /*----------------------------------------------------------------------
 |   functions
@@ -155,13 +178,13 @@ extern "C" {
 #endif /* __cplusplus */
 
 ATX_Result ATX_SubInputStream_Create(ATX_InputStream*       parent,
-                                     ATX_Offset             offset,
+                                     ATX_Position           offset,
                                      ATX_Size               size,
                                      ATX_StreamTransformer* transformer,
                                      ATX_InputStream**      stream);
 
 ATX_Result ATX_SubOutputStream_Create(ATX_OutputStream*      parent,
-                                      ATX_Offset             offset,
+                                      ATX_Position           offset,
                                       ATX_Size               size,
                                       ATX_StreamTransformer* transformer,
                                       ATX_OutputStream**     stream);
