@@ -1156,7 +1156,7 @@ BsdUdpSocket_Receive(ATX_DatagramSocket* _self,
 
     /* get the packet buffer */
     ATX_Byte* buffer        = ATX_DataBuffer_UseData(packet);
-    ssize_t   buffer_length = ATX_DataBuffer_GetDataSize(packet);;
+    ssize_t   buffer_length = ATX_DataBuffer_GetBufferSize(packet);
 
     /* check that we have some space to receive */
     if (buffer_length == 0) {

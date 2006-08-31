@@ -95,13 +95,14 @@
 #define ATX_CONFIG_INT64_TYPE __int64
 #define ATX_strdup     _strdup
 #if (_MSC_VER >= 1400)
-#define ATX_vsnprintf(s,c,f,a) _vsnprintf_s(s,c,_TRUNCATE,f,a)
-#define ATX_strncpy(d,s,c)     strncpy_s(d,c,s,_TRUNCATE)
+#define ATX_vsnprintf(s,c,f,a)  _vsnprintf_s(s,c,_TRUNCATE,f,a)
+#define ATX_snprintf(s,c,f,...) _snprintf_s(s,c,_TRUNCATE,f,__VA_ARGS__)
+#define ATX_strncpy(d,s,c)       strncpy_s(d,c,s,_TRUNCATE)
+#define ATX_dupenv(b,s,e)        _dupenv_s()
 #else
 #define ATX_vsnprintf  _vsnprintf
-#define ATX_strncpy    _strncpy
-#endif
 #define ATX_snprintf   _snprintf
+#endif
 #if (_MSC_VER >= 1300)
 typedef __w64 long ATX_PointerLong;
 #define ATX_POINTER_TO_LONG(_p) ((long)(ATX_PointerLong) (_p) )
@@ -129,8 +130,8 @@ typedef __w64 long ATX_PointerLong;
 #if !defined(ATX_snprintf)
 #define ATX_snprintf snprintf
 #endif
-#if !defined(ATX_snprintf)
-#define ATX_snprintf snprintf
+#if !defined(ATX_strncpy)
+#define ATX_strncpy strncpy
 #endif
 #if !defined(ATX_vsnprintf)
 #define ATX_vsnprintf vsnprintf

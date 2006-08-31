@@ -85,7 +85,7 @@ PrintUsageAndExit(void)
             "  -p <packet_size>: send by burst of <packet_size> (default: %d)"
             "\n"
             " and\n"
-            "  -b <birtrate>: send at the specified bitrate (default: as "
+            "  -b <bitrate>: send at the specified bitrate (default: as "
             "fast as possible)\n"
             "\n", PUMP_DEFAULT_PACKET_SIZE);
     exit(1);
