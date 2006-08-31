@@ -112,7 +112,13 @@
 				RelativePath="..\..\..\..\Source\System\Bsd\AtxBsdSockets.c">
 			</File>
 			<File
+				RelativePath="..\..\..\..\Source\Core\AtxConsole.c">
+			</File>
+			<File
 				RelativePath="..\..\..\..\Source\Core\AtxDataBuffer.c">
+			</File>
+			<File
+				RelativePath="..\..\..\..\Source\Core\AtxDebug.c">
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\AtxFile.c">

@@ -407,7 +407,7 @@ ATX_HttpClient_SendRequest(ATX_HttpClient*    self,
                     ATX_HttpResponse_Destroy(*response);
                     *response = NULL;
                     ATX_LOG_INFO_1("ATX_HttpClient::SendRequest - redirecting to %s",
-                                ATX_String_GetChars(location));
+                                   ATX_String_GetChars(location));
                 }
             }
         }       

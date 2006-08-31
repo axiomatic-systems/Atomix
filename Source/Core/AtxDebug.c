@@ -14,6 +14,7 @@
 #include "AtxDebug.h"
 #include "AtxUtils.h"
 
+#if defined(ATX_DEBUG)
 /*----------------------------------------------------------------------
 |   ATX_DebugOutputFunction
 +---------------------------------------------------------------------*/
@@ -23,6 +24,7 @@ ATX_DebugOutputFunction(void* parameter, const char* message)
     ATX_COMPILER_UNUSED(parameter);
     ATX_DebugOutput(message);
 }
+#endif
 
 /*----------------------------------------------------------------------
 |   ATX_Debug

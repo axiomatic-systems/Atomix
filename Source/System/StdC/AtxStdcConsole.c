@@ -1,8 +1,8 @@
 /*****************************************************************
+||
+|      Atomix - Console Support: StdC Implementation
 |
-|      Atomix - Debug Support: StdC Implementation
-|
-|      (c) 2002-2003 Gilles Boccon-Gibod
+|      (c) 2002-2006 Gilles Boccon-Gibod
 |      Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
@@ -15,13 +15,13 @@
 #include "AtxConfig.h"
 #include "AtxDefs.h"
 #include "AtxTypes.h"
-#include "AtxDebug.h"
+#include "AtxConsole.h"
 
 /*----------------------------------------------------------------------
-|       ATX_DebugOutput
+|       ATX_ConsoleOutput
 +---------------------------------------------------------------------*/
 void
-ATX_DebugOutput(const char* message)
+ATX_ConsoleOutput(const char* message)
 {
     printf("%s", message);
 }

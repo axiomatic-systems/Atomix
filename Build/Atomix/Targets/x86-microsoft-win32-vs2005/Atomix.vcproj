@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\..\..\Source\Atomix;..\..\..\..\Source\Config;..\..\..\..\source\Core"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;ATX_DEBUG"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;ATX_DEBUG;ATX_CONFIG_ENABLE_LOGGING"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -61,6 +61,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				OutputFile="$(OutDir)/Atomix.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -129,6 +130,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				OutputFile="$(OutDir)/Atomix.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -201,6 +203,14 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\AtxList.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\Source\Core\AtxLogging.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\Source\Core\AtxMap.c"
 				>
 			</File>
 			<File
@@ -311,6 +321,14 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\AtxList.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\Source\Core\AtxLogging.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\Source\Core\AtxMap.h"
 				>
 			</File>
 			<File

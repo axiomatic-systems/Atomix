@@ -31,9 +31,9 @@ ATX_END_INTERFACE_DEFINITION
 
 ATX_INTERFACE_ID_TYPE_MOD ATX_InterfaceId ATX_INTERFACE_ID__Foo = {1,2};
 
-#define Foo_FooMethod1(self, x)    self->interface->FooMethod1(self, x)
-#define Foo_FooMethod2(self, x, y) self->interface->FooMethod2(self, x, y)
-#define Foo_DoSomething(self)      self->interface->DoSomething(self)
+#define Foo_FooMethod1(self, x)    ATX_INTERFACE(self)->FooMethod1(self, x)
+#define Foo_FooMethod2(self, x, y) ATX_INTERFACE(self)->FooMethod2(self, x, y)
+#define Foo_DoSomething(self)      ATX_INTERFACE(self)->DoSomething(self)
 
 /*----------------------------------------------------------------------
 |   Bar
@@ -47,9 +47,9 @@ ATX_END_INTERFACE_DEFINITION
 
 ATX_INTERFACE_ID_TYPE_MOD ATX_InterfaceId ATX_INTERFACE_ID__Bar = {1,3};
 
-#define Bar_BarMethod1(self, x)    self->interface->BarMethod1(self, x)
-#define Bar_BarMethod2(self, x, y) self->interface->BarMethod2(self, x, y)
-#define Bar_DoSomething(self)      self->interface->DoSomething(self)
+#define Bar_BarMethod1(self, x)    ATX_INTERFACE(self)->BarMethod1(self, x)
+#define Bar_BarMethod2(self, x, y) ATX_INTERFACE(self)->BarMethod2(self, x, y)
+#define Bar_DoSomething(self)      ATX_INTERFACE(self)->DoSomething(self)
 
 /*----------------------------------------------------------------------
 |   Yop
@@ -61,7 +61,7 @@ ATX_END_INTERFACE_DEFINITION
 
 ATX_INTERFACE_ID_TYPE_MOD ATX_InterfaceId ATX_INTERFACE_ID__Yop = {1,4};
 
-#define Yop_YopMethod1(self) self->interface->YopMethod1(self)
+#define Yop_YopMethod1(self) ATX_INTERFACE(self)->YopMethod1(self)
 
 /*----------------------------------------------------------------------
 |   MyFooBar

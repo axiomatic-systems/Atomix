@@ -29,6 +29,7 @@
 #include "AtxReferenceable.h"
 #include "AtxDestroyable.h"
 #include "AtxSockets.h"
+#include "AtxDebug.h"
 
 /*----------------------------------------------------------------------
 |   types
@@ -316,10 +317,10 @@ ATX_LogManager_ParseConfig(const char* config,
     /* parse all entries */
     while (cursor <= config+config_size) {
         /* separators are newlines, ';' or end of buffer */
-        if (*cursor == '\n' || 
-            *cursor == '\r' || 
-            *cursor == ';' || 
-            cursor == config+config_size) {
+        if ( cursor == config+config_size ||
+            *cursor == '\n'              || 
+            *cursor == '\r'              || 
+            *cursor == ';') {
             /* newline or end of buffer */
             if (separator && line[0] != '#') {
                 /* we have a property */
@@ -576,6 +577,10 @@ ATX_LogManager_Initialize(void)
     /* create the root logger */
     LogManager.root = ATX_Logger_Create("");
     if (LogManager.root) {
+        /**
+        * FIXME: We should override this only if .handlers is not found in the config file
+        * so that we can add more than a ConsoleHandler to the root
+        */
         LogManager.root->level = ATX_LOG_ROOT_DEFAULT_LOG_LEVEL;
         LogManager.root->level_is_inherited = ATX_FALSE;
         ATX_LogManager_SetConfigValue(".handlers", 
@@ -961,7 +966,7 @@ ATX_LogConsoleHandler_Log(ATX_LogHandler* _self, const ATX_LogRecord* record)
         ATX_Log_FormatRecordToStream(record, output_stream, self->use_colors, self->format_filter);
         ATX_OutputStream_Write(output_stream, "\0", 1, NULL);
         ATX_MemoryStream_GetBuffer(memory_stream, &buffer);
-        ATX_ConsolePrint((const char*)ATX_DataBuffer_GetData(buffer));
+        ATX_ConsoleOutput((const char*)ATX_DataBuffer_GetData(buffer));
         ATX_RELEASE_OBJECT(output_stream);
     }
     ATX_MemoryStream_Destroy(memory_stream);
@@ -1121,7 +1126,6 @@ ATX_LogFileHandler_Create(const char*     logger_name,
     if (ATX_SUCCEEDED(ATX_File_Create(filename, &file))) {
         result = ATX_File_Open(file, 
                                ATX_FILE_OPEN_MODE_CREATE |
-                               ATX_FILE_OPEN_MODE_APPEND |
                                ATX_FILE_OPEN_MODE_WRITE  |
                                (append?ATX_FILE_OPEN_MODE_APPEND:0));
         if (ATX_SUCCEEDED(result)) {
