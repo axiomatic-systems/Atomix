@@ -21,7 +21,9 @@ ATX_MODULE_SOURCES = \
 	AtxDataBuffer.c \
 	AtxString.c \
 	AtxFile.c \
-	AtxLogging.c
+	AtxLogging.c \
+	AtxDebug.c  \
+	AtxConsole.c
 	
 ATX_MODULE_OBJECTS = $(ATX_MODULE_SOURCES:.c=.o)
 ATX_INCLUDES_C    += -I$(ATX_SOURCE_ROOT)/Core -I$(ATX_SOURCE_ROOT)/Config

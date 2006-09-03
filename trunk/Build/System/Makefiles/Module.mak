@@ -18,6 +18,7 @@ include $(ATX_BUILD_INCLUDES)/IncludeModuleDeps.mak
 #######################################################################
 ATX_MODULE_SOURCES = \
 	Atx$(ATX_SYSTEM_DEBUG_IMPLEMENTATION).c   \
+	Atx$(ATX_SYSTEM_CONSOLE_IMPLEMENTATION).c \
 	Atx$(ATX_SYSTEM_SOCKETS_IMPLEMENTATION).c \
 	Atx$(ATX_SYSTEM_FILE_IMPLEMENTATION).c    \
 	Atx$(ATX_SYSTEM_SYSTEM_IMPLEMENTATION).c
