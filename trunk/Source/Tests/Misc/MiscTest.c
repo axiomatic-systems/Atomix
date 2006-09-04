@@ -110,7 +110,7 @@ main(int argc, char** argv)
     SHOULD_FAIL(ATX_ParseInteger32("21474836470", &i32, ATX_FALSE));
 
     SHOULD_SUCCEED(ATX_ParseInteger32U("4294967295", &ui32, ATX_FALSE));
-    SHOULD_EQUAL_I(ui32, 4294967295);
+    SHOULD_EQUAL_I(ui32, 4294967295U);
     SHOULD_FAIL(ATX_ParseInteger32U("4294967296", &ui32, ATX_FALSE));
     SHOULD_FAIL(ATX_ParseInteger32U("-1", &ui32, ATX_FALSE));
 
