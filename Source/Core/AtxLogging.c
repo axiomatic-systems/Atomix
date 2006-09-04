@@ -496,6 +496,8 @@ ATX_LogManager_Terminate(void)
     /* check if we're initialized */
     if (!LogManager.initialized) return ATX_ERROR_INVALID_STATE;
 
+    ATX_Debug("ATX_LogManager::Terminate\n");
+    
     /* destroy everything we've created */
     ATX_LogManager_ClearConfig();
     ATX_List_Destroy(LogManager.config);
@@ -541,6 +543,8 @@ ATX_LogManager_Initialize(void)
 {
     char* config_sources;
 
+    ATX_Debug("ATX_LogManager::Terminate\n");
+
     if (LogManager.initialized) {
         return ATX_SUCCESS;
     }
@@ -550,6 +554,9 @@ ATX_LogManager_Initialize(void)
 
     /* create a config */
     ATX_List_Create(&LogManager.config);
+
+    /* set some default config values */
+    ATX_LogManager_SetConfigValue(".handlers", ATX_LOG_ROOT_DEFAULT_HANDLER);
 
     /* decide what the configuration sources are */
     config_sources = ATX_GetEnvironment(ATX_LOG_CONFIG_ENV);
@@ -577,14 +584,8 @@ ATX_LogManager_Initialize(void)
     /* create the root logger */
     LogManager.root = ATX_Logger_Create("");
     if (LogManager.root) {
-        /**
-        * FIXME: We should override this only if .handlers is not found in the config file
-        * so that we can add more than a ConsoleHandler to the root
-        */
         LogManager.root->level = ATX_LOG_ROOT_DEFAULT_LOG_LEVEL;
         LogManager.root->level_is_inherited = ATX_FALSE;
-        ATX_LogManager_SetConfigValue(".handlers", 
-                                      ATX_LOG_ROOT_DEFAULT_HANDLER);
         ATX_LogManager_ConfigureLogger(LogManager.root);
     }
 
