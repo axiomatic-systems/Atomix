@@ -10,7 +10,7 @@
 ##########################################################################
 #    tools
 ##########################################################################
-ATX_CROSS_PREFIX=arm-xscale-linux-
+ATX_CROSS_PREFIX=arm-linux-
 ATX_COMPILE_C   = $(ATX_CROSS_PREFIX)gcc
 ATX_FLAGS_C     = -ansi -pedantic
 ATX_DEFINES_C   = -D_REENTRANT -D_BSD_SOURCE -D_POSIX_SOURCE
