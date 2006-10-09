@@ -11,5 +11,7 @@
 #    target specific options
 #######################################################################
 ATX_SYSTEM_DEBUG_IMPLEMENTATION   = StdcDebug
-ATX_SYSTEM_SOCKETS_IMPLEMENTATION = BsdSockets
+ATX_SYSTEM_CONSOLE_IMPLEMENTATION = StdcConsole
 ATX_SYSTEM_FILE_IMPLEMENTATION    = StdcFile
+ATX_SYSTEM_SOCKETS_IMPLEMENTATION = BsdSockets
+ATX_SYSTEM_SYSTEM_IMPLEMENTATION  = PosixSystem
