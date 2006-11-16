@@ -508,12 +508,10 @@ ATX_IntegerToStringU(unsigned long value, char* buffer, ATX_Size buffer_size)
 /*----------------------------------------------------------------------
 |    ATX_CopyString
 +---------------------------------------------------------------------*/
-char*
+void
 ATX_CopyString(char* dst, const char* src)
 {
-    char* result = dst;
     while(*dst++ = *src++);
-    return result;
 }
 #endif
 

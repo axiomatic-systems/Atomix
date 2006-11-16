@@ -85,6 +85,7 @@
 #define ATX_COMPILER_UNUSED(p) (void)p
 #define ATX_CONFIG_HAVE_INT64
 #define ATX_CONFIG_INT64_TYPE long long
+#define ATX_OFFSET_OF(_member,_type) offsetof(_type,_member)
 #else
 #define ATX_COMPILER_UNUSED(p) 
 #endif
@@ -98,7 +99,6 @@
 #define ATX_vsnprintf(s,c,f,a)  _vsnprintf_s(s,c,_TRUNCATE,f,a)
 #define ATX_snprintf(s,c,f,...) _snprintf_s(s,c,_TRUNCATE,f,__VA_ARGS__)
 #define ATX_strncpy(d,s,c)       strncpy_s(d,c,s,_TRUNCATE)
-#define ATX_dupenv(b,s,e)        _dupenv_s()
 #else
 #define ATX_vsnprintf  _vsnprintf
 #define ATX_snprintf   _snprintf

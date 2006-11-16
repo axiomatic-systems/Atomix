@@ -40,10 +40,11 @@ typedef struct {
 } ATX_LogConfigEntry;
 
 typedef struct {
-    ATX_List*   config;
-    ATX_List*   loggers;
-    ATX_Logger* root;
-    ATX_Boolean initialized;
+    ATX_List*            config;
+    ATX_List*            loggers;
+    ATX_Logger*          root;
+    ATX_LogManagerLocker locker;
+    ATX_Boolean          initialized;
 } ATX_LogManager;
 
 typedef struct {
@@ -99,6 +100,23 @@ typedef struct {
 |   globals
 +---------------------------------------------------------------------*/
 static ATX_LogManager LogManager;
+
+/*----------------------------------------------------------------------
+|   macros
++---------------------------------------------------------------------*/
+#define ATX_LOG_MANAGER_LOCK do {                                                       \
+    if (LogManager.locker.iface != NULL) {                                              \
+        ATX_Result result = LogManager.locker.iface->Lock(LogManager.locker.instance);  \
+        if (ATX_FAILED(result)) return result;                                          \
+    }                                                                                   \
+} while (0)
+
+#define ATX_LOG_MANAGER_UNLOCK do {                                                     \
+    if (LogManager.locker.iface != NULL) {                                              \
+        ATX_Result result = LogManager.locker.iface->Unlock(LogManager.locker.instance);\
+        if (ATX_FAILED(result)) return result;                                          \
+    }                                                                                   \
+} while (0)
 
 /*----------------------------------------------------------------------
 |   forward references
@@ -484,6 +502,16 @@ ATX_LogManager_ConfigureLogger(ATX_Logger* logger)
         }
     }
 
+    return ATX_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   ATX_LogManager_SetLocker
++---------------------------------------------------------------------*/
+ATX_Result
+ATX_LogManager_SetLocker(ATX_LogManagerLocker locker)
+{
+    LogManager.locker = locker;
     return ATX_SUCCESS;
 }
 

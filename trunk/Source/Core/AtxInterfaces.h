@@ -16,6 +16,7 @@
 /*----------------------------------------------------------------------
 |   includes
 +---------------------------------------------------------------------*/
+#include "AtxConfig.h"
 #include "AtxDefs.h"
 #include "AtxTypes.h"
 
@@ -49,7 +50,9 @@ typedef struct {
 #define ATX_INTERFACE_ID_TYPE_MOD extern const
 #endif /* __cplusplus */
 
+#if !defined(ATX_OFFSET_OF)
 #define ATX_OFFSET_OF(_member,_type) (ATX_POINTER_TO_LONG(&( ((_type *)0)->_member)))
+#endif
 
 #define ATX_SELF_O(_object, _self_type, _interface_type) \
     ( (_self_type *)( ((ATX_Byte*)(_object)) - ATX_OFFSET_OF(_interface_type##_Base, _self_type)) )

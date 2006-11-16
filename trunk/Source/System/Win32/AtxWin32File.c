@@ -484,8 +484,8 @@ Win32File_Open(ATX_File* _self, ATX_Flags mode)
     Win32File*  self = ATX_SELF(Win32File, ATX_File);
     HANDLE      handle;
     DWORD       access_mode = 0;
-	DWORD       share_mode  = FILE_SHARE_READ | FILE_SHARE_WRITE;
-	DWORD       create_mode = 0;
+    DWORD       share_mode  = FILE_SHARE_READ | FILE_SHARE_WRITE;
+    DWORD       create_mode = 0;
     const char* filename = self->name;
 
     /* compute modes */
@@ -505,9 +505,9 @@ Win32File_Open(ATX_File* _self, ATX_Flags mode)
         if (mode & ATX_FILE_OPEN_MODE_TRUNCATE) {
             create_mode |= TRUNCATE_EXISTING;
         } else {
-		    create_mode |= OPEN_EXISTING;
+            create_mode |= OPEN_EXISTING;
         }
-	}
+    }
 
     /* handle special names */
     if (ATX_StringsEqual(filename, ATX_FILE_STANDARD_INPUT)) {
@@ -518,23 +518,23 @@ Win32File_Open(ATX_File* _self, ATX_Flags mode)
         handle = GetStdHandle(STD_ERROR_HANDLE);
     } else {
         /* try to open the file */
-	    handle = CreateFile(filename, 
-	                        access_mode, 
-		                    share_mode, 
-	                        NULL, 
+        handle = CreateFile(filename, 
+                            access_mode, 
+                            share_mode, 
+                            NULL, 
                             create_mode, 
                             FILE_ATTRIBUTE_NORMAL, 
                             NULL);
     }
-	if (handle == INVALID_HANDLE_VALUE) {
+    if (handle == INVALID_HANDLE_VALUE) {
         DWORD error = GetLastError();
-		switch (error) {
-		case ERROR_FILE_NOT_FOUND:
-		    return ATX_ERROR_NO_SUCH_FILE;
-		default:
-		    return ATX_FAILURE;
-		}
-	}
+        switch (error) {
+        case ERROR_FILE_NOT_FOUND:
+            return ATX_ERROR_NO_SUCH_FILE;
+        default:
+            return ATX_FAILURE;
+        }
+    }
 
     /* remember the mode */
     self->mode = mode;
