@@ -85,7 +85,7 @@
 #define ENETDOWN     WSAENETDOWN
 #define ENETUNREACH  WSAENETUNREACH
 #define EAGAIN       WSAEWOULDBLOCK
-#define EINTR		 WSAEINTR
+#define EINTR        WSAEINTR
 
 typedef int          ssize_t;
 typedef int          socklen_t;
@@ -113,7 +113,7 @@ typedef SOCKET       SocketFd;
 #undef ENETDOWN      
 #undef ENETUNREACH   
 #undef EAGAIN        
-#undef EINTR	      
+#undef EINTR      
 #undef EINPROGRESS
 
 #define EWOULDBLOCK   SYS_NET_EWOULDBLOCK 
@@ -126,7 +126,7 @@ typedef SOCKET       SocketFd;
 #define ENETDOWN      SYS_NET_ENETDOWN
 #define ENETUNREACH   SYS_NET_ENETUNREACH
 #define EAGAIN        SYS_NET_EAGAIN
-#define EINTR	      SYS_NET_EINTR
+#define EINTR         SYS_NET_EINTR
 #define EINPROGRESS   SYS_NET_EINPROGRESS
 
 typedef void*        SocketBuffer;
@@ -219,15 +219,15 @@ BsdSockets_Init(void)
 {
     static ATX_Boolean initialized = ATX_FALSE;
     if (!initialized) {
-		WORD    wVersionRequested;
-		WSADATA wsaData;
-		wVersionRequested = MAKEWORD( 2, 0 );
-		if (WSAStartup( wVersionRequested, &wsaData ) != 0) {
-			return ATX_FAILURE;
-		}
-		initialized = ATX_TRUE;
-	}
-	return ATX_SUCCESS;
+        WORD    wVersionRequested;
+        WSADATA wsaData;
+        wVersionRequested = MAKEWORD( 2, 0 );
+        if (WSAStartup( wVersionRequested, &wsaData ) != 0) {
+            return ATX_FAILURE;
+        }
+        initialized = ATX_TRUE;
+    }
+    return ATX_SUCCESS;
 }
 #elif defined(__PPU__)
 /*----------------------------------------------------------------------
@@ -1534,13 +1534,5 @@ ATX_INTERFACE_MAP(BsdTcpServerSocket, ATX_Destroyable) = {
     BsdTcpServerSocket_ATX_Destroyable_GetInterface,
     BsdSocket_Destroy
 };
-
-
-
-
-
-
-
-
 
 

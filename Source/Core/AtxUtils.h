@@ -164,13 +164,13 @@ extern void ATX_SetMemory(void* dest, int c, ATX_Size size);
 #endif
 
 #if defined(ATX_CONFIG_HAVE_STRCPY)
-#define ATX_CopyString(dst, src) strcpy((dst), (src))
+#define ATX_CopyString(dst, src) ((void)strcpy((dst), (src)))
 #else
-extern char* ATX_CopyString(char* dst, const char* src);
+extern void ATX_CopyString(char* dst, const char* src);
 #endif
 
 #if defined(ATX_CONFIG_HAVE_STRNCPY)
-#define ATX_CopyStringN(dst, src, n) ATX_strncpy((dst), (src), n)
+#define ATX_CopyStringN(dst, src, n) ((void)ATX_strncpy((dst), (src), n))
 #else
 extern int ATX_CopyStringN(char* dst, const char* src, unsigned long n);
 #endif
