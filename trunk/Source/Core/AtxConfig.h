@@ -95,7 +95,7 @@
 #define ATX_CONFIG_HAVE_INT64
 #define ATX_CONFIG_INT64_TYPE __int64
 #define ATX_strdup     _strdup
-#if (_MSC_VER >= 1400)
+#if (_MSC_VER >= 1400) && !defined(UNDER_CE)
 #define ATX_vsnprintf(s,c,f,a)  _vsnprintf_s(s,c,_TRUNCATE,f,a)
 #define ATX_snprintf(s,c,f,...) _snprintf_s(s,c,_TRUNCATE,f,__VA_ARGS__)
 #define ATX_strncpy(d,s,c)       strncpy_s(d,c,s,_TRUNCATE)
@@ -111,6 +111,11 @@ typedef __w64 long ATX_PointerLong;
 #if defined(_DEBUG)
 #define _CRTDBG_MAP_ALLOC
 #endif
+#endif
+
+/* windows CE */
+#if defined(UNDER_CE)
+#undef ATX_CONFIG_HAVE_GETENV
 #endif
 
 /*----------------------------------------------------------------------

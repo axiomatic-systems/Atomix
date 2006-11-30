@@ -265,14 +265,13 @@ ATX_RingBuffer_GetOut(ATX_RingBuffer* ring)
 |    ATX_RingBuffer_MoveIn
 +----------------------------------------------------------------------*/
 ATX_Result
-ATX_RingBuffer_MoveIn(ATX_RingBuffer* ring, ATX_Size offset)
+ATX_RingBuffer_MoveIn(ATX_RingBuffer* ring, ATX_Offset offset)
 {
-    int fold;
-
     ring->in += offset;
-    fold = ring->in - ring->data.end;
-    if (fold >= 0) {
-        ring->in = ring->data.start + fold;
+    if (ring->in < ring->data.start) {
+        ring->in += ring->size;
+    } else if (ring->in >= ring->data.end) {
+        ring->in -= ring->size;
     }
 
     return ATX_SUCCESS;
@@ -282,14 +281,13 @@ ATX_RingBuffer_MoveIn(ATX_RingBuffer* ring, ATX_Size offset)
 |    ATX_RingBuffer_MoveOut
 +----------------------------------------------------------------------*/
 ATX_Result
-ATX_RingBuffer_MoveOut(ATX_RingBuffer* ring, ATX_Size offset)
+ATX_RingBuffer_MoveOut(ATX_RingBuffer* ring, ATX_Offset offset)
 {
-    int fold;
-
     ring->out += offset;
-    fold = ring->out - ring->data.end;
-    if (fold >= 0) {
-        ring->out = ring->data.start + fold;
+    if (ring->out < ring->data.start) {
+        ring->out += ring->size;
+    } else if (ring->out >= ring->data.end) {
+        ring->out -= ring->size;
     }
 
     return ATX_SUCCESS;

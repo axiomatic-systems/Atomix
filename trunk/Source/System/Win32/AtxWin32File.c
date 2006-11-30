@@ -84,11 +84,16 @@ Win32FileHandleWrapper_Create(HANDLE                   handle,
 static void
 Win32FileHandleWrapper_Destroy(Win32FileHandleWrapper* self)
 {
+#if defined(UNDER_CE)
+    CloseHandle(self->handle);
+#else
     if (self->handle != GetStdHandle(STD_INPUT_HANDLE) &&
         self->handle != GetStdHandle(STD_OUTPUT_HANDLE) &&
         self->handle != GetStdHandle(STD_ERROR_HANDLE)) {
         CloseHandle(self->handle);
     }
+#endif
+
     ATX_FreeMemory((void*)self);
 }
 
@@ -415,6 +420,47 @@ ATX_IMPLEMENT_REFERENCEABLE_INTERFACE(Win32FileStream, reference_count)
 ATX_DECLARE_INTERFACE_MAP(Win32File, ATX_File)
 ATX_DECLARE_INTERFACE_MAP(Win32File, ATX_Destroyable)
 
+#if defined (UNDER_CE)
+/*----------------------------------------------------------------------
+|   FindFirstFile_UTF8
++---------------------------------------------------------------------*/
+static HANDLE
+FindFirstFile_UTF8(LPCSTR filename, LPWIN32_FIND_DATA info)
+{
+    HANDLE handle;
+    unsigned int filename_length = ATX_StringLength(filename);
+    WCHAR* filename_w = ATX_AllocateMemory(2*(filename_length+1));
+    MultiByteToWideChar(CP_UTF8, 0, filename, -1, filename_w, filename_length+1);
+    handle = FindFirstFile(filename_w, info);
+    ATX_FreeMemory(filename_w);
+
+    return handle;
+}
+
+/*----------------------------------------------------------------------
+|   CreateFile_UTF8
++---------------------------------------------------------------------*/
+static HANDLE
+CreateFile_UTF8(LPCSTR lpFileName,
+                DWORD dwDesiredAccess,
+                DWORD dwShareMode,
+                LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+                DWORD dwCreationDisposition,
+                DWORD dwFlagsAndAttributes,
+                HANDLE hTemplateFile)
+{
+    HANDLE handle;
+    unsigned int filename_length = ATX_StringLength(lpFileName);
+    WCHAR* filename_w = ATX_AllocateMemory(2*(filename_length+1));
+    MultiByteToWideChar(CP_UTF8, 0, lpFileName, -1, filename_w, filename_length+1);
+    handle = CreateFile(filename_w, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
+    ATX_FreeMemory(filename_w);
+
+    return handle;
+}
+
+#endif 
+
 /*----------------------------------------------------------------------
 |   ATX_File_Create
 +---------------------------------------------------------------------*/
@@ -434,13 +480,22 @@ ATX_File_Create(const char* filename, ATX_File** object)
     ATX_SET_CSTRING(file->name, filename);
 
     /* get the size */
+#if !defined(UNDER_CE)
     if (ATX_StringsEqual(filename, ATX_FILE_STANDARD_INPUT)  ||
         ATX_StringsEqual(filename, ATX_FILE_STANDARD_OUTPUT) ||
         ATX_StringsEqual(filename, ATX_FILE_STANDARD_ERROR)) {
         file->size = 0;
-    } else {
+    } else 
+#endif
+    {
         WIN32_FIND_DATA info;
-        HANDLE f = FindFirstFile(filename, &info);
+        HANDLE          f;
+#if defined(UNDER_CE)
+        f = FindFirstFile_UTF8(filename, &info);
+#else
+        f = FindFirstFile(filename, &info);
+#endif
+
         if (f == INVALID_HANDLE_VALUE) {
             file->size = 0;
         } else {
@@ -510,15 +565,23 @@ Win32File_Open(ATX_File* _self, ATX_Flags mode)
     }
 
     /* handle special names */
+#if !defined(UNDER_CE)
     if (ATX_StringsEqual(filename, ATX_FILE_STANDARD_INPUT)) {
         handle = GetStdHandle(STD_INPUT_HANDLE);
     } else if (ATX_StringsEqual(filename, ATX_FILE_STANDARD_OUTPUT)) {
         handle = GetStdHandle(STD_OUTPUT_HANDLE);
     } else if (ATX_StringsEqual(filename, ATX_FILE_STANDARD_ERROR)) {
         handle = GetStdHandle(STD_ERROR_HANDLE);
-    } else {
+    } else 
+#endif
+    {
         /* try to open the file */
-        handle = CreateFile(filename, 
+#if defined(UNDER_CE)
+        handle = CreateFile_UTF8(
+#else
+        handle = CreateFile(
+#endif
+                            filename, 
                             access_mode, 
                             share_mode, 
                             NULL, 

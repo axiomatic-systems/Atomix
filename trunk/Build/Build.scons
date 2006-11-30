@@ -134,7 +134,7 @@ env['ATX_EXTRA_LIBS'] = ''
 
 
 ### try to read in any target specific configuration
-target_config_file = env.GetBuildPath('#/Build/SCons/Targets/'+env['target']+'/Config.scons')
+target_config_file = env.GetBuildPath('#/Build/Targets/'+env['target']+'/Config.scons')
 if os.path.exists(target_config_file):
     # Load the target-specific config file    
     execfile(target_config_file)
@@ -145,7 +145,6 @@ if os.path.exists(target_config_file):
 LibraryModule(name               = 'Atomix', 
               build_source_dirs  = ['Core'],
               build_source_files = env['ATX_SYSTEM_SOURCES'],
-              include_dirs       = ['Config','Atomix'],
               linked_modules     = env['ATX_EXTRA_LIBS'])
             
 Application('NetPump', 'Source/Apps/NetPump')
