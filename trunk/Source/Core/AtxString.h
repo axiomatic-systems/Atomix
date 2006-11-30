@@ -50,8 +50,11 @@ typedef struct {
 #define ATX_String_Construct(str) do {                  \
     (str)->chars = NULL;                                \
 } while(0)
-#define ATX_String_Destruct(str) do {                                      \
-    if ((str)->chars) ATX_FreeMemory((void*)ATX_String_GetBuffer((str)));  \
+#define ATX_String_Destruct(str) do {                        \
+    if ((str)->chars) {                                      \
+        ATX_FreeMemory((void*)ATX_String_GetBuffer((str)));  \
+        (str)->chars = NULL;                                 \
+    }                                                        \
 } while(0)
 #define ATX_String_GetChar(str, index) ((str)->chars[(index)])
 #define ATX_String_SetChar(str, index, c) do {          \
