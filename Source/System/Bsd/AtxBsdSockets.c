@@ -12,7 +12,7 @@
 +---------------------------------------------------------------------*/
 #include "AtxConfig.h"
 
-#if defined(WIN32)
+#if defined(WIN32) || defined(UNDER_CE)
 
 #define STRICT
 #define ATX_WIN32_USE_WINSOCK2
@@ -50,10 +50,11 @@
 #include <netdb.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <stdio.h>
 #include <errno.h>
+#include <stdio.h>
 
-#endif 
+#endif
+
 
 #include "AtxConfig.h"
 #include "AtxInterfaces.h"

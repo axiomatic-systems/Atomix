@@ -40,7 +40,7 @@
 #include <dmalloc.h>
 #endif
 
-#if defined(WIN32) && defined(_DEBUG)
+#if defined(WIN32) && defined(_DEBUG) && !defined(UNDER_CE)
 #include <crtdbg.h>
 #endif
 
