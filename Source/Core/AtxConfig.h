@@ -85,7 +85,6 @@
 #define ATX_COMPILER_UNUSED(p) (void)p
 #define ATX_CONFIG_HAVE_INT64
 #define ATX_CONFIG_INT64_TYPE long long
-#define ATX_OFFSET_OF(_member,_type) offsetof(_type,_member)
 #else
 #define ATX_COMPILER_UNUSED(p) 
 #endif

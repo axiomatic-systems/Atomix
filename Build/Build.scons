@@ -22,7 +22,7 @@ def GlobSources(dir, patterns):
 def GetDirPath(dir):
     return '#/'+dir
     
-def DeclareBuildDir(dir):
+def DeclareBuildDir(env, dir):
     env.BuildDir(dir, GetDirPath(dir), duplicate=0)
     
 def GetIncludeDirs(modules, exclude=None):
@@ -90,14 +90,14 @@ class LibraryModule(Module):
         # and compute the list of source files to build
         sources = []
         for dir in Split(build_source_dirs):
-            DeclareBuildDir(dir)
+            DeclareBuildDir(self.env, dir)
             sources += GlobSources(dir, build_source_pattern)
 
         # add cherry-picked files
         for dir in build_source_files.keys():
             pattern = build_source_files[dir]
             dir_path = source_root+'/'+dir
-            DeclareBuildDir(dir_path)
+            DeclareBuildDir(self.env, dir_path)
             sources += GlobSources(dir_path, pattern)
 
         # calculate our build include path
@@ -109,14 +109,14 @@ class LibraryModule(Module):
         self.env.Alias(name, self.product)
         
 def Application(name, dir):
-    DeclareBuildDir(dir)
+    DeclareBuildDir(env, dir)
     libs = GetLibraries('Atomix')
     cpp_path = GetIncludeDirs('Atomix')
     
     prog = env.Program(name, 
                        GlobSources(dir, ['*.c']), 
                        LIBS=libs, CPPPATH=cpp_path)
-    env.Alias(name, prog)
+    #env.Alias(name, prog)
     if env.has_key('ATX_EXECUTABLE_POST_PROCESSOR'):
         env.AddPostAction(prog, env['ATX_EXECUTABLE_POST_PROCESSOR'])
         
