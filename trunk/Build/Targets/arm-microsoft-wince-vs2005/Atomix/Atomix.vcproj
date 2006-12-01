@@ -717,7 +717,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Source\System\WinCE\AtxWinceUtils.cpp"
+				RelativePath="..\..\..\..\Source\System\WinCE\AtxWinceUtils.c"
 				>
 			</File>
 		</Filter>
