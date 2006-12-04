@@ -52,6 +52,7 @@
 				AdditionalIncludeDirectories="..\..\..\..\Source\Core"
 				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_LIB;$(ARCHFAM);$(_ARCHFAM_);UNICODE;_UNICODE;ATX_DEBUG;ATX_CONFIG_ENABLE_LOGGING"
 				MinimalRebuild="true"
+				ExceptionHandling="0"
 				RuntimeLibrary="1"
 				BufferSecurityCheck="false"
 				UsePrecompiledHeader="0"
@@ -128,6 +129,7 @@
 				AdditionalIncludeDirectories="..\..\..\..\Source\Config;..\..\..\..\Source\Core;..\..\..\..\Source\Atomix"
 				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_LIB;$(ARCHFAM);$(_ARCHFAM_);UNICODE;_UNICODE;ATX_DEBUG;ATX_CONFIG_ENABLE_LOGGING"
 				MinimalRebuild="true"
+				ExceptionHandling="0"
 				RuntimeLibrary="1"
 				BufferSecurityCheck="false"
 				UsePrecompiledHeader="0"
@@ -204,6 +206,7 @@
 				AdditionalIncludeDirectories="..\..\..\..\Source\Config;..\..\..\..\Source\Core;..\..\..\..\Source\Atomix"
 				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_LIB;$(ARCHFAM);$(_ARCHFAM_);UNICODE;_UNICODE;ATX_DEBUG;ATX_CONFIG_ENABLE_LOGGING"
 				MinimalRebuild="true"
+				ExceptionHandling="0"
 				RuntimeLibrary="1"
 				BufferSecurityCheck="false"
 				UsePrecompiledHeader="0"
@@ -280,6 +283,7 @@
 				AdditionalIncludeDirectories="..\..\..\..\Source\Config;..\..\..\..\Source\Core;..\..\..\..\Source\Atomix"
 				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_LIB;$(ARCHFAM);$(_ARCHFAM_);UNICODE;_UNICODE;ATX_DEBUG;ATX_CONFIG_ENABLE_LOGGING"
 				MinimalRebuild="true"
+				ExceptionHandling="0"
 				RuntimeLibrary="1"
 				BufferSecurityCheck="false"
 				UsePrecompiledHeader="0"
@@ -355,6 +359,7 @@
 				Optimization="2"
 				AdditionalIncludeDirectories="..\..\..\..\Source\Config;..\..\..\..\Source\Core;..\..\..\..\Source\Atomix"
 				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;_LIB;$(ARCHFAM);$(_ARCHFAM_);UNICODE;_UNICODE"
+				ExceptionHandling="0"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="false"
 				UsePrecompiledHeader="0"
@@ -430,6 +435,7 @@
 				Optimization="2"
 				AdditionalIncludeDirectories="..\..\..\..\Source\Config;..\..\..\..\Source\Core;..\..\..\..\Source\Atomix"
 				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;_LIB;$(ARCHFAM);$(_ARCHFAM_);UNICODE;_UNICODE"
+				ExceptionHandling="0"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="false"
 				UsePrecompiledHeader="0"
@@ -505,6 +511,7 @@
 				Optimization="2"
 				AdditionalIncludeDirectories="..\..\..\..\Source\Config;..\..\..\..\Source\Core;..\..\..\..\Source\Atomix"
 				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;_LIB;$(ARCHFAM);$(_ARCHFAM_);UNICODE;_UNICODE"
+				ExceptionHandling="0"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="false"
 				UsePrecompiledHeader="0"
@@ -580,6 +587,7 @@
 				Optimization="2"
 				AdditionalIncludeDirectories="..\..\..\..\Source\Config;..\..\..\..\Source\Core;..\..\..\..\Source\Atomix"
 				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;_LIB;$(ARCHFAM);$(_ARCHFAM_);UNICODE;_UNICODE"
+				ExceptionHandling="0"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="false"
 				UsePrecompiledHeader="0"
@@ -650,6 +658,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\AtxDebug.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\Source\Core\AtxDestroyable.c"
 				>
 			</File>
 			<File
@@ -727,7 +739,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\..\Source\Config\AtxConfig.h"
+				RelativePath="..\..\..\..\Source\Core\AtxConfig.h"
 				>
 			</File>
 			<File

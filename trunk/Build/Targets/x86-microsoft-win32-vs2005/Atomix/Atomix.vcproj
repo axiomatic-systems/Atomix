@@ -64,6 +64,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalDependencies="ws2_32.lib"
 				OutputFile="$(OutDir)/Atomix.lib"
 			/>
 			<Tool
@@ -134,6 +135,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalDependencies="ws2_32.lib"
 				OutputFile="$(OutDir)/Atomix.lib"
 			/>
 			<Tool
@@ -191,6 +193,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\AtxDebug.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\Source\Core\AtxDestroyable.c"
 				>
 			</File>
 			<File

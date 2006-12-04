@@ -25,6 +25,7 @@
 #define ATX_CONFIG_HAVE_MATH_H
 #define ATX_CONFIG_HAVE_ASSERT_H
 #define ATX_CONFIG_HAVE_LIMITS_H
+#define ATX_CONFIG_HAVE_UNISTD_H
 
 /*----------------------------------------------------------------------
 |    CPU byte order
@@ -115,6 +116,15 @@ typedef __w64 long ATX_PointerLong;
 /* windows CE */
 #if defined(UNDER_CE)
 #undef ATX_CONFIG_HAVE_GETENV
+#endif
+
+/* Symbian */
+#if defined(__symbian__)
+#endif
+
+/* PS3 */
+#if defined(__PPU__)
+#undef ATX_CONFIG_HAVE_UNISTD_H
 #endif
 
 /*----------------------------------------------------------------------

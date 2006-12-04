@@ -41,14 +41,17 @@ ATX_BEGIN_INTERFACE_DEFINITION(ATX_Destroyable)
 ATX_END_INTERFACE_DEFINITION
 
 /*----------------------------------------------------------------------
-|   convenience macros
+|   interface stubs
 +---------------------------------------------------------------------*/
-/**
- * Convenience macro used to call the Destroy() method on objects 
- * that implement the ATX_Destroyable interface 
- */
-#define ATX_Destroyable_Destroy(object) \
-ATX_INTERFACE(object)->Destroy(ATX_INSTANCE(object))
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+ATX_Result ATX_Destroyable_Destroy(ATX_Destroyable* self);
+
+#if defined(__cplusplus)
+}
+#endif
 
 /*----------------------------------------------------------------------
 |   macros
@@ -68,7 +71,7 @@ do {                                                                      \
     if (object) {                                                         \
         ATX_Destroyable* destroyable = ATX_CAST(object, ATX_Destroyable); \
         ATX_ASSERT(destroyable != NULL);                                  \
-        ATX_INTERFACE(destroyable)->Destroy(destroyable);                 \
+        ATX_Destroyable_Destroy(destroyable);                             \
         object = NULL;                                                    \
     }                                                                     \
 } while(0)  
