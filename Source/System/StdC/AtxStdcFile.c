@@ -16,6 +16,9 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/stat.h>
+#if defined(ATX_CONFIG_HAVE_UNISTD_H)
+#include <unistd.h>
+#endif
 
 #include "AtxUtils.h"
 #include "AtxStreams.h"
@@ -23,14 +26,6 @@
 #include "AtxResults.h"
 #include "AtxReferenceable.h"
 #include "AtxDestroyable.h"
-
-/*----------------------------------------------------------------------
-|       platform adaptation
-+---------------------------------------------------------------------*/
-/* PS3 */
-#if defined(__PPU__)
-#include <unistd.h>
-#endif
 
 /*----------------------------------------------------------------------
 |       types

@@ -17,6 +17,39 @@
 #include "AtxDestroyable.h"
 
 /*----------------------------------------------------------------------
+|   interface stubs
++---------------------------------------------------------------------*/
+ATX_Result 
+ATX_File_Open(ATX_File* self, ATX_Flags mode)
+{
+    return ATX_INTERFACE(self)->Open(self, mode);
+}
+
+ATX_Result 
+ATX_File_Close(ATX_File* self)
+{
+    return ATX_INTERFACE(self)->Close(self);
+}
+
+ATX_Result 
+ATX_File_GetSize(ATX_File* self, ATX_Size* size)
+{
+    return ATX_INTERFACE(self)->GetSize(self, size);
+}
+
+ATX_Result 
+ATX_File_GetInputStream(ATX_File* self, ATX_InputStream** stream)
+{
+    return ATX_INTERFACE(self)->GetInputStream(self, stream);
+}
+
+ATX_Result 
+ATX_File_GetOutputStream(ATX_File* self, ATX_OutputStream**  stream)
+{
+    return ATX_INTERFACE(self)->GetOutputStream(self, stream);
+}
+
+/*----------------------------------------------------------------------
 |   ATX_File_Load
 +---------------------------------------------------------------------*/
 ATX_Result

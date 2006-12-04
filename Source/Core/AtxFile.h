@@ -51,22 +51,21 @@ ATX_BEGIN_INTERFACE_DEFINITION(ATX_File)
 ATX_END_INTERFACE_DEFINITION
 
 /*----------------------------------------------------------------------
-|   convenience macros
+|   interface stubs
 +---------------------------------------------------------------------*/
-#define ATX_File_Open(object, mode) \
-ATX_INTERFACE(object)->Open(object, mode)
+#if defined(__cplusplus)
+extern "C" {
+#endif
 
-#define ATX_File_Close(object) \
-ATX_INTERFACE(object)->Close(object)
+ATX_Result ATX_File_Open(ATX_File* self, ATX_Flags mode);
+ATX_Result ATX_File_Close(ATX_File* self);
+ATX_Result ATX_File_GetSize(ATX_File* self, ATX_Size* size);
+ATX_Result ATX_File_GetInputStream(ATX_File* self, ATX_InputStream** stream);
+ATX_Result ATX_File_GetOutputStream(ATX_File* self, ATX_OutputStream**  stream);
 
-#define ATX_File_GetSize(object, size) \
-ATX_INTERFACE(object)->GetSize(object, size)
-
-#define ATX_File_GetInputStream(object, stream) \
-ATX_INTERFACE(object)->GetInputStream(object, stream)
-
-#define ATX_File_GetOutputStream(object, stream) \
-ATX_INTERFACE(object)->GetOutputStream(object, stream)
+#if defined(__cplusplus)
+}
+#endif
 
 /*----------------------------------------------------------------------
 |   prototypes

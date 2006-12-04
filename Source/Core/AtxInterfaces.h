@@ -37,8 +37,8 @@
  * with a unique interface type ID and a version number
  */
 typedef struct {
-    unsigned long type;     /**< unique type ID integer */
-    unsigned long version;  /**< version integer        */
+    unsigned long i0;
+    unsigned long i1;
 } ATX_InterfaceId;
 
 /*----------------------------------------------------------------------
@@ -83,7 +83,7 @@ typedef struct {                                                        \
 } _iface;
 
 #define ATX_BEGIN_INTERFACE_DEFINITION(_iface) struct _iface##Interface { \
-    ATX_Object* (*GetInterface)(_iface*                instance,       \
+    ATX_Object* (*GetInterface)(_iface*                instance,          \
                                 const ATX_InterfaceId* id);     
 #define ATX_END_INTERFACE_DEFINITION };
 
@@ -122,7 +122,7 @@ static const _iface##Interface _class##_##_class##Interface = { \
  * Tests if two interface ID constants (ATX_InterfaceId type) are equal
  */
 #define ATX_INTERFACE_IDS_EQUAL(_iface_a,_iface_b) \
-(((_iface_a)->type == (_iface_b)->type) && ((_iface_a)->version == (_iface_b)->version))
+(((_iface_a)->i0 == (_iface_b)->i0) && ((_iface_a)->i1 == (_iface_b)->i1))
 
 #define ATX_DECLARE_GET_INTERFACE_IMPLEMENTATION(_class)                     \
 static ATX_Object* _class##_GetInterface(_class*                self,        \
