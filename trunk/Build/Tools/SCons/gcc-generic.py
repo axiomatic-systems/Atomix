@@ -17,7 +17,7 @@ def generate(env, gcc_cross_prefix=None, gcc_strict=True, gcc_stop_on_warning=Tr
         c_compiler_flags = '-O3'
     
     if gcc_stop_on_warning:
-        c_compiler_flags += '-Werror'
+        c_compiler_flags += ' -Werror'
 
     if gcc_cross_prefix:
         env['ENV']['PATH'] += os.environ['PATH']
