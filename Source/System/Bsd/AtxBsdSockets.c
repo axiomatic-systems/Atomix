@@ -12,7 +12,7 @@
 +---------------------------------------------------------------------*/
 #include "AtxConfig.h"
 
-#if defined(WIN32) || defined(UNDER_CE)
+#if defined(_WIN32) || defined(_WIN32_WCE)
 
 #define STRICT
 #define ATX_WIN32_USE_WINSOCK2
@@ -74,7 +74,7 @@
 /*----------------------------------------------------------------------
 |   WinSock adaptation layer
 +---------------------------------------------------------------------*/
-#if defined(WIN32)
+#if defined(_WIN32)
 #define EWOULDBLOCK  WSAEWOULDBLOCK
 #define EINPROGRESS  WSAEINPROGRESS
 #define ECONNREFUSED WSAECONNREFUSED
@@ -211,7 +211,7 @@ typedef struct {
     ATX_IMPLEMENTS(ATX_DatagramSocket);
 } BsdUdpSocket;
 
-#if defined(WIN32)
+#if defined(_WIN32)
 /*----------------------------------------------------------------------
 |   BsdSockets_Init
 +---------------------------------------------------------------------*/
@@ -839,7 +839,7 @@ BsdSocket_RefreshInfo(BsdSocket* self)
     return ATX_SUCCESS;
 }
 
-#if defined(WIN32)
+#if defined(_WIN32)
 /*----------------------------------------------------------------------
 |   BsdSocketFd_SetBlockingMode
 +---------------------------------------------------------------------*/

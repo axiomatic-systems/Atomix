@@ -84,7 +84,7 @@ Win32FileHandleWrapper_Create(HANDLE                   handle,
 static void
 Win32FileHandleWrapper_Destroy(Win32FileHandleWrapper* self)
 {
-#if defined(UNDER_CE)
+#if defined(_WIN32_WCE)
     CloseHandle(self->handle);
 #else
     if (self->handle != GetStdHandle(STD_INPUT_HANDLE) &&
@@ -420,7 +420,7 @@ ATX_IMPLEMENT_REFERENCEABLE_INTERFACE(Win32FileStream, reference_count)
 ATX_DECLARE_INTERFACE_MAP(Win32File, ATX_File)
 ATX_DECLARE_INTERFACE_MAP(Win32File, ATX_Destroyable)
 
-#if defined (UNDER_CE)
+#if defined (_WIN32_WCE)
 /*----------------------------------------------------------------------
 |   FindFirstFile_UTF8
 +---------------------------------------------------------------------*/
@@ -480,7 +480,7 @@ ATX_File_Create(const char* filename, ATX_File** object)
     ATX_SET_CSTRING(file->name, filename);
 
     /* get the size */
-#if !defined(UNDER_CE)
+#if !defined(_WIN32_WCE)
     if (ATX_StringsEqual(filename, ATX_FILE_STANDARD_INPUT)  ||
         ATX_StringsEqual(filename, ATX_FILE_STANDARD_OUTPUT) ||
         ATX_StringsEqual(filename, ATX_FILE_STANDARD_ERROR)) {
@@ -490,7 +490,7 @@ ATX_File_Create(const char* filename, ATX_File** object)
     {
         WIN32_FIND_DATA info;
         HANDLE          f;
-#if defined(UNDER_CE)
+#if defined(_WIN32_WCE)
         f = FindFirstFile_UTF8(filename, &info);
 #else
         f = FindFirstFile(filename, &info);
@@ -565,7 +565,7 @@ Win32File_Open(ATX_File* _self, ATX_Flags mode)
     }
 
     /* handle special names */
-#if !defined(UNDER_CE)
+#if !defined(_WIN32_WCE)
     if (ATX_StringsEqual(filename, ATX_FILE_STANDARD_INPUT)) {
         handle = GetStdHandle(STD_INPUT_HANDLE);
     } else if (ATX_StringsEqual(filename, ATX_FILE_STANDARD_OUTPUT)) {
@@ -576,7 +576,7 @@ Win32File_Open(ATX_File* _self, ATX_Flags mode)
 #endif
     {
         /* try to open the file */
-#if defined(UNDER_CE)
+#if defined(_WIN32_WCE)
         handle = CreateFile_UTF8(
 #else
         handle = CreateFile(

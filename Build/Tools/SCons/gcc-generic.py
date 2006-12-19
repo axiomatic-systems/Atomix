@@ -24,7 +24,6 @@ def generate(env, gcc_cross_prefix=None, gcc_strict=True, gcc_stop_on_warning=Tr
         env['AR']     = gcc_cross_prefix+'-ar'
         env['RANLIB'] = gcc_cross_prefix+'-ranlib'
         env['CC']     = gcc_cross_prefix+'-gcc'
-        env['LINK']   = gcc_cross_prefix+'-gcc'
 
     env['CPPFLAGS'] = ' '.join([c_compiler_defines])
     env['CCFLAGS']  = ' '.join([c_compiler_compliance_flags, c_compiler_flags, c_compiler_warnings])

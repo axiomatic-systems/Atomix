@@ -8,3 +8,4 @@ uiq3_flags    = ' -mapcs -nostdinc -march=armv5t -mfloat-abi=soft'
 uiq3_defines  = ' -D_UNICODE -D__GCCE__ -D__SYMBIAN32__ -D__EPOC32__ -D__MARM__ -D__EABI__ -D__MARM_ARMV5__ -D__SUPPORT_CPP_EXCEPTIONS__'
 uiq3_includes = ' -include "'+EPOC_ROOT+'\\include\\gcce\\gcce.h" -I"'+EPOC_ROOT+'\\include" -I"'+EPOC_ROOT+'\\include\\libc"'
 env['CCFLAGS']  += uiq3_flags + uiq3_defines + uiq3_includes
+env['LINKFLAGS'] += '--target1-abs --no-undefined -nostdlib -shared --discard-locals --default-symver --entry _E32Startup -u_E32Startup -Tdata 0x400000 -Ttext 0x8000 -lgcc'

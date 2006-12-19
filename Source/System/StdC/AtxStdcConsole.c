@@ -1,5 +1,5 @@
 /*****************************************************************
-||
+|
 |      Atomix - Console Support: StdC Implementation
 |
 |      (c) 2002-2006 Gilles Boccon-Gibod

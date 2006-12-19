@@ -87,7 +87,7 @@ typedef struct {
 #define ATX_LOG_TCP_HANDLER_DEFAULT_PORT            7723
 #define ATX_LOG_TCP_HANDLER_DEFAULT_CONNECT_TIMEOUT 5000 /* 5 seconds */
 
-#if defined(WIN32) || defined(UNDER_CE)
+#if defined(_WIN32) || defined(_WIN32_WCE)
 #define ATX_LOG_CONSOLE_HANDLER_DEFAULT_COLOR_MODE ATX_FALSE
 #else
 #define ATX_LOG_CONSOLE_HANDLER_DEFAULT_COLOR_MODE ATX_TRUE
@@ -569,9 +569,10 @@ ATX_LogManager_AtExitHandler(void)
 ATX_Result
 ATX_LogManager_Initialize(void) 
 {
-    char* config_sources;
+    ATX_String  config_sources_env = ATX_EMPTY_STRING;
+    const char* config_sources = ATX_LOG_DEFAULT_CONFIG_SOURCE;
 
-    ATX_Debug("ATX_LogManager::Terminate\n");
+    ATX_Debug("ATX_LogManager::Initialize\n");
 
     if (LogManager.initialized) {
         return ATX_SUCCESS;
@@ -586,9 +587,10 @@ ATX_LogManager_Initialize(void)
     /* set some default config values */
     ATX_LogManager_SetConfigValue(".handlers", ATX_LOG_ROOT_DEFAULT_HANDLER);
 
-    /* decide what the configuration sources are */
-    config_sources = ATX_GetEnvironment(ATX_LOG_CONFIG_ENV);
-    if (config_sources == NULL) config_sources = ATX_LOG_DEFAULT_CONFIG_SOURCE;
+    /* see if the config sources have been set to non-default values */
+    if (ATX_SUCCEEDED(ATX_GetEnvironment(ATX_LOG_CONFIG_ENV, &config_sources_env))) {
+        config_sources = ATX_CSTR(config_sources_env);
+    }
 
     /* load all configs */
     {
@@ -607,6 +609,7 @@ ATX_LogManager_Initialize(void)
             cursor++;
         }
         ATX_String_Destruct(&config_source);
+        ATX_String_Destruct(&config_sources_env);
     }
 
     /* create the root logger */
@@ -711,7 +714,7 @@ ATX_Logger_Log(ATX_Logger*  self,
         ATX_Logger*   logger = self;
         
         /* setup the log record */
-        record.logger_name = ATX_CSTR(self->name),
+        record.logger_name = ATX_CSTR(logger->name),
         record.level       = level;
         record.message     = message;
         record.source_file = source_file;
@@ -780,7 +783,7 @@ ATX_Logger_SetParent(ATX_Logger* self, ATX_Logger* parent)
     self->parent = parent;
 
     /* find the first ancestor with its own log level */
-    if (logger->level_is_inherited && logger->parent) {
+    while (logger->level_is_inherited && logger->parent) {
         logger = logger->parent;
     }
     if (logger != self) self->level = logger->level;
@@ -971,7 +974,7 @@ ATX_Log_FormatRecordToStream(const ATX_LogRecord* record,
     }
     ATX_OutputStream_Write(stream, ": ", 2, NULL);
     ATX_OutputStream_WriteString(stream, record->message);
-    ATX_OutputStream_Write(stream, "\r\n", 2, NULL);
+    ATX_OutputStream_Write(stream, "\n", 2, NULL);
 }
 
 /*----------------------------------------------------------------------
