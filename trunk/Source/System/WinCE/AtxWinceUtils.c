@@ -18,12 +18,3 @@
 #include "AtxDebug.h"
 #include "AtxUtils.h"
 
-/*----------------------------------------------------------------------
-|   ATX_GetEnvironment
-+---------------------------------------------------------------------*/
-char*
-ATX_GetEnvironment(const char* name)
-{
-    return NULL;
-}
-

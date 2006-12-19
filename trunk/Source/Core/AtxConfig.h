@@ -95,10 +95,13 @@
 #define ATX_CONFIG_HAVE_INT64
 #define ATX_CONFIG_INT64_TYPE __int64
 #define ATX_strdup     _strdup
-#if (_MSC_VER >= 1400) && !defined(UNDER_CE)
+#if (_MSC_VER >= 1400) && !defined(_WIN32_WCE)
 #define ATX_vsnprintf(s,c,f,a)  _vsnprintf_s(s,c,_TRUNCATE,f,a)
 #define ATX_snprintf(s,c,f,...) _snprintf_s(s,c,_TRUNCATE,f,__VA_ARGS__)
 #define ATX_strncpy(d,s,c)       strncpy_s(d,c,s,_TRUNCATE)
+#undef ATX_CONFIG_HAVE_GETENV
+#define ATX_CONFIG_HAVE_DUPENV_S
+#define dupenv_s _dupenv_s
 #else
 #define ATX_vsnprintf  _vsnprintf
 #define ATX_snprintf   _snprintf
@@ -114,7 +117,7 @@ typedef __w64 long ATX_PointerLong;
 #endif
 
 /* windows CE */
-#if defined(UNDER_CE)
+#if defined(_WIN32_WCE)
 #undef ATX_CONFIG_HAVE_GETENV
 #endif
 

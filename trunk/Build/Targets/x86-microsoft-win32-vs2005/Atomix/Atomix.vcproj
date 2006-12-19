@@ -252,6 +252,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\Source\System\StdC\AtxStdcEnvironment.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\Source\Core\AtxStreams.c"
 				>
 			</File>
@@ -286,11 +290,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\..\Source\Atomix\Atomix.h"
+				RelativePath="..\..\..\..\Source\Core\Atomix.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Source\Config\AtxConfig.h"
+				RelativePath="..\..\..\..\Source\Core\AtxConfig.h"
 				>
 			</File>
 			<File

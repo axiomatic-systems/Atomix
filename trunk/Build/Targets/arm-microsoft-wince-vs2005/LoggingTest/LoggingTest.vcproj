@@ -2,9 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="Atomix"
-	ProjectGUID="{BC346D9B-8D52-47EE-B68A-188F719DC3F7}"
-	RootNamespace="Atomix"
+	Name="LoggingTest"
+	ProjectGUID="{D4FC329C-82F8-41D6-92DC-C36075B7CE03}"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -28,7 +27,7 @@
 			Name="Debug|Pocket PC 2003 (ARMV4)"
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="4"
+			ConfigurationType="1"
 			CharacterSet="1"
 			>
 			<Tool
@@ -51,12 +50,9 @@
 				ExecutionBucket="7"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\..\..\Source\Core"
-				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_LIB;$(ARCHFAM);$(_ARCHFAM_);UNICODE;_UNICODE;ATX_DEBUG;ATX_CONFIG_ENABLE_LOGGING"
+				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_CONSOLE;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;ATX_CONFIG_ENABLE_LOGGING"
 				MinimalRebuild="true"
-				ExceptionHandling="0"
 				RuntimeLibrary="1"
-				BufferSecurityCheck="false"
-				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -74,9 +70,17 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
-				AdditionalOptions=" /subsystem:windowsce,4.20 /machine:ARM"
-				OutputFile="$(OutDir)/Atomix.lib"
+				Name="VCLinkerTool"
+				AdditionalOptions=" /subsystem:windowsce,4.20 /machine:ARM /ARMPADCODE"
+				OutputFile="$(OutDir)/LoggingTest.exe"
+				LinkIncremental="2"
+				DelayLoadDLLs="$(NOINHERIT)"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(OutDir)/LoggingTest.pdb"
+				SubSystem="0"
+				StackReserveSize="65536"
+				StackCommitSize="4096"
+				EntryPointSymbol="mainWCRTStartup"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -106,7 +110,7 @@
 			Name="Debug|Smartphone 2003 (ARMV4)"
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="4"
+			ConfigurationType="1"
 			CharacterSet="1"
 			>
 			<Tool
@@ -128,13 +132,10 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..\Source\Config;..\..\..\..\Source\Core;..\..\..\..\Source\Atomix"
-				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_LIB;$(ARCHFAM);$(_ARCHFAM_);UNICODE;_UNICODE;ATX_DEBUG;ATX_CONFIG_ENABLE_LOGGING"
+				AdditionalIncludeDirectories="..\..\..\..\Source\Core"
+				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_CONSOLE;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;ATX_CONFIG_ENABLE_LOGGING"
 				MinimalRebuild="true"
-				ExceptionHandling="0"
 				RuntimeLibrary="1"
-				BufferSecurityCheck="false"
-				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -152,9 +153,17 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
-				AdditionalOptions=" /subsystem:windowsce,4.20 /machine:ARM"
-				OutputFile="$(OutDir)/Atomix.lib"
+				Name="VCLinkerTool"
+				AdditionalOptions=" /subsystem:windowsce,4.20 /machine:ARM /ARMPADCODE"
+				OutputFile="$(OutDir)/LoggingTest.exe"
+				LinkIncremental="2"
+				DelayLoadDLLs="$(NOINHERIT)"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(OutDir)/LoggingTest.pdb"
+				SubSystem="0"
+				StackReserveSize="65536"
+				StackCommitSize="4096"
+				EntryPointSymbol="mainWCRTStartup"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -184,7 +193,7 @@
 			Name="Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)"
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="4"
+			ConfigurationType="1"
 			CharacterSet="1"
 			>
 			<Tool
@@ -206,13 +215,10 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..\Source\Config;..\..\..\..\Source\Core;..\..\..\..\Source\Atomix"
-				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_LIB;$(ARCHFAM);$(_ARCHFAM_);UNICODE;_UNICODE;ATX_DEBUG;ATX_CONFIG_ENABLE_LOGGING"
+				AdditionalIncludeDirectories="..\..\..\..\Source\Core"
+				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_CONSOLE;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;ATX_CONFIG_ENABLE_LOGGING"
 				MinimalRebuild="true"
-				ExceptionHandling="0"
 				RuntimeLibrary="1"
-				BufferSecurityCheck="false"
-				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -230,9 +236,17 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
+				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,5.01"
-				OutputFile="$(OutDir)/Atomix.lib"
+				OutputFile="$(OutDir)/LoggingTest.exe"
+				LinkIncremental="2"
+				DelayLoadDLLs="$(NOINHERIT)"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(OutDir)/LoggingTest.pdb"
+				SubSystem="0"
+				StackReserveSize="65536"
+				StackCommitSize="4096"
+				EntryPointSymbol="mainWCRTStartup"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -262,7 +276,7 @@
 			Name="Debug|Windows Mobile 5.0 Smartphone SDK (ARMV4I)"
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="4"
+			ConfigurationType="1"
 			CharacterSet="1"
 			>
 			<Tool
@@ -284,13 +298,10 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..\Source\Config;..\..\..\..\Source\Core;..\..\..\..\Source\Atomix"
-				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_LIB;$(ARCHFAM);$(_ARCHFAM_);UNICODE;_UNICODE;ATX_DEBUG;ATX_CONFIG_ENABLE_LOGGING"
+				AdditionalIncludeDirectories="..\..\..\..\Source\Core"
+				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_CONSOLE;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;ATX_CONFIG_ENABLE_LOGGING"
 				MinimalRebuild="true"
-				ExceptionHandling="0"
 				RuntimeLibrary="1"
-				BufferSecurityCheck="false"
-				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -308,10 +319,17 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
+				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,5.01"
-				AdditionalDependencies="ws2.lib"
-				OutputFile="$(OutDir)/Atomix.lib"
+				OutputFile="$(OutDir)/LoggingTest.exe"
+				LinkIncremental="2"
+				DelayLoadDLLs="$(NOINHERIT)"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(OutDir)/LoggingTest.pdb"
+				SubSystem="0"
+				StackReserveSize="65536"
+				StackCommitSize="4096"
+				EntryPointSymbol="mainWCRTStartup"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -341,9 +359,8 @@
 			Name="Release|Pocket PC 2003 (ARMV4)"
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="4"
+			ConfigurationType="1"
 			CharacterSet="1"
-			WholeProgramOptimization="0"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -363,16 +380,10 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
-				Optimization="3"
-				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="..\..\..\..\Source\Config;..\..\..\..\Source\Core;..\..\..\..\Source\Atomix"
-				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;_LIB;$(ARCHFAM);$(_ARCHFAM_);UNICODE;_UNICODE"
-				StringPooling="true"
-				ExceptionHandling="0"
+				Optimization="2"
+				AdditionalIncludeDirectories="..\..\..\..\Source\Core"
+				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;_CONSOLE;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;ATX_CONFIG_ENABLE_LOGGING"
 				RuntimeLibrary="0"
-				BufferSecurityCheck="false"
-				EnableFunctionLevelLinking="true"
-				RuntimeTypeInfo="false"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -390,10 +401,19 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
-				AdditionalOptions=" /subsystem:windowsce,4.20 /machine:ARM"
-				AdditionalDependencies="ws2.lib"
-				OutputFile="$(OutDir)/Atomix.lib"
+				Name="VCLinkerTool"
+				AdditionalOptions=" /subsystem:windowsce,4.20 /machine:ARM /ARMPADCODE"
+				OutputFile="$(OutDir)/LoggingTest.exe"
+				LinkIncremental="1"
+				DelayLoadDLLs="$(NOINHERIT)"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(OutDir)/LoggingTest.pdb"
+				SubSystem="0"
+				StackReserveSize="65536"
+				StackCommitSize="4096"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				EntryPointSymbol="mainWCRTStartup"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -423,9 +443,8 @@
 			Name="Release|Smartphone 2003 (ARMV4)"
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="4"
+			ConfigurationType="1"
 			CharacterSet="1"
-			WholeProgramOptimization="0"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -445,16 +464,10 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
-				Optimization="3"
-				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="..\..\..\..\Source\Config;..\..\..\..\Source\Core;..\..\..\..\Source\Atomix"
-				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;_LIB;$(ARCHFAM);$(_ARCHFAM_);UNICODE;_UNICODE"
-				StringPooling="true"
-				ExceptionHandling="0"
+				Optimization="2"
+				AdditionalIncludeDirectories="..\..\..\..\Source\Core"
+				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;_CONSOLE;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;ATX_CONFIG_ENABLE_LOGGING"
 				RuntimeLibrary="0"
-				BufferSecurityCheck="false"
-				EnableFunctionLevelLinking="true"
-				RuntimeTypeInfo="false"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -472,10 +485,19 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
-				AdditionalOptions=" /subsystem:windowsce,4.20 /machine:ARM"
-				AdditionalDependencies="ws2.lib"
-				OutputFile="$(OutDir)/Atomix.lib"
+				Name="VCLinkerTool"
+				AdditionalOptions=" /subsystem:windowsce,4.20 /machine:ARM /ARMPADCODE"
+				OutputFile="$(OutDir)/LoggingTest.exe"
+				LinkIncremental="1"
+				DelayLoadDLLs="$(NOINHERIT)"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(OutDir)/LoggingTest.pdb"
+				SubSystem="0"
+				StackReserveSize="65536"
+				StackCommitSize="4096"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				EntryPointSymbol="mainWCRTStartup"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -505,9 +527,8 @@
 			Name="Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)"
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="4"
+			ConfigurationType="1"
 			CharacterSet="1"
-			WholeProgramOptimization="0"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -527,16 +548,10 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
-				Optimization="3"
-				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="..\..\..\..\Source\Config;..\..\..\..\Source\Core;..\..\..\..\Source\Atomix"
-				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;_LIB;$(ARCHFAM);$(_ARCHFAM_);UNICODE;_UNICODE"
-				StringPooling="true"
-				ExceptionHandling="0"
+				Optimization="2"
+				AdditionalIncludeDirectories="..\..\..\..\Source\Core"
+				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;_CONSOLE;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;ATX_CONFIG_ENABLE_LOGGING"
 				RuntimeLibrary="0"
-				BufferSecurityCheck="false"
-				EnableFunctionLevelLinking="true"
-				RuntimeTypeInfo="false"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -554,9 +569,19 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
+				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,5.01"
-				OutputFile="$(OutDir)/Atomix.lib"
+				OutputFile="$(OutDir)/LoggingTest.exe"
+				LinkIncremental="1"
+				DelayLoadDLLs="$(NOINHERIT)"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(OutDir)/LoggingTest.pdb"
+				SubSystem="0"
+				StackReserveSize="65536"
+				StackCommitSize="4096"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				EntryPointSymbol="mainWCRTStartup"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -586,9 +611,8 @@
 			Name="Release|Windows Mobile 5.0 Smartphone SDK (ARMV4I)"
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="4"
+			ConfigurationType="1"
 			CharacterSet="1"
-			WholeProgramOptimization="0"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -608,16 +632,10 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
-				Optimization="3"
-				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="..\..\..\..\Source\Config;..\..\..\..\Source\Core;..\..\..\..\Source\Atomix"
-				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;_LIB;$(ARCHFAM);$(_ARCHFAM_);UNICODE;_UNICODE"
-				StringPooling="true"
-				ExceptionHandling="0"
+				Optimization="2"
+				AdditionalIncludeDirectories="..\..\..\..\Source\Core"
+				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;_CONSOLE;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;ATX_CONFIG_ENABLE_LOGGING"
 				RuntimeLibrary="0"
-				BufferSecurityCheck="false"
-				EnableFunctionLevelLinking="true"
-				RuntimeTypeInfo="false"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -635,9 +653,19 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
+				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,5.01"
-				OutputFile="$(OutDir)/Atomix.lib"
+				OutputFile="$(OutDir)/LoggingTest.exe"
+				LinkIncremental="1"
+				DelayLoadDLLs="$(NOINHERIT)"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(OutDir)/LoggingTest.pdb"
+				SubSystem="0"
+				StackReserveSize="65536"
+				StackCommitSize="4096"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				EntryPointSymbol="mainWCRTStartup"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -673,95 +701,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\..\Source\System\Bsd\AtxBsdSockets.c"
+				RelativePath="..\..\..\..\Source\System\WinCE\AtxWinceMain.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Source\Core\AtxConsole.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxDataBuffer.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxDebug.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxDestroyable.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxFile.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxHttp.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxInterfaces.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxList.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxLogging.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxMap.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxProperties.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxRingBuffer.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxSockets.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxStreams.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxString.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxUtils.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\System\Win32\AtxWin32File.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\System\Win32\AtxWin32System.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\System\WinCE\AtxWinceConsole.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\System\WinCE\AtxWinceDebug.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\System\WinCE\AtxWinceEnvironment.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\System\WinCE\AtxWinceUtils.c"
+				RelativePath="..\..\..\..\Source\Tests\Logging\LoggingTest.c"
 				>
 			</File>
 		</Filter>
@@ -770,106 +714,6 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxConfig.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxConsole.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxDataBuffer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxDebug.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxDefs.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxDestroyable.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxFile.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxHttp.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxInterfaces.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxIterator.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxList.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxLogging.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxMap.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxModule.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxProperties.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxReferenceable.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxResults.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxRingBuffer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxSockets.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxStreams.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxString.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxSystem.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxTime.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxTypes.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Core\AtxUtils.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

@@ -11,7 +11,7 @@
 |   includes
 +---------------------------------------------------------------------*/
 #include <windows.h>
-#if !defined(UNDER_CE)
+#if !defined(_WIN32_WCE)
 #include <sys/timeb.h>
 #endif
 
@@ -26,7 +26,7 @@
 +---------------------------------------------------------------------*/
 static ATX_Boolean ATX_System_RandomGeneratorSeeded = ATX_FALSE;
 
-#if defined(UNDER_CE)
+#if defined(_WIN32_WCE)
 /*----------------------------------------------------------------------
 |   ATX_System_GetCurrentTimeStamp
 +---------------------------------------------------------------------*/
@@ -41,10 +41,10 @@ ATX_System_GetCurrentTimeStamp(ATX_TimeStamp* now)
 
     /* convert to 64-bits 100-nanoseconds value */
     time64 = (((unsigned __int64)ftime.dwHighDateTime)<<32) | ((unsigned __int64)ftime.dwLowDateTime);
-    time64 += 116444736000000000; /* convert from the Windows epoch (Jan. 1, 1601) to the 
+    time64 -= 116444736000000000; /* convert from the Windows epoch (Jan. 1, 1601) to the 
                                    * Unix epoch (Jan. 1, 1970) */
     
-    now->seconds = (ATX_Int32)time64/10000000;
+    now->seconds = (ATX_Int32)(time64/10000000);
     now->nanoseconds = 100*(ATX_Int32)(time64-((unsigned __int64)now->seconds*10000000));
 
     return ATX_SUCCESS;

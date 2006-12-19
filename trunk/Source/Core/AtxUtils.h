@@ -14,6 +14,7 @@
 |    includes
 +---------------------------------------------------------------------*/
 #include "AtxConfig.h"
+#include "AtxString.h"
 #include "AtxTypes.h"
 
 #if defined(ATX_CONFIG_HAVE_STDLIB_H)
@@ -40,7 +41,7 @@
 #include <dmalloc.h>
 #endif
 
-#if defined(WIN32) && defined(_DEBUG) && !defined(UNDER_CE)
+#if defined(_WIN32) && defined(_DEBUG) && !defined(_WIN32_WCE)
 #include <crtdbg.h>
 #endif
 
@@ -124,6 +125,22 @@ ATX_FormatOutput(void        (*function)(void* parameter, const char* message),
                  void*       function_parameter,
                  const char* format, 
                  va_list     args);
+
+/*----------------------------------------------------------------------
+|    environment variables
++---------------------------------------------------------------------*/
+/**
+ * Get the value of an environment variable.
+ * @param name Name of the environment variable to get.
+ * @param value Pointer to a string object where the value of the 
+ * environment variable will be stored before returning.
+ * @returns ATX_SUCCESS if the environment variable exists, 
+ * ATX_ERROR_NO_SUCH_ITEM if it does not, or some other error code
+ * if an error occurs.
+ *
+ * The caller owns the string value.
+ */
+ATX_Result ATX_GetEnvironment(const char* name, ATX_String* value);
 
 /*----------------------------------------------------------------------
 |    C Runtime
@@ -242,12 +259,6 @@ extern int ATX_MemoryEqual(const void* s1, const void* s2, unsigned long n);
 #define ATX_AtExit(_fun) atexit(_fun)
 #else
 extern int atexit(void (*func )( void ));
-#endif
-
-#if defined(ATX_CONFIG_HAVE_GETENV)
-#define ATX_GetEnvironment(name) getenv(name)
-#else
-extern char* ATX_GetEnvironment(const char* name);
 #endif
 
 #ifdef __cplusplus
