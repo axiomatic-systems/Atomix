@@ -143,11 +143,9 @@ typedef long       ATX_Timeout;
  */
 #if defined(ATX_CONFIG_HAVE_INT64)
 typedef ATX_CONFIG_INT64_TYPE ATX_Int64;
-#else
-typedef struct {
-    ATX_UInt32 high;
-    ATX_UInt32 low;
-} ATX_Int64;
+typedef unsigned ATX_CONFIG_INT64_TYPE ATX_UInt64;
+#else 
+#error ATX_CONFIG_INT64_TYPE not defined
 #endif
 
 #if defined(ATX_CONFIG_HAVE_INT_MIN)

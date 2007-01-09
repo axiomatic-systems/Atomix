@@ -547,3 +547,20 @@ ATX_FormatOutput(void        (*function)(void* parameter, const char* message),
     (*function)(function_parameter, buffer);
     if (buffer != local_buffer) ATX_FreeMemory((void*)buffer);
 }
+
+/*----------------------------------------------------------------------
+|   ATX_ScrubMemory
++---------------------------------------------------------------------*/
+void 
+ATX_ScrubMemory(void* buffer, ATX_Size size)
+{
+    if (buffer == NULL) return;
+
+    {
+        volatile char* mem = (volatile char*)buffer; 
+    
+        while (size--) {
+            *mem++ = 0; 
+        }
+    }
+}

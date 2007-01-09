@@ -143,6 +143,15 @@ ATX_FormatOutput(void        (*function)(void* parameter, const char* message),
 ATX_Result ATX_GetEnvironment(const char* name, ATX_String* value);
 
 /*----------------------------------------------------------------------
+|   memory
++---------------------------------------------------------------------*/
+/**
+ * Zero-out a memory buffer in a way that will not be optimized-out
+ * by the compiler.
+ */
+void ATX_ScrubMemory(void* buffer, ATX_Size size);
+
+/*----------------------------------------------------------------------
 |    C Runtime
 +---------------------------------------------------------------------*/
 #if defined(ATX_CONFIG_HAVE_MALLOC)
