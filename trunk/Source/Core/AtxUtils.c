@@ -433,7 +433,7 @@ ATX_FloatToString(float value, char* buffer, ATX_Size buffer_size)
 |   ATX_IntegerToString
 +---------------------------------------------------------------------*/
 ATX_Result
-ATX_IntegerToString(long value, char* buffer, ATX_Size buffer_size)
+ATX_IntegerToString(ATX_Int3264 value, char* buffer, ATX_Size buffer_size)
 {
     char s[32];
     char* c = &s[31];
@@ -477,7 +477,7 @@ ATX_IntegerToString(long value, char* buffer, ATX_Size buffer_size)
 |   ATX_IntegerToStringU
 +---------------------------------------------------------------------*/
 ATX_Result
-ATX_IntegerToStringU(unsigned long value, char* buffer, ATX_Size buffer_size)
+ATX_IntegerToStringU(ATX_UInt3264 value, char* buffer, ATX_Size buffer_size)
 {
     char s[32];
     char* c = &s[31];

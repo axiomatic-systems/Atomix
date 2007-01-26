@@ -44,7 +44,7 @@ typedef enum {
  *
  * When a function or method call succeeds, the return value is always 
  * ATX_SUCCESS unless otherwise documented. Error conditions are always
- * negative values, defined in AtxErrors.h
+ * negative values, defined in AtxResults.h
  */
 typedef int ATX_Result;
 
@@ -147,6 +147,15 @@ typedef unsigned ATX_CONFIG_INT64_TYPE ATX_UInt64;
 #else 
 #error ATX_CONFIG_INT64_TYPE not defined
 #endif
+
+/**
+ * Integer that matches the native machine word size.
+ * This is 32-bit in 32-bit mode, and 64-bit in 64-bit mode
+ * (This type is necessary, because not all 64-bit systems
+ * have 64-bit longs)
+ */
+typedef ATX_CONFIG_INT_32_64_TYPE ATX_Int3264;
+typedef unsigned ATX_CONFIG_INT_32_64_TYPE ATX_UInt3264;
 
 #if defined(ATX_CONFIG_HAVE_INT_MIN)
 #define ATX_INT_MIN INT_MIN
