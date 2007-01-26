@@ -41,7 +41,7 @@
 #include <dmalloc.h>
 #endif
 
-#if defined(_WIN32) && defined(_DEBUG) && !defined(_WIN32_WCE)
+#if defined(_WIN32) && defined(_DEBUG) && !defined(_WIN32_WCE) && !defined(__SYMBIAN32__)
 #include <crtdbg.h>
 #endif
 
@@ -99,10 +99,10 @@ extern ATX_Result
 ATX_FloatToString(float value, char* buffer, ATX_Size buffer_size);
 
 extern ATX_Result
-ATX_IntegerToString(long value, char* buffer, ATX_Size buffer_size);
+ATX_IntegerToString(ATX_Int3264 value, char* buffer, ATX_Size buffer_size);
 
 extern ATX_Result
-ATX_IntegerToStringU(unsigned long value, char* buffer, ATX_Size buffer_size);
+ATX_IntegerToStringU(ATX_UInt3264 value, char* buffer, ATX_Size buffer_size);
 
 /*----------------------------------------------------------------------
 |    byte IO

@@ -21,11 +21,14 @@
 #define ATX_CONFIG_HAVE_STRING_H
 #define ATX_CONFIG_HAVE_STDIO_H
 #define ATX_CONFIG_HAVE_STDARG_H
+#define ATX_CONFIG_HAVE_STDDEF_H
 #define ATX_CONFIG_HAVE_CTYPE_H
 #define ATX_CONFIG_HAVE_MATH_H
 #define ATX_CONFIG_HAVE_ASSERT_H
 #define ATX_CONFIG_HAVE_LIMITS_H
 #define ATX_CONFIG_HAVE_UNISTD_H
+
+#define ATX_CONFIG_HAVE_INT64
 
 /*----------------------------------------------------------------------
 |    CPU byte order
@@ -84,8 +87,6 @@
 /* GCC */
 #if defined(__GNUC__)
 #define ATX_COMPILER_UNUSED(p) (void)p
-#define ATX_CONFIG_HAVE_INT64
-#define ATX_CONFIG_INT64_TYPE long long
 #else
 #define ATX_COMPILER_UNUSED(p) 
 #endif
@@ -107,8 +108,14 @@
 #define ATX_snprintf   _snprintf
 #endif
 #if (_MSC_VER >= 1300)
+#if defined (_WIN64)
+typedef __int64 ATX_PointerLong;
+#define ATX_CONFIG_INT_32_64_TYPE __int64
+#else
 typedef __w64 long ATX_PointerLong;
-#define ATX_POINTER_TO_LONG(_p) ((long)(ATX_PointerLong) (_p) )
+#define ATX_CONFIG_INT_32_64_TYPE long
+#endif
+#define ATX_POINTER_TO_LONG(_p) ((ATX_PointerLong) (_p) )
 #undef ATX_CONFIG_HAVE_STRCPY
 #endif
 #if defined(_DEBUG)
@@ -122,7 +129,8 @@ typedef __w64 long ATX_PointerLong;
 #endif
 
 /* Symbian */
-#if defined(__symbian__)
+#if defined(__SYMBIAN32__)
+#include "e32def.h"
 #endif
 
 /* PS3 */
@@ -135,6 +143,14 @@ typedef __w64 long ATX_PointerLong;
 +---------------------------------------------------------------------*/
 #ifndef ATX_POINTER_TO_LONG
 #define ATX_POINTER_TO_LONG(_p) ((long)(_p))
+#endif
+
+#if !defined(ATX_CONFIG_INT_32_64_TYPE)
+#define ATX_CONFIG_INT_32_64_TYPE long
+#endif
+
+#if defined(ATX_CONFIG_HAVE_INT64) && !defined(ATX_CONFIG_INT64_TYPE)
+#define ATX_CONFIG_INT64_TYPE long long
 #endif
 
 /*----------------------------------------------------------------------
