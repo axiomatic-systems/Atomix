@@ -10,9 +10,9 @@
 /*----------------------------------------------------------------------
 |   includes
 +---------------------------------------------------------------------*/
+#include "AtxConfig.h"
 #include "AtxUtils.h"
 #include "AtxResults.h"
-#include "AtxConfig.h"
 #if defined(ATX_CONFIG_HAVE_MATH_H)
 #include <math.h>
 #endif
@@ -532,7 +532,7 @@ ATX_FormatOutput(void        (*function)(void* parameter, const char* message),
         int result;
 
         /* try to format the message (it might not fit) */
-        result = ATX_vsnprintf(buffer, buffer_size-1, format, args);
+        result = ATX_FormatStringVN(buffer, buffer_size-1, format, args);
         buffer[buffer_size-1] = 0; /* force a NULL termination */
         if (result >= 0) break;
 

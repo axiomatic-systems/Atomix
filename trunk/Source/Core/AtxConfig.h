@@ -130,7 +130,8 @@ typedef __w64 long ATX_PointerLong;
 
 /* Symbian */
 #if defined(__SYMBIAN32__)
-#include "e32def.h"
+#undef ATX_CONFIG_HAVE_SNPRINTF
+#undef ATX_CONFIG_HAVE_VSNPRINTF
 #endif
 
 /* PS3 */

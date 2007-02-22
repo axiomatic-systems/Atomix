@@ -124,8 +124,8 @@ ATX_INTERFACE(object)->Seek(object, where)
 #define ATX_OutputStream_Tell(object, where) \
 ATX_INTERFACE(object)->Tell(object, where)
 
-#define ATX_OutputStream_Flush(object, where) \
-ATX_INTERFACE(object)->Flush(object, where)
+#define ATX_OutputStream_Flush(object) \
+ATX_INTERFACE(object)->Flush(object)
 
 /*----------------------------------------------------------------------
 |   ATX_StreamTransformer
