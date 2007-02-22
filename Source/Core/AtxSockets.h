@@ -58,6 +58,10 @@ typedef struct {
 /*----------------------------------------------------------------------
 |   functions
 +---------------------------------------------------------------------*/
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 void ATX_IpAddress_Reset(ATX_IpAddress* address);
 void ATX_IpAddress_SetFromLong(ATX_IpAddress* address,
                                unsigned long  long_addr);
@@ -72,6 +76,10 @@ void ATX_SocketAddress_Reset(ATX_SocketAddress* address);
 void ATX_SocketAddress_Set(ATX_SocketAddress* address,
                            ATX_IpAddress*     ip_address,
                            ATX_IpPort         port);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 /*----------------------------------------------------------------------
 |   ATX_Socket
@@ -114,10 +122,18 @@ ATX_INTERFACE(object)->GetInfo(object, info)
 /*----------------------------------------------------------------------
 |   functions
 +---------------------------------------------------------------------*/
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 ATX_Result ATX_Socket_ConnectToHost(ATX_Socket* self,
                                     ATX_CString host,
                                     ATX_IpPort  port,
                                     ATX_Timeout timeout);
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
 
 /*----------------------------------------------------------------------
 |   ATX_DatagramSocket
