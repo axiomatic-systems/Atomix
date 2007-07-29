@@ -65,6 +65,7 @@ ATX_Result    ATX_List_InsertItem(ATX_List* list, ATX_ListItem* where, ATX_ListI
 ATX_Result    ATX_List_RemoveData(ATX_List* list, ATX_Any data);
 ATX_Result    ATX_List_RemoveItem(ATX_List* list, ATX_ListItem* item);
 ATX_Result    ATX_List_DetachItem(ATX_List* list, ATX_ListItem* item);
+ATX_Result    ATX_List_DestroyItem(ATX_List* list, ATX_ListItem* item);
 ATX_Cardinal  ATX_List_GetItemCount(ATX_List* list);
 ATX_ListItem* ATX_List_GetFirstItem(ATX_List* list);
 ATX_ListItem* ATX_List_GetLastItem(ATX_List* list);
@@ -72,7 +73,6 @@ ATX_ListItem* ATX_List_GetItem(ATX_List* list, ATX_Ordinal indx);
 ATX_ListItem* ATX_List_FindData(ATX_List* list, ATX_Any data);
 ATX_ListItem* ATX_List_Find(ATX_List* list, const ATX_ListDataPredicate* predicate);
 
-ATX_Result    ATX_ListItem_Destroy(ATX_ListItem* item);
 ATX_Any       ATX_ListItem_GetData(ATX_ListItem* item);
 ATX_Result    ATX_ListItem_SetData(ATX_ListItem* item, ATX_Any data);
 ATX_UInt32    ATX_ListItem_GetType(ATX_ListItem* item);
