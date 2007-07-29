@@ -131,6 +131,7 @@ main(int argc, char** argv)
     ATX_ASSERT(ATX_RingBuffer_GetSpace(buffer) == BUFFER_SIZE-1);
     ATX_ASSERT(ATX_RingBuffer_GetContiguousSpace(buffer) == BUFFER_SIZE-3);
 
+    ATX_RingBuffer_Reset(buffer);
     for (i=0; i<100000000; i++) {
         if (ATX_FAILED(WriteChunk(buffer))) {
             printf("WriteChunk failed\n");

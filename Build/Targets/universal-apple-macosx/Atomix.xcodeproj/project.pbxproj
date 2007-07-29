@@ -1,0 +1,383 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		CA2B345D0C599C1E005900F4 /* Atomix.h in Headers */ = {isa = PBXBuildFile; fileRef = CA2B34320C599C1E005900F4 /* Atomix.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CA2B345E0C599C1E005900F4 /* AtxConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = CA2B34330C599C1E005900F4 /* AtxConfig.h */; };
+		CA2B345F0C599C1E005900F4 /* AtxConsole.c in Sources */ = {isa = PBXBuildFile; fileRef = CA2B34340C599C1E005900F4 /* AtxConsole.c */; };
+		CA2B34600C599C1E005900F4 /* AtxConsole.h in Headers */ = {isa = PBXBuildFile; fileRef = CA2B34350C599C1E005900F4 /* AtxConsole.h */; };
+		CA2B34610C599C1E005900F4 /* AtxDataBuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = CA2B34360C599C1E005900F4 /* AtxDataBuffer.c */; };
+		CA2B34620C599C1E005900F4 /* AtxDataBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = CA2B34370C599C1E005900F4 /* AtxDataBuffer.h */; };
+		CA2B34630C599C1E005900F4 /* AtxDebug.c in Sources */ = {isa = PBXBuildFile; fileRef = CA2B34380C599C1E005900F4 /* AtxDebug.c */; };
+		CA2B34640C599C1E005900F4 /* AtxDebug.h in Headers */ = {isa = PBXBuildFile; fileRef = CA2B34390C599C1E005900F4 /* AtxDebug.h */; };
+		CA2B34650C599C1E005900F4 /* AtxDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = CA2B343A0C599C1E005900F4 /* AtxDefs.h */; };
+		CA2B34660C599C1E005900F4 /* AtxDestroyable.c in Sources */ = {isa = PBXBuildFile; fileRef = CA2B343B0C599C1E005900F4 /* AtxDestroyable.c */; };
+		CA2B34670C599C1E005900F4 /* AtxDestroyable.h in Headers */ = {isa = PBXBuildFile; fileRef = CA2B343C0C599C1E005900F4 /* AtxDestroyable.h */; };
+		CA2B34680C599C1E005900F4 /* AtxFile.c in Sources */ = {isa = PBXBuildFile; fileRef = CA2B343D0C599C1E005900F4 /* AtxFile.c */; };
+		CA2B34690C599C1E005900F4 /* AtxFile.h in Headers */ = {isa = PBXBuildFile; fileRef = CA2B343E0C599C1E005900F4 /* AtxFile.h */; };
+		CA2B346A0C599C1E005900F4 /* AtxHttp.c in Sources */ = {isa = PBXBuildFile; fileRef = CA2B343F0C599C1E005900F4 /* AtxHttp.c */; };
+		CA2B346B0C599C1E005900F4 /* AtxHttp.h in Headers */ = {isa = PBXBuildFile; fileRef = CA2B34400C599C1E005900F4 /* AtxHttp.h */; };
+		CA2B346C0C599C1E005900F4 /* AtxInterfaces.c in Sources */ = {isa = PBXBuildFile; fileRef = CA2B34410C599C1E005900F4 /* AtxInterfaces.c */; };
+		CA2B346D0C599C1E005900F4 /* AtxInterfaces.h in Headers */ = {isa = PBXBuildFile; fileRef = CA2B34420C599C1E005900F4 /* AtxInterfaces.h */; };
+		CA2B346E0C599C1E005900F4 /* AtxIterator.h in Headers */ = {isa = PBXBuildFile; fileRef = CA2B34430C599C1E005900F4 /* AtxIterator.h */; };
+		CA2B346F0C599C1E005900F4 /* AtxList.c in Sources */ = {isa = PBXBuildFile; fileRef = CA2B34440C599C1E005900F4 /* AtxList.c */; };
+		CA2B34700C599C1E005900F4 /* AtxList.h in Headers */ = {isa = PBXBuildFile; fileRef = CA2B34450C599C1E005900F4 /* AtxList.h */; };
+		CA2B34710C599C1E005900F4 /* AtxLogging.c in Sources */ = {isa = PBXBuildFile; fileRef = CA2B34460C599C1E005900F4 /* AtxLogging.c */; };
+		CA2B34720C599C1E005900F4 /* AtxLogging.h in Headers */ = {isa = PBXBuildFile; fileRef = CA2B34470C599C1E005900F4 /* AtxLogging.h */; };
+		CA2B34730C599C1E005900F4 /* AtxMap.c in Sources */ = {isa = PBXBuildFile; fileRef = CA2B34480C599C1E005900F4 /* AtxMap.c */; };
+		CA2B34740C599C1E005900F4 /* AtxMap.h in Headers */ = {isa = PBXBuildFile; fileRef = CA2B34490C599C1E005900F4 /* AtxMap.h */; };
+		CA2B34750C599C1E005900F4 /* AtxModule.h in Headers */ = {isa = PBXBuildFile; fileRef = CA2B344A0C599C1E005900F4 /* AtxModule.h */; };
+		CA2B34760C599C1E005900F4 /* AtxProperties.c in Sources */ = {isa = PBXBuildFile; fileRef = CA2B344B0C599C1E005900F4 /* AtxProperties.c */; };
+		CA2B34770C599C1E005900F4 /* AtxProperties.h in Headers */ = {isa = PBXBuildFile; fileRef = CA2B344C0C599C1E005900F4 /* AtxProperties.h */; };
+		CA2B34780C599C1E005900F4 /* AtxReferenceable.h in Headers */ = {isa = PBXBuildFile; fileRef = CA2B344D0C599C1E005900F4 /* AtxReferenceable.h */; };
+		CA2B34790C599C1E005900F4 /* AtxResults.h in Headers */ = {isa = PBXBuildFile; fileRef = CA2B344E0C599C1E005900F4 /* AtxResults.h */; };
+		CA2B347A0C599C1E005900F4 /* AtxRingBuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = CA2B344F0C599C1E005900F4 /* AtxRingBuffer.c */; };
+		CA2B347B0C599C1E005900F4 /* AtxRingBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = CA2B34500C599C1E005900F4 /* AtxRingBuffer.h */; };
+		CA2B347C0C599C1E005900F4 /* AtxSockets.c in Sources */ = {isa = PBXBuildFile; fileRef = CA2B34510C599C1E005900F4 /* AtxSockets.c */; };
+		CA2B347D0C599C1E005900F4 /* AtxSockets.h in Headers */ = {isa = PBXBuildFile; fileRef = CA2B34520C599C1E005900F4 /* AtxSockets.h */; };
+		CA2B347E0C599C1E005900F4 /* AtxStreams.c in Sources */ = {isa = PBXBuildFile; fileRef = CA2B34530C599C1E005900F4 /* AtxStreams.c */; };
+		CA2B347F0C599C1E005900F4 /* AtxStreams.h in Headers */ = {isa = PBXBuildFile; fileRef = CA2B34540C599C1E005900F4 /* AtxStreams.h */; };
+		CA2B34800C599C1E005900F4 /* AtxString.c in Sources */ = {isa = PBXBuildFile; fileRef = CA2B34550C599C1E005900F4 /* AtxString.c */; };
+		CA2B34810C599C1E005900F4 /* AtxString.h in Headers */ = {isa = PBXBuildFile; fileRef = CA2B34560C599C1E005900F4 /* AtxString.h */; };
+		CA2B34820C599C1E005900F4 /* AtxSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = CA2B34570C599C1E005900F4 /* AtxSystem.h */; };
+		CA2B34830C599C1E005900F4 /* AtxTime.h in Headers */ = {isa = PBXBuildFile; fileRef = CA2B34580C599C1E005900F4 /* AtxTime.h */; };
+		CA2B34840C599C1E005900F4 /* AtxTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = CA2B34590C599C1E005900F4 /* AtxTypes.h */; };
+		CA2B34850C599C1E005900F4 /* AtxUtils.c in Sources */ = {isa = PBXBuildFile; fileRef = CA2B345A0C599C1E005900F4 /* AtxUtils.c */; };
+		CA2B34860C599C1E005900F4 /* AtxUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = CA2B345B0C599C1E005900F4 /* AtxUtils.h */; };
+		CA2B34870C599C1E005900F4 /* AtxVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = CA2B345C0C599C1E005900F4 /* AtxVersion.h */; };
+		CA2B348E0C599C2F005900F4 /* AtxStdcConsole.c in Sources */ = {isa = PBXBuildFile; fileRef = CA2B348A0C599C2F005900F4 /* AtxStdcConsole.c */; };
+		CA2B348F0C599C2F005900F4 /* AtxStdcDebug.c in Sources */ = {isa = PBXBuildFile; fileRef = CA2B348B0C599C2F005900F4 /* AtxStdcDebug.c */; };
+		CA2B34900C599C2F005900F4 /* AtxStdcEnvironment.c in Sources */ = {isa = PBXBuildFile; fileRef = CA2B348C0C599C2F005900F4 /* AtxStdcEnvironment.c */; };
+		CA2B34910C599C2F005900F4 /* AtxStdcFile.c in Sources */ = {isa = PBXBuildFile; fileRef = CA2B348D0C599C2F005900F4 /* AtxStdcFile.c */; };
+		CA2B34930C599C4A005900F4 /* AtxPosixSystem.c in Sources */ = {isa = PBXBuildFile; fileRef = CA2B34920C599C4A005900F4 /* AtxPosixSystem.c */; };
+		CA2B34950C599C79005900F4 /* AtxBsdSockets.c in Sources */ = {isa = PBXBuildFile; fileRef = CA2B34940C599C79005900F4 /* AtxBsdSockets.c */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		CA2B34320C599C1E005900F4 /* Atomix.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Atomix.h; path = ../../../Source/Core/Atomix.h; sourceTree = SOURCE_ROOT; };
+		CA2B34330C599C1E005900F4 /* AtxConfig.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AtxConfig.h; path = ../../../Source/Core/AtxConfig.h; sourceTree = SOURCE_ROOT; };
+		CA2B34340C599C1E005900F4 /* AtxConsole.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = AtxConsole.c; path = ../../../Source/Core/AtxConsole.c; sourceTree = SOURCE_ROOT; };
+		CA2B34350C599C1E005900F4 /* AtxConsole.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AtxConsole.h; path = ../../../Source/Core/AtxConsole.h; sourceTree = SOURCE_ROOT; };
+		CA2B34360C599C1E005900F4 /* AtxDataBuffer.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = AtxDataBuffer.c; path = ../../../Source/Core/AtxDataBuffer.c; sourceTree = SOURCE_ROOT; };
+		CA2B34370C599C1E005900F4 /* AtxDataBuffer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AtxDataBuffer.h; path = ../../../Source/Core/AtxDataBuffer.h; sourceTree = SOURCE_ROOT; };
+		CA2B34380C599C1E005900F4 /* AtxDebug.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = AtxDebug.c; path = ../../../Source/Core/AtxDebug.c; sourceTree = SOURCE_ROOT; };
+		CA2B34390C599C1E005900F4 /* AtxDebug.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AtxDebug.h; path = ../../../Source/Core/AtxDebug.h; sourceTree = SOURCE_ROOT; };
+		CA2B343A0C599C1E005900F4 /* AtxDefs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AtxDefs.h; path = ../../../Source/Core/AtxDefs.h; sourceTree = SOURCE_ROOT; };
+		CA2B343B0C599C1E005900F4 /* AtxDestroyable.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = AtxDestroyable.c; path = ../../../Source/Core/AtxDestroyable.c; sourceTree = SOURCE_ROOT; };
+		CA2B343C0C599C1E005900F4 /* AtxDestroyable.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AtxDestroyable.h; path = ../../../Source/Core/AtxDestroyable.h; sourceTree = SOURCE_ROOT; };
+		CA2B343D0C599C1E005900F4 /* AtxFile.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = AtxFile.c; path = ../../../Source/Core/AtxFile.c; sourceTree = SOURCE_ROOT; };
+		CA2B343E0C599C1E005900F4 /* AtxFile.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AtxFile.h; path = ../../../Source/Core/AtxFile.h; sourceTree = SOURCE_ROOT; };
+		CA2B343F0C599C1E005900F4 /* AtxHttp.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = AtxHttp.c; path = ../../../Source/Core/AtxHttp.c; sourceTree = SOURCE_ROOT; };
+		CA2B34400C599C1E005900F4 /* AtxHttp.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AtxHttp.h; path = ../../../Source/Core/AtxHttp.h; sourceTree = SOURCE_ROOT; };
+		CA2B34410C599C1E005900F4 /* AtxInterfaces.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = AtxInterfaces.c; path = ../../../Source/Core/AtxInterfaces.c; sourceTree = SOURCE_ROOT; };
+		CA2B34420C599C1E005900F4 /* AtxInterfaces.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AtxInterfaces.h; path = ../../../Source/Core/AtxInterfaces.h; sourceTree = SOURCE_ROOT; };
+		CA2B34430C599C1E005900F4 /* AtxIterator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AtxIterator.h; path = ../../../Source/Core/AtxIterator.h; sourceTree = SOURCE_ROOT; };
+		CA2B34440C599C1E005900F4 /* AtxList.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = AtxList.c; path = ../../../Source/Core/AtxList.c; sourceTree = SOURCE_ROOT; };
+		CA2B34450C599C1E005900F4 /* AtxList.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AtxList.h; path = ../../../Source/Core/AtxList.h; sourceTree = SOURCE_ROOT; };
+		CA2B34460C599C1E005900F4 /* AtxLogging.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = AtxLogging.c; path = ../../../Source/Core/AtxLogging.c; sourceTree = SOURCE_ROOT; };
+		CA2B34470C599C1E005900F4 /* AtxLogging.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AtxLogging.h; path = ../../../Source/Core/AtxLogging.h; sourceTree = SOURCE_ROOT; };
+		CA2B34480C599C1E005900F4 /* AtxMap.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = AtxMap.c; path = ../../../Source/Core/AtxMap.c; sourceTree = SOURCE_ROOT; };
+		CA2B34490C599C1E005900F4 /* AtxMap.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AtxMap.h; path = ../../../Source/Core/AtxMap.h; sourceTree = SOURCE_ROOT; };
+		CA2B344A0C599C1E005900F4 /* AtxModule.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AtxModule.h; path = ../../../Source/Core/AtxModule.h; sourceTree = SOURCE_ROOT; };
+		CA2B344B0C599C1E005900F4 /* AtxProperties.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = AtxProperties.c; path = ../../../Source/Core/AtxProperties.c; sourceTree = SOURCE_ROOT; };
+		CA2B344C0C599C1E005900F4 /* AtxProperties.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AtxProperties.h; path = ../../../Source/Core/AtxProperties.h; sourceTree = SOURCE_ROOT; };
+		CA2B344D0C599C1E005900F4 /* AtxReferenceable.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AtxReferenceable.h; path = ../../../Source/Core/AtxReferenceable.h; sourceTree = SOURCE_ROOT; };
+		CA2B344E0C599C1E005900F4 /* AtxResults.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AtxResults.h; path = ../../../Source/Core/AtxResults.h; sourceTree = SOURCE_ROOT; };
+		CA2B344F0C599C1E005900F4 /* AtxRingBuffer.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = AtxRingBuffer.c; path = ../../../Source/Core/AtxRingBuffer.c; sourceTree = SOURCE_ROOT; };
+		CA2B34500C599C1E005900F4 /* AtxRingBuffer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AtxRingBuffer.h; path = ../../../Source/Core/AtxRingBuffer.h; sourceTree = SOURCE_ROOT; };
+		CA2B34510C599C1E005900F4 /* AtxSockets.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = AtxSockets.c; path = ../../../Source/Core/AtxSockets.c; sourceTree = SOURCE_ROOT; };
+		CA2B34520C599C1E005900F4 /* AtxSockets.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AtxSockets.h; path = ../../../Source/Core/AtxSockets.h; sourceTree = SOURCE_ROOT; };
+		CA2B34530C599C1E005900F4 /* AtxStreams.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = AtxStreams.c; path = ../../../Source/Core/AtxStreams.c; sourceTree = SOURCE_ROOT; };
+		CA2B34540C599C1E005900F4 /* AtxStreams.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AtxStreams.h; path = ../../../Source/Core/AtxStreams.h; sourceTree = SOURCE_ROOT; };
+		CA2B34550C599C1E005900F4 /* AtxString.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = AtxString.c; path = ../../../Source/Core/AtxString.c; sourceTree = SOURCE_ROOT; };
+		CA2B34560C599C1E005900F4 /* AtxString.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AtxString.h; path = ../../../Source/Core/AtxString.h; sourceTree = SOURCE_ROOT; };
+		CA2B34570C599C1E005900F4 /* AtxSystem.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AtxSystem.h; path = ../../../Source/Core/AtxSystem.h; sourceTree = SOURCE_ROOT; };
+		CA2B34580C599C1E005900F4 /* AtxTime.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AtxTime.h; path = ../../../Source/Core/AtxTime.h; sourceTree = SOURCE_ROOT; };
+		CA2B34590C599C1E005900F4 /* AtxTypes.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AtxTypes.h; path = ../../../Source/Core/AtxTypes.h; sourceTree = SOURCE_ROOT; };
+		CA2B345A0C599C1E005900F4 /* AtxUtils.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = AtxUtils.c; path = ../../../Source/Core/AtxUtils.c; sourceTree = SOURCE_ROOT; };
+		CA2B345B0C599C1E005900F4 /* AtxUtils.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AtxUtils.h; path = ../../../Source/Core/AtxUtils.h; sourceTree = SOURCE_ROOT; };
+		CA2B345C0C599C1E005900F4 /* AtxVersion.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AtxVersion.h; path = ../../../Source/Core/AtxVersion.h; sourceTree = SOURCE_ROOT; };
+		CA2B348A0C599C2F005900F4 /* AtxStdcConsole.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = AtxStdcConsole.c; path = ../../../Source/System/StdC/AtxStdcConsole.c; sourceTree = SOURCE_ROOT; };
+		CA2B348B0C599C2F005900F4 /* AtxStdcDebug.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = AtxStdcDebug.c; path = ../../../Source/System/StdC/AtxStdcDebug.c; sourceTree = SOURCE_ROOT; };
+		CA2B348C0C599C2F005900F4 /* AtxStdcEnvironment.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = AtxStdcEnvironment.c; path = ../../../Source/System/StdC/AtxStdcEnvironment.c; sourceTree = SOURCE_ROOT; };
+		CA2B348D0C599C2F005900F4 /* AtxStdcFile.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = AtxStdcFile.c; path = ../../../Source/System/StdC/AtxStdcFile.c; sourceTree = SOURCE_ROOT; };
+		CA2B34920C599C4A005900F4 /* AtxPosixSystem.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = AtxPosixSystem.c; path = ../../../Source/System/Posix/AtxPosixSystem.c; sourceTree = SOURCE_ROOT; };
+		CA2B34940C599C79005900F4 /* AtxBsdSockets.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = AtxBsdSockets.c; path = ../../../Source/System/Bsd/AtxBsdSockets.c; sourceTree = SOURCE_ROOT; };
+		D2AAC046055464E500DB518D /* libAtomix.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libAtomix.a; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D289987405E68DCB004EDB86 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		08FB7794FE84155DC02AAC07 /* Atomix */ = {
+			isa = PBXGroup;
+			children = (
+				08FB7795FE84155DC02AAC07 /* Source */,
+				C6A0FF2B0290797F04C91782 /* Documentation */,
+				1AB674ADFE9D54B511CA2CBB /* Products */,
+			);
+			name = Atomix;
+			sourceTree = "<group>";
+		};
+		08FB7795FE84155DC02AAC07 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				CA2B34940C599C79005900F4 /* AtxBsdSockets.c */,
+				CA2B34920C599C4A005900F4 /* AtxPosixSystem.c */,
+				CA2B348A0C599C2F005900F4 /* AtxStdcConsole.c */,
+				CA2B348B0C599C2F005900F4 /* AtxStdcDebug.c */,
+				CA2B348C0C599C2F005900F4 /* AtxStdcEnvironment.c */,
+				CA2B348D0C599C2F005900F4 /* AtxStdcFile.c */,
+				CA2B34320C599C1E005900F4 /* Atomix.h */,
+				CA2B34330C599C1E005900F4 /* AtxConfig.h */,
+				CA2B34340C599C1E005900F4 /* AtxConsole.c */,
+				CA2B34350C599C1E005900F4 /* AtxConsole.h */,
+				CA2B34360C599C1E005900F4 /* AtxDataBuffer.c */,
+				CA2B34370C599C1E005900F4 /* AtxDataBuffer.h */,
+				CA2B34380C599C1E005900F4 /* AtxDebug.c */,
+				CA2B34390C599C1E005900F4 /* AtxDebug.h */,
+				CA2B343A0C599C1E005900F4 /* AtxDefs.h */,
+				CA2B343B0C599C1E005900F4 /* AtxDestroyable.c */,
+				CA2B343C0C599C1E005900F4 /* AtxDestroyable.h */,
+				CA2B343D0C599C1E005900F4 /* AtxFile.c */,
+				CA2B343E0C599C1E005900F4 /* AtxFile.h */,
+				CA2B343F0C599C1E005900F4 /* AtxHttp.c */,
+				CA2B34400C599C1E005900F4 /* AtxHttp.h */,
+				CA2B34410C599C1E005900F4 /* AtxInterfaces.c */,
+				CA2B34420C599C1E005900F4 /* AtxInterfaces.h */,
+				CA2B34430C599C1E005900F4 /* AtxIterator.h */,
+				CA2B34440C599C1E005900F4 /* AtxList.c */,
+				CA2B34450C599C1E005900F4 /* AtxList.h */,
+				CA2B34460C599C1E005900F4 /* AtxLogging.c */,
+				CA2B34470C599C1E005900F4 /* AtxLogging.h */,
+				CA2B34480C599C1E005900F4 /* AtxMap.c */,
+				CA2B34490C599C1E005900F4 /* AtxMap.h */,
+				CA2B344A0C599C1E005900F4 /* AtxModule.h */,
+				CA2B344B0C599C1E005900F4 /* AtxProperties.c */,
+				CA2B344C0C599C1E005900F4 /* AtxProperties.h */,
+				CA2B344D0C599C1E005900F4 /* AtxReferenceable.h */,
+				CA2B344E0C599C1E005900F4 /* AtxResults.h */,
+				CA2B344F0C599C1E005900F4 /* AtxRingBuffer.c */,
+				CA2B34500C599C1E005900F4 /* AtxRingBuffer.h */,
+				CA2B34510C599C1E005900F4 /* AtxSockets.c */,
+				CA2B34520C599C1E005900F4 /* AtxSockets.h */,
+				CA2B34530C599C1E005900F4 /* AtxStreams.c */,
+				CA2B34540C599C1E005900F4 /* AtxStreams.h */,
+				CA2B34550C599C1E005900F4 /* AtxString.c */,
+				CA2B34560C599C1E005900F4 /* AtxString.h */,
+				CA2B34570C599C1E005900F4 /* AtxSystem.h */,
+				CA2B34580C599C1E005900F4 /* AtxTime.h */,
+				CA2B34590C599C1E005900F4 /* AtxTypes.h */,
+				CA2B345A0C599C1E005900F4 /* AtxUtils.c */,
+				CA2B345B0C599C1E005900F4 /* AtxUtils.h */,
+				CA2B345C0C599C1E005900F4 /* AtxVersion.h */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+		1AB674ADFE9D54B511CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D2AAC046055464E500DB518D /* libAtomix.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C6A0FF2B0290797F04C91782 /* Documentation */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Documentation;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		D2AAC043055464E500DB518D /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CA2B345D0C599C1E005900F4 /* Atomix.h in Headers */,
+				CA2B345E0C599C1E005900F4 /* AtxConfig.h in Headers */,
+				CA2B34600C599C1E005900F4 /* AtxConsole.h in Headers */,
+				CA2B34620C599C1E005900F4 /* AtxDataBuffer.h in Headers */,
+				CA2B34640C599C1E005900F4 /* AtxDebug.h in Headers */,
+				CA2B34650C599C1E005900F4 /* AtxDefs.h in Headers */,
+				CA2B34670C599C1E005900F4 /* AtxDestroyable.h in Headers */,
+				CA2B34690C599C1E005900F4 /* AtxFile.h in Headers */,
+				CA2B346B0C599C1E005900F4 /* AtxHttp.h in Headers */,
+				CA2B346D0C599C1E005900F4 /* AtxInterfaces.h in Headers */,
+				CA2B346E0C599C1E005900F4 /* AtxIterator.h in Headers */,
+				CA2B34700C599C1E005900F4 /* AtxList.h in Headers */,
+				CA2B34720C599C1E005900F4 /* AtxLogging.h in Headers */,
+				CA2B34740C599C1E005900F4 /* AtxMap.h in Headers */,
+				CA2B34750C599C1E005900F4 /* AtxModule.h in Headers */,
+				CA2B34770C599C1E005900F4 /* AtxProperties.h in Headers */,
+				CA2B34780C599C1E005900F4 /* AtxReferenceable.h in Headers */,
+				CA2B34790C599C1E005900F4 /* AtxResults.h in Headers */,
+				CA2B347B0C599C1E005900F4 /* AtxRingBuffer.h in Headers */,
+				CA2B347D0C599C1E005900F4 /* AtxSockets.h in Headers */,
+				CA2B347F0C599C1E005900F4 /* AtxStreams.h in Headers */,
+				CA2B34810C599C1E005900F4 /* AtxString.h in Headers */,
+				CA2B34820C599C1E005900F4 /* AtxSystem.h in Headers */,
+				CA2B34830C599C1E005900F4 /* AtxTime.h in Headers */,
+				CA2B34840C599C1E005900F4 /* AtxTypes.h in Headers */,
+				CA2B34860C599C1E005900F4 /* AtxUtils.h in Headers */,
+				CA2B34870C599C1E005900F4 /* AtxVersion.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		D2AAC045055464E500DB518D /* Atomix */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1DEB91EB08733DB70010E9CD /* Build configuration list for PBXNativeTarget "Atomix" */;
+			buildPhases = (
+				D2AAC043055464E500DB518D /* Headers */,
+				D2AAC044055464E500DB518D /* Sources */,
+				D289987405E68DCB004EDB86 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Atomix;
+			productName = Atomix;
+			productReference = D2AAC046055464E500DB518D /* libAtomix.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB91EF08733DB70010E9CD /* Build configuration list for PBXProject "Atomix" */;
+			hasScannedForEncodings = 1;
+			mainGroup = 08FB7794FE84155DC02AAC07 /* Atomix */;
+			projectDirPath = "";
+			targets = (
+				D2AAC045055464E500DB518D /* Atomix */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D2AAC044055464E500DB518D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CA2B345F0C599C1E005900F4 /* AtxConsole.c in Sources */,
+				CA2B34610C599C1E005900F4 /* AtxDataBuffer.c in Sources */,
+				CA2B34630C599C1E005900F4 /* AtxDebug.c in Sources */,
+				CA2B34660C599C1E005900F4 /* AtxDestroyable.c in Sources */,
+				CA2B34680C599C1E005900F4 /* AtxFile.c in Sources */,
+				CA2B346A0C599C1E005900F4 /* AtxHttp.c in Sources */,
+				CA2B346C0C599C1E005900F4 /* AtxInterfaces.c in Sources */,
+				CA2B346F0C599C1E005900F4 /* AtxList.c in Sources */,
+				CA2B34710C599C1E005900F4 /* AtxLogging.c in Sources */,
+				CA2B34730C599C1E005900F4 /* AtxMap.c in Sources */,
+				CA2B34760C599C1E005900F4 /* AtxProperties.c in Sources */,
+				CA2B347A0C599C1E005900F4 /* AtxRingBuffer.c in Sources */,
+				CA2B347C0C599C1E005900F4 /* AtxSockets.c in Sources */,
+				CA2B347E0C599C1E005900F4 /* AtxStreams.c in Sources */,
+				CA2B34800C599C1E005900F4 /* AtxString.c in Sources */,
+				CA2B34850C599C1E005900F4 /* AtxUtils.c in Sources */,
+				CA2B348E0C599C2F005900F4 /* AtxStdcConsole.c in Sources */,
+				CA2B348F0C599C2F005900F4 /* AtxStdcDebug.c in Sources */,
+				CA2B34900C599C2F005900F4 /* AtxStdcEnvironment.c in Sources */,
+				CA2B34910C599C2F005900F4 /* AtxStdcFile.c in Sources */,
+				CA2B34930C599C4A005900F4 /* AtxPosixSystem.c in Sources */,
+				CA2B34950C599C79005900F4 /* AtxBsdSockets.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1DEB91EC08733DB70010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = Atomix;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		1DEB91ED08733DB70010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = Atomix;
+			};
+			name = Release;
+		};
+		1DEB91F008733DB70010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+			};
+			name = Debug;
+		};
+		1DEB91F108733DB70010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB91EB08733DB70010E9CD /* Build configuration list for PBXNativeTarget "Atomix" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB91EC08733DB70010E9CD /* Debug */,
+				1DEB91ED08733DB70010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1DEB91EF08733DB70010E9CD /* Build configuration list for PBXProject "Atomix" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB91F008733DB70010E9CD /* Debug */,
+				1DEB91F108733DB70010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}

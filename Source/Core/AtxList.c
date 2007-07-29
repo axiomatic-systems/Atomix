@@ -231,9 +231,35 @@ ATX_List_DetachItem(ATX_List* list, ATX_ListItem* item)
         }
     }
 
+    /* clear the links */
+    item->prev = item->next = NULL;
+    
     /* one less item in the list now */
     list->item_count--;
 
+    return ATX_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|    ATX_List_DestroyItem
++---------------------------------------------------------------------*/
+ATX_Result
+ATX_List_DestroyItem(ATX_List* list, ATX_ListItem* item)
+{
+    if (item->next || item->prev) {
+        return ATX_ERROR_INVALID_STATE;
+    }
+    
+    /* destroy the item data */
+    if (list->destructor.DestroyData) {
+        list->destructor.DestroyData(&list->destructor,
+                                     item->data,
+                                     item->type);
+    }
+    
+    /* free the item memory */
+    ATX_FreeMemory(item);    
+    
     return ATX_SUCCESS;
 }
 
@@ -309,17 +335,8 @@ ATX_List_RemoveItem(ATX_List* list, ATX_ListItem* item)
     /* pop the item out of the list */
     ATX_List_DetachItem(list, item);
 
-    /* destroy the item data */
-    if (list->destructor.DestroyData) {
-        list->destructor.DestroyData(&list->destructor,
-                                     item->data,
-                                     item->type);
-    }
-
-    /* free the item memory */
-    ATX_FreeMemory(item);
-
-    return ATX_SUCCESS;
+    /* destroy the item */
+    return ATX_List_DestroyItem(list, item);
 }
 
 /*----------------------------------------------------------------------
