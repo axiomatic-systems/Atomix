@@ -34,12 +34,12 @@
  * Type of data represented by the 'value' field of an ATX_Property structure.
  */
 typedef enum {
-    ATX_PROPERTY_TYPE_NONE,     /**< There is no value             */
-    ATX_PROPERTY_TYPE_INTEGER,  /**< The value is an integer       */
-    ATX_PROPERTY_TYPE_FLOAT,    /**< The value is an integer       */
-    ATX_PROPERTY_TYPE_STRING,   /**< The value is a string         */
-    ATX_PROPERTY_TYPE_BOOLEAN,  /**< The value is a boolean        */
-    ATX_PROPERTY_TYPE_RAW_DATA  /**< The value is a raw data block */
+    ATX_PROPERTY_TYPE_NONE,     /**< There is no value                    */
+    ATX_PROPERTY_TYPE_INTEGER,  /**< The value is an integer              */
+    ATX_PROPERTY_TYPE_FLOAT,    /**< The value is a floating point number */
+    ATX_PROPERTY_TYPE_STRING,   /**< The value is a string                */
+    ATX_PROPERTY_TYPE_BOOLEAN,  /**< The value is a boolean               */
+    ATX_PROPERTY_TYPE_RAW_DATA  /**< The value is a raw data block        */
 } ATX_PropertyType;
 
 typedef struct {
