@@ -363,48 +363,6 @@ Properties_GetProperty(ATX_Properties* _self,
 }
 
 /*----------------------------------------------------------------------
-|   Properties_SetProperty
-+---------------------------------------------------------------------*/
-ATX_METHOD
-Properties_SetProperty(ATX_Properties*          _self,
-                       ATX_CString              name,
-                       ATX_PropertyType         type,
-                       const ATX_PropertyValue* value)
-{
-    Properties*   self = ATX_SELF(Properties, ATX_Properties);
-    PropertyNode* node;
-
-    /* check parameters */
-    if (name == NULL || value == NULL) {
-        return ATX_ERROR_INVALID_PARAMETERS;
-    }
-
-    /* find the property with that name */
-    node = Properties_FindProperty(self, name);
-    if (node) {
-        /* a property with that name exists, check the type */
-        if (node->property.type != type) {
-            return ATX_ERROR_PROPERTY_TYPE_MISMATCH;
-        }
-        PropertyNode_DestroyValue(node);
-        PropertyNode_SetValue(node, type, value);
-    } else {
-        /* no property with that name, create one */
-        node = PropertyNode_Create(name, type, value);
-        if (node == NULL) return ATX_ERROR_OUT_OF_MEMORY;
-
-        /* add the node to the list */
-        node->next = self->property_nodes;
-        self->property_nodes = node;
-    } 
-
-    /* notify the listeners */
-    Properties_NotifyListeners(self, name, type, value);
-
-    return ATX_SUCCESS;
-}
-
-/*----------------------------------------------------------------------
 |   Properties_UnsetProperty
 +---------------------------------------------------------------------*/
 ATX_METHOD
@@ -441,6 +399,58 @@ Properties_UnsetProperty(ATX_Properties* _self, ATX_CString name)
     }
     
     return ATX_ERROR_NO_SUCH_PROPERTY;
+}
+
+/*----------------------------------------------------------------------
+|   Properties_SetProperty
++---------------------------------------------------------------------*/
+ATX_METHOD
+Properties_SetProperty(ATX_Properties*          _self,
+                       ATX_CString              name,
+                       ATX_PropertyType         type,
+                       const ATX_PropertyValue* value)
+{
+    Properties*   self = ATX_SELF(Properties, ATX_Properties);
+    PropertyNode* node;
+
+    /* check parameters */
+    if (name == NULL || value == NULL) {
+        return ATX_ERROR_INVALID_PARAMETERS;
+    }
+
+    /* special case when the type is NONE */
+    if (type == ATX_PROPERTY_TYPE_NONE) {
+        return Properties_UnsetProperty(_self, name);
+    }
+
+    /* from here one we need a value */
+    if (value == NULL) {
+        return ATX_ERROR_INVALID_PARAMETERS;
+    }
+
+    /* find the property with that name */
+    node = Properties_FindProperty(self, name);
+    if (node) {
+        /* a property with that name exists, check the type */
+        if (node->property.type != type) {
+            return ATX_ERROR_PROPERTY_TYPE_MISMATCH;
+        }
+        PropertyNode_DestroyValue(node);
+        PropertyNode_SetValue(node, type, value);
+    } else {
+        /* no property with that name, create one */
+        node = PropertyNode_Create(name, type, value);
+        if (node == NULL) return ATX_ERROR_OUT_OF_MEMORY;
+
+        /* add the node to the list */
+        node->next = self->property_nodes;
+        self->property_nodes = node;
+    } 
+
+    /* notify the listeners */
+    Properties_NotifyListeners(self, name, type, value);
+
+    return ATX_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
