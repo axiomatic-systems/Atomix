@@ -878,7 +878,7 @@ BsdSocket_SetBlockingMode(BsdSocket* self, ATX_Boolean blocking)
 {
     int flags = fcntl(self->socket_ref->fd, F_GETFL, 0);
     if (blocking == ATX_TRUE) {
-        flags ^= O_NONBLOCK;
+        flags &= ~O_NONBLOCK;
     } else {
         flags |= O_NONBLOCK;
     }
