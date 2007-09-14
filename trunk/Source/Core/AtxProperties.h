@@ -77,6 +77,16 @@ typedef struct {
 +---------------------------------------------------------------------*/
 ATX_DECLARE_INTERFACE(ATX_PropertyListener)
 ATX_BEGIN_INTERFACE_DEFINITION(ATX_PropertyListener)
+    /**
+     * Notify that a property has changed. When the property type
+     * is ATX_PROPERTY_TYPE_NONE, it indicates that the property
+     * has been deleted (in this case, the value pointer will be NULL).
+     * @param name Name of the property that has changed. This parameter
+     * may be NULL or an empty string when the notification is for the
+     * deletion of all the properties in list and that the listener is
+     * listening for changes to all the properties (this way the listener
+     * is not called once for each property deletion).
+     */
     void (*OnPropertyChanged)(ATX_PropertyListener*    self,
                               ATX_CString              name,
                               ATX_PropertyType         type,
@@ -164,6 +174,17 @@ ATX_BEGIN_INTERFACE_DEFINITION(ATX_Properties)
                              ATX_CString             name,
                              ATX_Iterator*           iterator);
 #endif
+    /**
+     * Add a listener. The listener will notified of changes to one
+     * or all properties.
+     * @param name Name of the property of whose changes the listener wants
+     * to be notified. If name is NULL, the listener will be notified of
+     * changes to any of the properties.
+     * @param listener Pointer to a listener object that will receive 
+     * notifications.
+     * @param handle Pointer to a handle where the listener handle will
+     * be returned.
+     */
     ATX_Result (*AddListener)(ATX_Properties*             self,
                               ATX_CString                 name,
                               ATX_PropertyListener*       listener, 
@@ -258,12 +279,3 @@ ATX_Result ATX_Properties_Create(ATX_Properties** properties);
 #endif
 
 #endif /* _ATX_PROPERTIES_H_ */
-
-
-
-
-
-
-
-
-
