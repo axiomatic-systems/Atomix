@@ -511,7 +511,7 @@ ATX_IntegerToStringU(ATX_UInt3264 value, char* buffer, ATX_Size buffer_size)
 void
 ATX_CopyString(char* dst, const char* src)
 {
-    while(*dst++ = *src++);
+    while((*dst++ = *src++));
 }
 #endif
 

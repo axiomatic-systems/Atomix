@@ -128,12 +128,6 @@ typedef __w64 long ATX_PointerLong;
 #undef ATX_CONFIG_HAVE_GETENV
 #endif
 
-/* Symbian */
-#if defined(__SYMBIAN32__)
-#undef ATX_CONFIG_HAVE_SNPRINTF
-#undef ATX_CONFIG_HAVE_VSNPRINTF
-#endif
-
 /* PS3 */
 #if defined(__PPU__)
 #undef ATX_CONFIG_HAVE_UNISTD_H

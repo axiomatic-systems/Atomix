@@ -533,6 +533,14 @@ StdcFile_Open(ATX_File* _self, ATX_Flags mode)
                 return ATX_ERROR_ERRNO(errno);
             }
         }
+#if defined(__SYMBIAN32__)
+        else {
+            /* Hack to get the filesize since PIPS stat() is broken. */
+            fseek(stdc_file, 0L, SEEK_END); 
+            self->size = ftell(stdc_file);
+            fseek(stdc_file, 0L, SEEK_SET); /* return the beginning */
+        }
+#endif
     }
 
     /* set the buffered/unbuffered option */

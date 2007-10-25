@@ -49,6 +49,9 @@ ATX_Result ATX_DataBuffer_SetData(ATX_DataBuffer* self,
                                   ATX_Size        data_size);
 ATX_Boolean ATX_DataBuffer_Equals(const ATX_DataBuffer* self,
                                   const ATX_DataBuffer* other);
+ATX_Result  ATX_DataBuffer_AppendData(ATX_DataBuffer* self,
+                                      const ATX_Byte* data,
+                                      ATX_Size        data_size);
 
 #ifdef __cplusplus
 }

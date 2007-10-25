@@ -266,3 +266,21 @@ ATX_DataBuffer_Equals(const ATX_DataBuffer* self,
                            other->buffer, 
                            self->data_size);
 }
+
+/*----------------------------------------------------------------------
+|   ATX_DataBuffer_AppendData
++---------------------------------------------------------------------*/
+ATX_Result
+ATX_DataBuffer_AppendData(ATX_DataBuffer*   self,
+                          const ATX_Byte*   data,
+                          ATX_Size          data_size)
+{
+    ATX_Size   new_data_size = self->data_size + data_size;
+    
+    /* reserve the space and copy the appended data */
+    ATX_CHECK(ATX_DataBuffer_Reserve(self, new_data_size));
+    ATX_CopyMemory(self->buffer + self->data_size, data, data_size);
+    self->data_size = new_data_size;
+    
+    return ATX_SUCCESS;
+}
