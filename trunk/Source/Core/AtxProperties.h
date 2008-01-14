@@ -34,13 +34,12 @@
  * Type of data represented by the 'value' field of an ATX_Property structure.
  */
 typedef enum {
-    ATX_PROPERTY_TYPE_NONE,     /**< There is no value                    */
-    ATX_PROPERTY_TYPE_INTEGER,  /**< The value is an integer              */
-    ATX_PROPERTY_TYPE_FLOAT,    /**< The value is a floating point number */
-    ATX_PROPERTY_TYPE_STRING,   /**< The value is a string                */
-    ATX_PROPERTY_TYPE_BOOLEAN,  /**< The value is a boolean               */
-    ATX_PROPERTY_TYPE_RAW_DATA  /**< The value is a raw data block        */
-} ATX_PropertyType;
+    ATX_PROPERTY_VALUE_TYPE_INTEGER,  /**< The value is an integer              */
+    ATX_PROPERTY_VALUE_TYPE_FLOAT,    /**< The value is a floating point number */
+    ATX_PROPERTY_VALUE_TYPE_STRING,   /**< The value is a string                */
+    ATX_PROPERTY_VALUE_TYPE_BOOLEAN,  /**< The value is a boolean               */
+    ATX_PROPERTY_VALUE_TYPE_RAW_DATA  /**< The value is a raw data block        */
+} ATX_PropertyValueType;
 
 typedef struct {
     ATX_Size size;
@@ -48,8 +47,8 @@ typedef struct {
 } ATX_PropertyRawData;
 
 /**
- * Union different possible types the 'value' field of an ATX_Property 
- * structure.
+ * Union of the different possible data types for the 'data' field of 
+ * an ATX_PropertyValue struct.
  */
 typedef union {
     void*               any;      /**< Any pointer               */
@@ -58,6 +57,14 @@ typedef union {
     ATX_Float           fp;       /**< A floating point number   */
     ATX_Boolean         boolean;  /**< A boolean value           */
     ATX_PropertyRawData raw_data; /**< A pointer to untyped data */
+} ATX_PropertyValueData;
+
+/**
+ * Value of a property
+ */
+typedef struct {
+    ATX_PropertyValueType type;
+    ATX_PropertyValueData data;
 } ATX_PropertyValue;
 
 typedef const void* ATX_PropertyListenerHandle;
@@ -67,9 +74,8 @@ typedef const void* ATX_PropertyListenerHandle;
  * types)
  */
 typedef struct {
-    ATX_CString       name;  /**< Name of the property              */
-    ATX_PropertyType  type;  /**< Type of the value of the property */
-    ATX_PropertyValue value; /**< Value of the property             */
+    ATX_CString       name;  /**< Name of the property  */
+    ATX_PropertyValue value; /**< Value of the property */
 } ATX_Property;
 
 /*----------------------------------------------------------------------
@@ -78,18 +84,19 @@ typedef struct {
 ATX_DECLARE_INTERFACE(ATX_PropertyListener)
 ATX_BEGIN_INTERFACE_DEFINITION(ATX_PropertyListener)
     /**
-     * Notify that a property has changed. When the property type
-     * is ATX_PROPERTY_TYPE_NONE, it indicates that the property
-     * has been deleted (in this case, the value pointer will be NULL).
+     * Notify that a property has changed or deleted. 
      * @param name Name of the property that has changed. This parameter
      * may be NULL or an empty string when the notification is for the
-     * deletion of all the properties in list and that the listener is
+     * deletion of all the properties in a list and that the listener is
      * listening for changes to all the properties (this way the listener
      * is not called once for each property deletion).
+     * @param value Pointer to the value of the property. If the notification
+     * is for the deletion of a property, this parameter is NULL. If the
+     * notification is for the change of a property's value, this parameter
+     * points to the new value of the property.
      */
     void (*OnPropertyChanged)(ATX_PropertyListener*    self,
                               ATX_CString              name,
-                              ATX_PropertyType         type,
                               const ATX_PropertyValue* value);
 ATX_END_INTERFACE_DEFINITION
 
@@ -107,79 +114,52 @@ ATX_DECLARE_INTERFACE(ATX_Properties)
  */
 ATX_BEGIN_INTERFACE_DEFINITION(ATX_Properties)
     /**
-     * Returns the property with a specified name in the property list.
+     * Get the value of a property by name.
      * @param self Pointer to the object on which this method is called
-     * @param name Name of the property that is requested
-     * @param property Address of the property variable where the property
-     * will be returned
+     * @param name Name of the property of which the value is requested.
+     * @param value Pointer to where the value of the property should be
+     * written.
      * @return ATX_SUCCESS if the property with the specified name is found
-     * and returned, ATX_ERROR_NO_SUCH_PROPERY if there is no property 
-     * with that name in the list, or a negative ATX_Result error code 
-     * if the call fails
+     * and its value returned, ATX_ERROR_NO_SUCH_PROPERY if there is no 
+     * property with that name in the list, or a negative ATX_Result error 
+     * code if the call fails for another reason.
      */
-    ATX_Result (*GetProperty)(ATX_Properties* self,
-                              ATX_CString     name,
-                              ATX_Property*   property);
+    ATX_Result (*GetProperty)(ATX_Properties*    self,
+                              ATX_CString        name,
+                              ATX_PropertyValue* value);
 
     /**
-     * Sets the value of a property in a property list.
-     * @param self Pointer to the object on which this method is called
-     * @param name Name of the property to set
-     * @param type Type of the property to set
+     * Set the value of a property in a property list.
+     * @param self Pointer to the object on which this method is called.
+     * @param name Name of the property to set.
      * @param value Pointer to the value of the property to set, or NULL
-     * to unset the property (remove the property from the list)
+     * to delete the property (remove the property from the list).
      * @atx_method_result
      */
     ATX_Result (*SetProperty)(ATX_Properties*          self,
                               ATX_CString              name,
-                              ATX_PropertyType         type,
                               const ATX_PropertyValue* value);
 
     /**
-     * Unsets (removes) a property from a property list.
-     * @param self Pointer to the object on which this method is called
-     * @param name Name of the property to unset
-     * @atx_method_result
-     */
-    ATX_Result (*UnsetProperty)(ATX_Properties* self,
-                                ATX_CString     name);
-
-    /**
-     * Unsets all properties.
+     * Delete all properties.
      * @param self Pointer to the object on which this method is called
      * @atx_method_result
      */
     ATX_Result (*Clear)(ATX_Properties* self);
 
+    /**
+      * Get an iterator for the properties in the list. If this list cannot
+      * be iterated, this method returns ATX_ERROR_NOT_SUPPORTED.
+      */
     ATX_Result (*GetIterator)(ATX_Properties* self,
                               ATX_Iterator**  iterator);
-#if 0
-    ATX_Result (*AddAlias)(ATX_PropertiesInstance* instance,
-                           ATX_CString             alias,
-                           ATX_CString             name);
 
-    ATX_Result (*RemoveAlias)(ATX_PropertiesInstance* instance,
-                              ATX_CString             alias);
-
-    /**
-     * Returns an iterator over the aliases for a property name.
-     * @param instance Instance pointer of the object on which this method 
-     * is called
-     * @param name Name of the property for which to iterate aliases
-     * @param iterator Pointer to the object reference where the iterator
-     * will be returned.
-     * @atx_method_result
-     */
-    ATX_Result (*GetAliases)(ATX_PropertiesInstance* instance,
-                             ATX_CString             name,
-                             ATX_Iterator*           iterator);
-#endif
     /**
      * Add a listener. The listener will notified of changes to one
      * or all properties.
      * @param name Name of the property of whose changes the listener wants
-     * to be notified. If name is NULL, the listener will be notified of
-     * changes to any of the properties.
+     * to be notified. If this parameter is NULL, the listener will be 
+     * notified of changes to any of the properties in the list.
      * @param listener Pointer to a listener object that will receive 
      * notifications.
      * @param handle Pointer to a handle where the listener handle will
@@ -202,27 +182,19 @@ ATX_END_INTERFACE_DEFINITION
  * Convenience macro used to call the GetProperty() method on objects 
  * that implement the ATX_Properties interface 
  */
-#define ATX_Properties_GetProperty(object, name, property)  \
-ATX_INTERFACE(object)->GetProperty(object,                  \
-                                   name,                    \
-                                   property)
+#define ATX_Properties_GetProperty(object, name, value)  \
+ATX_INTERFACE(object)->GetProperty(object,               \
+                                   name,                 \
+                                   value)
 
 /**
  * Convenience macro used to call the SetProperty() method on objects that 
  * implement the ATX_Properties interface 
  */
-#define ATX_Properties_SetProperty(object, name, type, value)    \
-ATX_INTERFACE(object)->SetProperty(object,                       \
-                                   name,                         \
-                                   type,                         \
+#define ATX_Properties_SetProperty(object, name, value)    \
+ATX_INTERFACE(object)->SetProperty(object,                 \
+                                   name,                   \
                                    value)
-
-/**
- * Convenience macro used to call the UnsetProperty() method on objects that 
- * implement the ATX_Properties interface 
- */
-#define ATX_Properties_UnsetProperty(object, name)               \
-ATX_INTERFACE(object)->UnsetProperty(object, name)
 
 /**
  * Convenience macro used to call the Clear() method on objects that 
@@ -259,11 +231,23 @@ ATX_INTERFACE(object)->RemoveListener(object, handle)
  * Convenience macro used to call the OnPropertyChanged() method on objects 
  * that implement the ATX_PropertyListener interface 
  */
-#define ATX_PropertyListener_OnPropertyChanged(object, name, type, value) \
-ATX_INTERFACE(object)->OnPropertyChanged(object,                          \
-                                         name,                            \
-                                         type,                            \
+#define ATX_PropertyListener_OnPropertyChanged(object, name, value) \
+ATX_INTERFACE(object)->OnPropertyChanged(object,                    \
+                                         name,                      \
                                          value)
+
+/*----------------------------------------------------------------------
+|   implementation templates
++---------------------------------------------------------------------*/
+#define ATX_IMPLEMENT_STATIC_PROPERTIES_INTERFACE(_class) \
+ATX_BEGIN_INTERFACE_MAP(_class, ATX_Properties)           \
+    _class##_GetProperty,                                 \
+    ATX_BaseProperties_SetProperty,                       \
+    ATX_BaseProperties_Clear,                             \
+    ATX_BaseProperties_GetIterator,                       \
+    ATX_BaseProperties_AddListener,                       \
+    ATX_BaseProperties_RemoveListener                     \
+ATX_END_INTERFACE_MAP
 
 /*----------------------------------------------------------------------
 |   functions
@@ -271,6 +255,23 @@ ATX_INTERFACE(object)->OnPropertyChanged(object,                          \
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
+
+ATX_Result 
+ATX_BaseProperties_SetProperty(ATX_Properties*          self, 
+                               ATX_CString              name,
+                               const ATX_PropertyValue* value);
+ATX_Result
+ATX_BaseProperties_Clear(ATX_Properties* self);
+ATX_Result
+ATX_BaseProperties_GetIterator(ATX_Properties* self, ATX_Iterator** iterator);
+ATX_Result
+ATX_BaseProperties_AddListener(ATX_Properties*             self,
+                               ATX_CString                 name,
+                               ATX_PropertyListener*       listener, 
+                               ATX_PropertyListenerHandle* handle);
+ATX_Result
+ATX_BaseProperties_RemoveListener(ATX_Properties*            self,
+                                  ATX_PropertyListenerHandle handle);
 
 ATX_Result ATX_Properties_Create(ATX_Properties** properties);
 

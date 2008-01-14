@@ -278,8 +278,6 @@ ATX_LogManager_SetConfigValue(const char* key, const char* value)
     ATX_String* value_string = ATX_LogManager_GetConfigValue(key, NULL);
     if (value_string) {
         /* the key already exists, replace the value */
-        /*ATX_Debug("ATX_LogManager_SetConfigValue - update, key=%s, value=%s\n", 
-                  key, value);*/
         return ATX_String_Assign(value_string, value);
     } else {
         /* the value does not already exist, create a new one */
@@ -293,8 +291,6 @@ ATX_LogManager_SetConfigValue(const char* key, const char* value)
         }
         entry->key = ATX_String_Create(key);
         entry->value = ATX_String_Create(value);
-        /*ATX_Debug("ATX_LogManager_SetConfigValue - new entry, key=%s, value=%s\n", 
-                  key, value);*/
     }
 
     return ATX_SUCCESS;
@@ -524,8 +520,6 @@ ATX_LogManager_Terminate(void)
     /* check if we're initialized */
     if (!LogManager.initialized) return ATX_ERROR_INVALID_STATE;
 
-    ATX_Debug("ATX_LogManager::Terminate\n");
-    
     /* destroy everything we've created */
     ATX_LogManager_ClearConfig();
     ATX_List_Destroy(LogManager.config);
@@ -571,8 +565,6 @@ ATX_LogManager_Initialize(void)
 {
     ATX_String  config_sources_env = ATX_EMPTY_STRING;
     const char* config_sources = ATX_LOG_DEFAULT_CONFIG_SOURCE;
-
-    ATX_Debug("ATX_LogManager::Initialize\n");
 
     if (LogManager.initialized) {
         return ATX_SUCCESS;
@@ -1163,8 +1155,6 @@ ATX_LogFileHandler_Create(const char*     logger_name,
             if (ATX_FAILED(result)) {
                 instance->stream = NULL;
             }
-        } else {
-            ATX_Debug("ATX_LogFileHandler_Create - cannot open log file '%s' (%d)\n", filename, result);
         }
     
         ATX_DESTROY_OBJECT(file);
@@ -1214,9 +1204,6 @@ ATX_LogTcpHandler_Connect(ATX_LogTcpHandler* self)
         /* get the stream */
         result = ATX_Socket_GetOutputStream(tcp_socket, &self->stream);
         if (ATX_FAILED(result)) self->stream = NULL;
-    } else {
-        ATX_Debug("ATX_LogTcpHandler_Connect - failed to connect to %s:%d (%d)\n",
-                  ATX_CSTR(self->host), self->port, result);
     }
 
     /* cleanup */

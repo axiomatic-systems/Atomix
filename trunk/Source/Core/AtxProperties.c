@@ -157,31 +157,30 @@ ATX_END_INTERFACE_MAP
 +---------------------------------------------------------------------*/
 static ATX_Result
 PropertyNode_SetValue(PropertyNode*            node,
-                      ATX_PropertyType         type, 
                       const ATX_PropertyValue* value)
 {
-    node->property.type = type;
-    switch (type) {
-      case ATX_PROPERTY_TYPE_INTEGER:
-      case ATX_PROPERTY_TYPE_FLOAT:
-      case ATX_PROPERTY_TYPE_BOOLEAN:
-        node->property.value = *value;
+    node->property.value.type = value->type;
+    switch (value->type) {
+      case ATX_PROPERTY_VALUE_TYPE_INTEGER:
+      case ATX_PROPERTY_VALUE_TYPE_FLOAT:
+      case ATX_PROPERTY_VALUE_TYPE_BOOLEAN:
+        node->property.value.data = value->data;
         break;
 
-      case ATX_PROPERTY_TYPE_STRING:
-        node->property.value.string = ATX_DuplicateString(value->string);
+      case ATX_PROPERTY_VALUE_TYPE_STRING:
+        node->property.value.data.string = ATX_DuplicateString(value->data.string);
         break;
 
-      case ATX_PROPERTY_TYPE_RAW_DATA:
-        node->property.value.raw_data.size = value->raw_data.size;
-        node->property.value.raw_data.data = 
-            ATX_AllocateMemory(node->property.value.raw_data.size);
-        if (node->property.value.raw_data.data == NULL) {
+      case ATX_PROPERTY_VALUE_TYPE_RAW_DATA:
+        node->property.value.data.raw_data.size = value->data.raw_data.size;
+        node->property.value.data.raw_data.data = 
+            ATX_AllocateMemory(node->property.value.data.raw_data.size);
+        if (node->property.value.data.raw_data.data == NULL) {
             return ATX_ERROR_OUT_OF_MEMORY;
         }
-        ATX_CopyMemory(node->property.value.raw_data.data,
-                       value->raw_data.data,
-                       value->raw_data.size);
+        ATX_CopyMemory(node->property.value.data.raw_data.data,
+                       value->data.raw_data.data,
+                       value->data.raw_data.size);
         break;
 
       default:
@@ -198,14 +197,14 @@ static void
 PropertyNode_DestroyValue(PropertyNode* node)
 {
     /* destruct the node */
-    switch (node->property.type) {
-      case ATX_PROPERTY_TYPE_STRING:
-        ATX_FreeMemory((void*)node->property.value.string);
+    switch (node->property.value.type) {
+      case ATX_PROPERTY_VALUE_TYPE_STRING:
+        ATX_FreeMemory((void*)node->property.value.data.string);
         break;
 
-      case ATX_PROPERTY_TYPE_RAW_DATA:
-        if (node->property.value.raw_data.data) {
-            ATX_FreeMemory((void*)node->property.value.raw_data.data);
+      case ATX_PROPERTY_VALUE_TYPE_RAW_DATA:
+        if (node->property.value.data.raw_data.data) {
+            ATX_FreeMemory((void*)node->property.value.data.raw_data.data);
         }
         break;
 
@@ -219,7 +218,6 @@ PropertyNode_DestroyValue(PropertyNode* node)
 +---------------------------------------------------------------------*/
 static PropertyNode*
 PropertyNode_Create(ATX_CString              name, 
-                    ATX_PropertyType         type, 
                     const ATX_PropertyValue* value)
 {
     PropertyNode* node;
@@ -231,7 +229,7 @@ PropertyNode_Create(ATX_CString              name,
     /* construct the node */
     node->next = NULL;
     node->property.name = ATX_DuplicateString(name);
-    if (ATX_FAILED(PropertyNode_SetValue(node, type, value))) {
+    if (ATX_FAILED(PropertyNode_SetValue(node, value))) {
         ATX_FreeMemory((void*)node->property.name);
         ATX_FreeMemory((void*)node);
         return NULL;
@@ -301,7 +299,6 @@ PropertyListenerNode_Destroy(PropertyListenerNode* node)
 static void
 Properties_NotifyListeners(Properties*              self,
                            ATX_CString              name,
-                           ATX_PropertyType         type,
                            const ATX_PropertyValue* value)
 {
     PropertyListenerNode* node;
@@ -312,7 +309,6 @@ Properties_NotifyListeners(Properties*              self,
         if (node->name == NULL || ATX_StringsEqual(node->name, name)) {
             ATX_PropertyListener_OnPropertyChanged(node->listener,
                                                    name,
-                                                   type,
                                                    value);
         }
         node = node->next;
@@ -345,17 +341,22 @@ Properties_FindProperty(Properties* self, ATX_CString name)
 |   Properties_GetProperty
 +---------------------------------------------------------------------*/
 ATX_METHOD
-Properties_GetProperty(ATX_Properties* _self,
-                       ATX_CString     name,
-                       ATX_Property*   property)
+Properties_GetProperty(ATX_Properties*    _self,
+                       ATX_CString        name,
+                       ATX_PropertyValue* value)
 {
     Properties*   self = ATX_SELF(Properties, ATX_Properties);
     PropertyNode* node; 
 
+    /* check parameters */
+    if (self == NULL || name == NULL) {
+        return ATX_ERROR_INVALID_PARAMETERS;
+    }
+    
     /* find the node with that name */
     node = Properties_FindProperty(self, name);
     if (node) {
-        *property = node->property;
+        *value = node->property.value;
         return ATX_SUCCESS;
     } else {
         return ATX_ERROR_NO_SUCH_PROPERTY;
@@ -363,10 +364,10 @@ Properties_GetProperty(ATX_Properties* _self,
 }
 
 /*----------------------------------------------------------------------
-|   Properties_UnsetProperty
+|   Properties_DeleteProperty
 +---------------------------------------------------------------------*/
-ATX_METHOD
-Properties_UnsetProperty(ATX_Properties* _self, ATX_CString name)
+static ATX_Result
+Properties_DeleteProperty(ATX_Properties* _self, ATX_CString name)
 {
     Properties*   self = ATX_SELF(Properties, ATX_Properties);
     PropertyNode* node;
@@ -387,7 +388,6 @@ Properties_UnsetProperty(ATX_Properties* _self, ATX_CString name)
             /* notify the listeners */
             Properties_NotifyListeners(self, 
                                        name, 
-                                       ATX_PROPERTY_TYPE_NONE, 
                                        NULL);
 
             /* destroy the node */
@@ -407,20 +407,19 @@ Properties_UnsetProperty(ATX_Properties* _self, ATX_CString name)
 ATX_METHOD
 Properties_SetProperty(ATX_Properties*          _self,
                        ATX_CString              name,
-                       ATX_PropertyType         type,
                        const ATX_PropertyValue* value)
 {
     Properties*   self = ATX_SELF(Properties, ATX_Properties);
     PropertyNode* node;
 
     /* check parameters */
-    if (name == NULL || value == NULL) {
+    if (self == NULL || name == NULL) {
         return ATX_ERROR_INVALID_PARAMETERS;
     }
 
-    /* special case when the type is NONE */
-    if (type == ATX_PROPERTY_TYPE_NONE) {
-        return Properties_UnsetProperty(_self, name);
+    /* special case when the value is NULL, we delete the property */
+    if (value == NULL) {
+        return Properties_DeleteProperty(_self, name);
     }
 
     /* from here one we need a value */
@@ -431,15 +430,11 @@ Properties_SetProperty(ATX_Properties*          _self,
     /* find the property with that name */
     node = Properties_FindProperty(self, name);
     if (node) {
-        /* a property with that name exists, check the type */
-        if (node->property.type != type) {
-            return ATX_ERROR_PROPERTY_TYPE_MISMATCH;
-        }
         PropertyNode_DestroyValue(node);
-        PropertyNode_SetValue(node, type, value);
+        PropertyNode_SetValue(node, value);
     } else {
         /* no property with that name, create one */
-        node = PropertyNode_Create(name, type, value);
+        node = PropertyNode_Create(name, value);
         if (node == NULL) return ATX_ERROR_OUT_OF_MEMORY;
 
         /* add the node to the list */
@@ -448,7 +443,7 @@ Properties_SetProperty(ATX_Properties*          _self,
     } 
 
     /* notify the listeners */
-    Properties_NotifyListeners(self, name, type, value);
+    Properties_NotifyListeners(self, name, value);
 
     return ATX_SUCCESS;
 }
@@ -467,7 +462,6 @@ Properties_Clear(ATX_Properties* _self)
     while (node) {
         ATX_PropertyListener_OnPropertyChanged(node->listener, 
                                                node->name, 
-                                               ATX_PROPERTY_TYPE_NONE, 
                                                NULL);
         node = node->next;
     }
@@ -634,14 +628,76 @@ ATX_IMPLEMENT_DESTROYABLE_INTERFACE(Properties)
 ATX_BEGIN_INTERFACE_MAP(Properties, ATX_Properties)
     Properties_GetProperty,
     Properties_SetProperty,
-    Properties_UnsetProperty,
     Properties_Clear,
     Properties_GetIterator,
     Properties_AddListener,
     Properties_RemoveListener
 ATX_END_INTERFACE_MAP
 
+/*----------------------------------------------------------------------
+|   ATX_BaseProperties_SetProperty
++---------------------------------------------------------------------*/
+ATX_Result
+ATX_BaseProperties_SetProperty(ATX_Properties*          self, 
+                               ATX_CString              name,
+                               const ATX_PropertyValue* value)
+{
+    ATX_COMPILER_UNUSED(self);
+    ATX_COMPILER_UNUSED(name);
+    ATX_COMPILER_UNUSED(value);
+    return ATX_ERROR_NOT_SUPPORTED;
+}
 
+/*----------------------------------------------------------------------
+|   ATX_BaseProperties_Clear
++---------------------------------------------------------------------*/
+ATX_Result
+ATX_BaseProperties_Clear(ATX_Properties* self)
+{
+    ATX_COMPILER_UNUSED(self);
+    return ATX_ERROR_NOT_SUPPORTED;
+}
+
+/*----------------------------------------------------------------------
+|   ATX_BaseProperties_GetIterator
++---------------------------------------------------------------------*/
+ATX_Result
+ATX_BaseProperties_GetIterator(ATX_Properties* self, ATX_Iterator** iterator)
+{
+    ATX_COMPILER_UNUSED(self);
+    *iterator = NULL;
+    return ATX_ERROR_NOT_SUPPORTED;
+}
+
+/*----------------------------------------------------------------------
+|   ATX_BaseProperties_AddListener
++---------------------------------------------------------------------*/
+ATX_Result
+ATX_BaseProperties_AddListener(ATX_Properties*             self,
+                               ATX_CString                 name,
+                               ATX_PropertyListener*       listener, 
+                               ATX_PropertyListenerHandle* handle)
+{
+    ATX_COMPILER_UNUSED(self);
+    ATX_COMPILER_UNUSED(name);
+    ATX_COMPILER_UNUSED(listener);
+    *handle = 0;
+
+    return ATX_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   ATX_BaseProperties_RemoveListener
++---------------------------------------------------------------------*/
+ATX_Result
+ATX_BaseProperties_RemoveListener(ATX_Properties*            self,
+                                  ATX_PropertyListenerHandle handle)
+{
+    ATX_COMPILER_UNUSED(self);
+    ATX_COMPILER_UNUSED(handle);
+    
+    return ATX_SUCCESS;
+}
 
 
 

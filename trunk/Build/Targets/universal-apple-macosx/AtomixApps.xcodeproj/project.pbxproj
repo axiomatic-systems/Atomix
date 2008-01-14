@@ -75,6 +75,62 @@
 			remoteGlobalIDString = D2AAC045055464E500DB518D;
 			remoteInfo = Atomix;
 		};
+		CA0C98B30D15C14900E23496 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CA2B349D0C599CDF005900F4 /* Atomix.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = CA0C98B00D15C14800E23496 /* PropertiesTest */;
+			remoteInfo = PropertiesTest;
+		};
+		CA0C99A70D15CFBB00E23496 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CA2B349D0C599CDF005900F4 /* Atomix.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = CA0C99A20D15CFBB00E23496 /* ContainersTest */;
+			remoteInfo = ContainersTest;
+		};
+		CA0C99C00D15D03500E23496 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CA2B349D0C599CDF005900F4 /* Atomix.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = CA0C99BD0D15D03500E23496 /* HttpTest */;
+			remoteInfo = HttpTest;
+		};
+		CA0C99D00D15D06000E23496 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CA2B349D0C599CDF005900F4 /* Atomix.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = CA0C99CB0D15D06000E23496 /* RingBufferTest */;
+			remoteInfo = RingBufferTest;
+		};
+		CA0C99EC0D15D0AB00E23496 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CA2B349D0C599CDF005900F4 /* Atomix.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = CA0C99E90D15D0AA00E23496 /* StringsTest */;
+			remoteInfo = StringsTest;
+		};
+		CA0C9A000D15D0E900E23496 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CA2B349D0C599CDF005900F4 /* Atomix.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = CA0C99FD0D15D0E900E23496 /* MiscTest */;
+			remoteInfo = MiscTest;
+		};
+		CA0C9A170D15D12200E23496 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CA2B349D0C599CDF005900F4 /* Atomix.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = CA0C9A120D15D12100E23496 /* LoggingTest */;
+			remoteInfo = LoggingTest;
+		};
+		CA0C9A2B0D15D16D00E23496 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CA2B349D0C599CDF005900F4 /* Atomix.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = CA0C9A260D15D16C00E23496 /* NetPump */;
+			remoteInfo = NetPump;
+		};
 		CA2B34A10C599CDF005900F4 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA2B349D0C599CDF005900F4 /* Atomix.xcodeproj */;
@@ -288,6 +344,14 @@
 			isa = PBXGroup;
 			children = (
 				CA2B34A20C599CDF005900F4 /* libAtomix.a */,
+				CA0C98B40D15C14900E23496 /* PropertiesTest */,
+				CA0C99A80D15CFBB00E23496 /* ContainersTest */,
+				CA0C99C10D15D03500E23496 /* HttpTest */,
+				CA0C99D10D15D06000E23496 /* RingBufferTest */,
+				CA0C99ED0D15D0AB00E23496 /* StringsTest */,
+				CA0C9A010D15D0E900E23496 /* MiscTest */,
+				CA0C9A180D15D12200E23496 /* LoggingTest */,
+				CA0C9A2C0D15D16D00E23496 /* NetPump */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -454,6 +518,7 @@
 		08FB7793FE84155DC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "AtomixApps" */;
+			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 1;
 			mainGroup = 08FB7794FE84155DC02AAC07 /* AtomixApps */;
 			projectDirPath = "";
@@ -463,6 +528,7 @@
 					ProjectRef = CA2B349D0C599CDF005900F4 /* Atomix.xcodeproj */;
 				},
 			);
+			projectRoot = ../../..;
 			targets = (
 				CA2B34A60C599D28005900F4 /* NetPump */,
 				CA0995C30C5AAD790026C140 /* ContainersTest */,
@@ -477,6 +543,70 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		CA0C98B40D15C14900E23496 /* PropertiesTest */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			name = PropertiesTest;
+			path = build/Debug/PropertiesTest;
+			remoteRef = CA0C98B30D15C14900E23496 /* PBXContainerItemProxy */;
+			sourceTree = "<group>";
+		};
+		CA0C99A80D15CFBB00E23496 /* ContainersTest */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			name = ContainersTest;
+			path = build/Debug/ContainersTest;
+			remoteRef = CA0C99A70D15CFBB00E23496 /* PBXContainerItemProxy */;
+			sourceTree = "<group>";
+		};
+		CA0C99C10D15D03500E23496 /* HttpTest */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			name = HttpTest;
+			path = build/Debug/HttpTest;
+			remoteRef = CA0C99C00D15D03500E23496 /* PBXContainerItemProxy */;
+			sourceTree = "<group>";
+		};
+		CA0C99D10D15D06000E23496 /* RingBufferTest */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			name = RingBufferTest;
+			path = build/Debug/RingBufferTest;
+			remoteRef = CA0C99D00D15D06000E23496 /* PBXContainerItemProxy */;
+			sourceTree = "<group>";
+		};
+		CA0C99ED0D15D0AB00E23496 /* StringsTest */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			name = StringsTest;
+			path = build/Debug/StringsTest;
+			remoteRef = CA0C99EC0D15D0AB00E23496 /* PBXContainerItemProxy */;
+			sourceTree = "<group>";
+		};
+		CA0C9A010D15D0E900E23496 /* MiscTest */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			name = MiscTest;
+			path = build/Debug/MiscTest;
+			remoteRef = CA0C9A000D15D0E900E23496 /* PBXContainerItemProxy */;
+			sourceTree = "<group>";
+		};
+		CA0C9A180D15D12200E23496 /* LoggingTest */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			name = LoggingTest;
+			path = build/Debug/LoggingTest;
+			remoteRef = CA0C9A170D15D12200E23496 /* PBXContainerItemProxy */;
+			sourceTree = "<group>";
+		};
+		CA0C9A2C0D15D16D00E23496 /* NetPump */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			name = NetPump;
+			path = build/Debug/NetPump;
+			remoteRef = CA0C9A2B0D15D16D00E23496 /* PBXContainerItemProxy */;
+			sourceTree = "<group>";
+		};
 		CA2B34A20C599CDF005900F4 /* libAtomix.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;

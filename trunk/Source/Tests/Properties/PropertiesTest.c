@@ -34,13 +34,13 @@ typedef struct {
 |       constants
 +---------------------------------------------------------------------*/
 ATX_Property Properties[] = {
-    {"Property 1", ATX_PROPERTY_TYPE_STRING,  {"Some String Value"}},
-    {"Property 2", ATX_PROPERTY_TYPE_INTEGER, {(void*)0x23456789}},
-    {"Property 3", ATX_PROPERTY_TYPE_FLOAT,   {(void*)0}},
-    {"Property 4", ATX_PROPERTY_TYPE_BOOLEAN, {(void*)1}},
-    {"Property 5", ATX_PROPERTY_TYPE_BOOLEAN, {(void*)0}},
-    {"Property 6", ATX_PROPERTY_TYPE_INTEGER, {(void*)0x23456789}},
-    {"Property 1", ATX_PROPERTY_TYPE_INTEGER, {(void*)7}}
+    {"Property 1", {ATX_PROPERTY_VALUE_TYPE_STRING,  {"Some String Value"}}},
+    {"Property 2", {ATX_PROPERTY_VALUE_TYPE_INTEGER, {(void*)0x23456789}}},
+    {"Property 3", {ATX_PROPERTY_VALUE_TYPE_FLOAT,   {(void*)0}}},
+    {"Property 4", {ATX_PROPERTY_VALUE_TYPE_BOOLEAN, {(void*)1}}},
+    {"Property 5", {ATX_PROPERTY_VALUE_TYPE_BOOLEAN, {(void*)0}}},
+    {"Property 6", {ATX_PROPERTY_VALUE_TYPE_INTEGER, {(void*)0x23456789}}},
+    {"Property 1", {ATX_PROPERTY_VALUE_TYPE_INTEGER, {(void*)7}}}
 };
 
 /*----------------------------------------------------------------------
@@ -53,30 +53,30 @@ ATX_INTERFACE_MAP(Listener, ATX_Destroyable);
 |       PrintProperty
 +---------------------------------------------------------------------*/
 static void
-PrintProperty(ATX_CString name, ATX_PropertyType type, const ATX_PropertyValue* value)
+PrintProperty(ATX_CString name, const ATX_PropertyValue* value)
 {
     ATX_Debug("name=%s ", name);
-    switch (type) {
-      case ATX_PROPERTY_TYPE_INTEGER:
-        ATX_Debug("[INTEGER] %d (%x)\n", value->integer, value->integer);
+    switch (value->type) {
+      case ATX_PROPERTY_VALUE_TYPE_INTEGER:
+        ATX_Debug("[INTEGER] %d (%x)\n", value->data.integer, value->data.integer);
         break;
 
-      case ATX_PROPERTY_TYPE_FLOAT:
-        ATX_Debug("[FLOAT] %f\n", value->fp);
+      case ATX_PROPERTY_VALUE_TYPE_FLOAT:
+        ATX_Debug("[FLOAT] %f\n", value->data.fp);
         break;
 
-      case ATX_PROPERTY_TYPE_BOOLEAN:
+      case ATX_PROPERTY_VALUE_TYPE_BOOLEAN:
         ATX_Debug("[BOOL] %s\n", 
-                  value->boolean == ATX_TRUE ? "TRUE" : "FALSE");
+                  value->data.boolean == ATX_TRUE ? "TRUE" : "FALSE");
         break;
 
-      case ATX_PROPERTY_TYPE_STRING:
-        ATX_Debug("[STRING] %s\n", value->string);
+      case ATX_PROPERTY_VALUE_TYPE_STRING:
+        ATX_Debug("[STRING] %s\n", value->data.string);
         break;
 
-      case ATX_PROPERTY_TYPE_RAW_DATA:
+      case ATX_PROPERTY_VALUE_TYPE_RAW_DATA:
         ATX_Debug("[DATA] %d bytes at %lx\n", 
-                  value->raw_data.size, ATX_POINTER_TO_LONG(value->raw_data.data));
+                  value->data.raw_data.size, ATX_POINTER_TO_LONG(value->data.raw_data.data));
         break;
 
       default:
@@ -129,14 +129,13 @@ Listener_Destroy(ATX_Destroyable* _self)
 static void
 Listener_OnPropertyChanged(ATX_PropertyListener*    _self,
                            ATX_CString              name,
-                           ATX_PropertyType         type,
                            const ATX_PropertyValue* value)
 {
     Listener* self = ATX_SELF(Listener, ATX_PropertyListener);
 
     ATX_Debug("OnPropertyChanged[%s]: ", ATX_CSTR(self->name));
     if (value) {
-        PrintProperty(name, type, value);
+        PrintProperty(name, value);
     } else {
         ATX_Debug("name=%s [REMOVED]\n", name);
     }
@@ -171,7 +170,7 @@ DumpProperties(ATX_Properties* properties)
     }
     while (ATX_SUCCEEDED(ATX_Iterator_GetNext(iterator, 
                                               (ATX_Any*)(void*)&property))) {
-        PrintProperty(property->name, property->type, &property->value);
+        PrintProperty(property->name, &property->value);
     }
     ATX_Debug("--------------------------------------------\n");
 
@@ -205,7 +204,7 @@ main(int argc, char** argv)
 
     result = ATX_Properties_Create(&properties);
 
-    Properties[2].value.fp = 0.123456789f;
+    Properties[2].value.data.fp = 0.123456789f;
 
     j = 0;
     for (i=0; i<10000; i++) {
@@ -215,14 +214,14 @@ main(int argc, char** argv)
                       Properties[j].name, j);
             result = ATX_Properties_SetProperty(properties, 
                                                 Properties[j].name,
-                                                Properties[j].type,
                                                 &Properties[j].value);
             ATX_Debug("(%d)\n", result);
         } else {
             ATX_Debug("&& unsetting property '%s' [%d]\n", 
                       Properties[j].name, j);
-            result = ATX_Properties_UnsetProperty(properties,
-                                                  Properties[j].name);
+            result = ATX_Properties_SetProperty(properties,
+                                                  Properties[j].name,
+                                                  NULL);
             ATX_Debug("(%d)\n", result);
         }
         j++;
