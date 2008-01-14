@@ -25,6 +25,15 @@
 #define ATX_ERROR_EOS (ATX_ERROR_BASE_BYTE_STREAM - 0)
 
 /*----------------------------------------------------------------------
+|   constants
++---------------------------------------------------------------------*/
+#define ATX_INPUT_STREAM_PROPERTY_SEEK_SPEED   "SeekSpeed"
+#define ATX_INPUT_STREAM_SEEK_SPEED_NO_SEEK    0 /** cannot seek  */
+#define ATX_INPUT_STREAM_SEEK_SPEED_SLOW       1 /** slow         */
+#define ATX_INPUT_STREAM_SEEK_SPEED_MEDIUM     2 /** medium speed */
+#define ATX_INPUT_STREAM_SEEK_SPEED_FAST       3 /** fast speed   */
+
+/*----------------------------------------------------------------------
 |   ATX_InputStream
 +---------------------------------------------------------------------*/
 ATX_DECLARE_INTERFACE(ATX_InputStream)
@@ -133,8 +142,8 @@ ATX_INTERFACE(object)->Flush(object)
 ATX_DECLARE_INTERFACE(ATX_StreamTransformer)
 ATX_BEGIN_INTERFACE_DEFINITION(ATX_StreamTransformer)
     ATX_Result (*Transform)(ATX_StreamTransformer* self,
-                            ATX_AnyConst              buffer,
-                            ATX_Size                  size);
+                            ATX_AnyConst           buffer,
+                            ATX_Size               size);
 ATX_END_INTERFACE_DEFINITION
 
 #define ATX_StreamTransformer_Transform(object, buffer, size) \
