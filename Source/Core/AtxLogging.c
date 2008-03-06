@@ -53,7 +53,6 @@ typedef struct {
 } ATX_LogConsoleHandler;
 
 typedef struct {
-    ATX_Boolean       use_colors;
     ATX_OutputStream* stream;
 } ATX_LogFileHandler;
 
@@ -964,7 +963,7 @@ ATX_Log_FormatRecordToStream(const ATX_LogRecord* record,
     }
     ATX_OutputStream_Write(stream, ": ", 2, NULL);
     ATX_OutputStream_WriteString(stream, record->message);
-    ATX_OutputStream_Write(stream, "\n", 2, NULL);
+    ATX_OutputStream_Write(stream, "\r\n", 2, NULL);
 }
 
 /*----------------------------------------------------------------------
@@ -1000,7 +999,7 @@ ATX_LogConsoleHandler_Log(ATX_LogHandler* _self, const ATX_LogRecord* record)
 static void
 ATX_LogConsoleHandler_Destroy(ATX_LogHandler* _self)
 {
-    ATX_LogFileHandler* self = (ATX_LogFileHandler*)_self->instance;
+    ATX_LogConsoleHandler* self = (ATX_LogConsoleHandler*)_self->instance;
 
     /* free the object memory */
     ATX_FreeMemory((void*)self);
