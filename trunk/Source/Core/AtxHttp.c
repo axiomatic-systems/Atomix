@@ -401,13 +401,16 @@ ATX_HttpClient_SendRequest(ATX_HttpClient*    self,
                 ATX_HttpUrl url;
                 result = ATX_HttpUrl_Construct(&url, ATX_String_GetChars(location));
                 if (ATX_SUCCEEDED(result)) {
+                    ATX_LOG_FINE_1("ATX_HttpClient::SendRequest - redirecting to %s",
+                                   ATX_String_GetChars(location));
                     ATX_HttpUrl_Destruct(&request->url);
                     request->url = url;
                     keep_going = ATX_TRUE;
                     ATX_HttpResponse_Destroy(*response);
                     *response = NULL;
-                    ATX_LOG_INFO_1("ATX_HttpClient::SendRequest - redirecting to %s",
-                                   ATX_String_GetChars(location));
+                } else {
+                    ATX_LOG_FINE_1("ATX_HttpClient::SendRequest - failed to create redirection URL (%d)", result);
+                    break;
                 }
             }
         }       
@@ -626,9 +629,7 @@ ATX_HttpMessage_SetBody(ATX_HttpMessage* self,
     ATX_REFERENCE_OBJECT(stream);
 
     /* recompute the content length header */
-    if (stream == NULL) {
-        ATX_HttpMessage_SetHeader(self, ATX_HTTP_HEADER_CONTENT_LENGTH, "0");
-    } else {
+    if (stream) {
         char length_string[32];
         ATX_Http_NumToAscii(length_string, content_length);
         ATX_HttpMessage_SetHeader(self, ATX_HTTP_HEADER_CONTENT_LENGTH, 
