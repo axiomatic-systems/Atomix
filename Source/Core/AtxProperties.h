@@ -38,7 +38,8 @@ typedef enum {
     ATX_PROPERTY_VALUE_TYPE_FLOAT,    /**< The value is a floating point number */
     ATX_PROPERTY_VALUE_TYPE_STRING,   /**< The value is a string                */
     ATX_PROPERTY_VALUE_TYPE_BOOLEAN,  /**< The value is a boolean               */
-    ATX_PROPERTY_VALUE_TYPE_RAW_DATA  /**< The value is a raw data block        */
+    ATX_PROPERTY_VALUE_TYPE_RAW_DATA, /**< The value is a raw data block        */
+    ATX_PROPERTY_VALUE_TYPE_POINTER   /**< The value is a pointer               */
 } ATX_PropertyValueType;
 
 typedef struct {
@@ -51,7 +52,7 @@ typedef struct {
  * an ATX_PropertyValue struct.
  */
 typedef union {
-    void*               any;      /**< Any pointer               */
+    void*               pointer;  /**< A pointer                 */
     ATX_CString         string;   /**< A character string        */
     ATX_Int32           integer;  /**< An integer number         */
     ATX_Float           fp;       /**< A floating point number   */
