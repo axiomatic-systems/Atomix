@@ -164,6 +164,7 @@ PropertyNode_SetValue(PropertyNode*            node,
       case ATX_PROPERTY_VALUE_TYPE_INTEGER:
       case ATX_PROPERTY_VALUE_TYPE_FLOAT:
       case ATX_PROPERTY_VALUE_TYPE_BOOLEAN:
+      case ATX_PROPERTY_VALUE_TYPE_POINTER:
         node->property.value.data = value->data;
         break;
 
@@ -181,9 +182,6 @@ PropertyNode_SetValue(PropertyNode*            node,
         ATX_CopyMemory(node->property.value.data.raw_data.data,
                        value->data.raw_data.data,
                        value->data.raw_data.size);
-        break;
-
-      default:
         break;
     }
 
