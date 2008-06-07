@@ -92,8 +92,9 @@ typedef struct {
 #define ATX_LOG_CONSOLE_HANDLER_DEFAULT_COLOR_MODE ATX_TRUE
 #endif
 
-#define ATX_LOG_FORMAT_FILTER_NO_SOURCE      1
-#define ATX_LOG_FORMAT_FILTER_NO_TIMESTAMP   2
+#define ATX_LOG_FORMAT_FILTER_NO_SOURCE        1
+#define ATX_LOG_FORMAT_FILTER_NO_TIMESTAMP     2
+#define ATX_LOG_FORMAT_FILTER_NO_FUNCTION_NAME 4
 
 /*----------------------------------------------------------------------
 |   globals
@@ -670,6 +671,7 @@ ATX_Logger_Log(ATX_Logger*  self,
                int          level, 
                const char*  source_file,
                unsigned int source_line,
+               const char*  source_function,
                const char*  msg, 
                             ...)
 {
@@ -705,11 +707,12 @@ ATX_Logger_Log(ATX_Logger*  self,
         ATX_Logger*   logger = self;
         
         /* setup the log record */
-        record.logger_name = ATX_CSTR(logger->name),
-        record.level       = level;
-        record.message     = message;
-        record.source_file = source_file;
-        record.source_line = source_line;
+        record.logger_name     = ATX_CSTR(logger->name),
+        record.level           = level;
+        record.message         = message;
+        record.source_file     = source_file;
+        record.source_line     = source_line;
+        record.source_function = source_function;
         ATX_System_GetCurrentTimeStamp(&record.timestamp);
 
         /* call all handlers for this logger and parents */
@@ -933,37 +936,44 @@ ATX_Log_FormatRecordToStream(const ATX_LogRecord* record,
     }
     if ((format_filter & ATX_LOG_FORMAT_FILTER_NO_SOURCE) == 0) {
         ATX_OutputStream_WriteString(stream, record->source_file);
-        ATX_OutputStream_Write(stream, "(", 1, NULL);
+        ATX_OutputStream_WriteFully(stream, "(", 1);
         ATX_IntegerToStringU(record->source_line, buffer, sizeof(buffer));
         ATX_OutputStream_WriteString(stream, buffer);
-        ATX_OutputStream_Write(stream, "): ", 3, NULL);
+        ATX_OutputStream_WriteFully(stream, "): ", 3);
     }
-    ATX_OutputStream_Write(stream, "[", 1, NULL);
+    ATX_OutputStream_WriteFully(stream, "[", 1);
     ATX_OutputStream_WriteString(stream, record->logger_name);
-    ATX_OutputStream_Write(stream, "] ", 2, NULL);
+    ATX_OutputStream_WriteFully(stream, "] ", 2);
     if ((format_filter & ATX_LOG_FORMAT_FILTER_NO_TIMESTAMP) == 0) {
         ATX_IntegerToStringU(record->timestamp.seconds, buffer, sizeof(buffer));
         ATX_OutputStream_WriteString(stream, buffer);
         ATX_OutputStream_WriteString(stream, ":");
         ATX_IntegerToStringU(record->timestamp.nanoseconds/1000000L, buffer, sizeof(buffer));
         ATX_OutputStream_WriteString(stream, buffer);
-        ATX_OutputStream_Write(stream, " ", 1, NULL);
+        ATX_OutputStream_WriteFully(stream, " ", 1);
+    }
+    if ((format_filter & ATX_LOG_FORMAT_FILTER_NO_FUNCTION_NAME) == 0) {
+        ATX_OutputStream_WriteFully(stream, "[",1);
+        if (record->source_function) {
+            ATX_OutputStream_WriteString(stream, record->source_function);
+        }
+        ATX_OutputStream_WriteFully(stream, "] ",2);
     }
     if (use_colors) {
         ansi_color = ATX_Log_GetLogLevelAnsiColor(record->level);
         if (ansi_color) {
-            ATX_OutputStream_Write(stream, "\033[", 2, NULL);
+            ATX_OutputStream_WriteFully(stream, "\033[", 2);
             ATX_OutputStream_WriteString(stream, ansi_color);
-            ATX_OutputStream_Write(stream, ";1m", 3, NULL);
+            ATX_OutputStream_WriteFully(stream, ";1m", 3);
         }
     }
     ATX_OutputStream_WriteString(stream, level_name);
     if (use_colors && ansi_color) {
-        ATX_OutputStream_Write(stream, "\033[0m", 4, NULL);
+        ATX_OutputStream_WriteFully(stream, "\033[0m", 4);
     }
-    ATX_OutputStream_Write(stream, ": ", 2, NULL);
+    ATX_OutputStream_WriteFully(stream, ": ", 2);
     ATX_OutputStream_WriteString(stream, record->message);
-    ATX_OutputStream_Write(stream, "\r\n", 2, NULL);
+    ATX_OutputStream_WriteFully(stream, "\r\n", 2);
 }
 
 /*----------------------------------------------------------------------
@@ -985,7 +995,7 @@ ATX_LogConsoleHandler_Log(ATX_LogHandler* _self, const ATX_LogRecord* record)
     if (ATX_SUCCEEDED(ATX_MemoryStream_GetOutputStream(memory_stream, &output_stream))) {
         const ATX_DataBuffer* buffer;
         ATX_Log_FormatRecordToStream(record, output_stream, self->use_colors, self->format_filter);
-        ATX_OutputStream_Write(output_stream, "\0", 1, NULL);
+        ATX_OutputStream_WriteFully(output_stream, "\0", 1);
         ATX_MemoryStream_GetBuffer(memory_stream, &buffer);
         ATX_ConsoleOutput((const char*)ATX_DataBuffer_GetData(buffer));
         ATX_RELEASE_OBJECT(output_stream);
