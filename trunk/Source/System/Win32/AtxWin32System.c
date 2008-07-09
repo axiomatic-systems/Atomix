@@ -58,7 +58,7 @@ ATX_System_GetCurrentTimeStamp(ATX_TimeStamp* now)
 {
     struct _timeb time_stamp;
 
-#if (_MSC_VER >= 1400)
+#if defined(_MSC_VER) && (_MSC_VER >= 1400)
     _ftime_s(&time_stamp);
 #else
     _ftime(&time_stamp);
