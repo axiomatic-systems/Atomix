@@ -88,7 +88,9 @@
 #define EAGAIN       WSAEWOULDBLOCK
 #define EINTR        WSAEINTR
 
+#if !defined(__MINGW32__)
 typedef int          ssize_t;
+#endif
 typedef int          socklen_t;
 typedef char*        SocketBuffer;
 typedef const char*  SocketConstBuffer;
