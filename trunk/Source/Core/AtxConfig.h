@@ -2,7 +2,7 @@
 |
 |   Atomix - Platform Configuration
 |
-|   (c) 2002-2006 Gilles Boccon-Gibod
+|   (c) 2002-2008 Gilles Boccon-Gibod
 |   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
@@ -86,6 +86,7 @@
 +---------------------------------------------------------------------*/
 /* GCC */
 #if defined(__GNUC__)
+#define ATX_LocalFunctionName __FUNCTION__
 #define ATX_COMPILER_UNUSED(p) (void)p
 #else
 #define ATX_COMPILER_UNUSED(p) 
@@ -93,6 +94,7 @@
 
 /* Microsoft C Compiler */
 #if defined(_MSC_VER)
+#define ATX_LocalFunctionName __FUNCTION__
 #define ATX_CONFIG_HAVE_INT64
 #define ATX_CONFIG_INT64_TYPE __int64
 #define ATX_strdup     _strdup
@@ -163,6 +165,9 @@ typedef __w64 long ATX_PointerLong;
 #endif
 #if !defined(ATX_vsnprintf)
 #define ATX_vsnprintf vsnprintf
+#endif
+#if !defined(ATX_LocalFunctionName)
+#define ATX_LocalFunctionName (NULL)
 #endif
 
 #endif /* _ATX_CONFIG_H_ */
