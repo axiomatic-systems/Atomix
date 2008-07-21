@@ -439,7 +439,7 @@ ATX_LogManager_ConfigureLogger(ATX_Logger* logger)
         ATX_String* level_value = ATX_LogManager_GetConfigValue(
             ATX_CSTR(logger->name),".level");
         if (level_value) {
-            long value;
+            int value;
             /* try a symbolic name */
             value = ATX_Log_GetLogLevel(ATX_CSTR(*level_value));
             if (value < 0) {
@@ -1052,7 +1052,7 @@ ATX_LogConsoleHandler_Create(const char*     logger_name,
         instance->format_filter = 0;
         filter = ATX_LogManager_GetConfigValue(ATX_CSTR(logger_prefix),".filter");
         if (filter) {
-            long flags;
+            int flags;
             ATX_String_ToInteger(filter, &flags, ATX_TRUE);
             instance->format_filter = flags;
         }
@@ -1325,7 +1325,7 @@ ATX_LogTcpHandler_Create(const char* logger_name, ATX_LogHandler* handler)
     }
     port = ATX_LogManager_GetConfigValue(ATX_CSTR(logger_prefix), ".port");
     if (port) {
-        long port_int;
+        int port_int;
         if (ATX_SUCCEEDED(ATX_String_ToInteger(port, &port_int, ATX_TRUE))) {
             instance->port = (ATX_UInt16)port_int;
         } else {

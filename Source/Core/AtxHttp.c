@@ -658,7 +658,7 @@ ATX_HttpMessage_GetBody(const ATX_HttpMessage* self,
         const ATX_String* length_string = 
             ATX_HttpMessage_GetHeader(self, ATX_HTTP_HEADER_CONTENT_LENGTH);
         if (length_string && self->body) {
-            long length = 0;
+            int length = 0;
             if (ATX_SUCCEEDED(ATX_String_ToInteger(length_string, &length, ATX_TRUE))) {
                 *content_length = (ATX_Size)length;
             }

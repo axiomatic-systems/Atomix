@@ -64,7 +64,7 @@ int
 main(int argc, char** argv)
 {
     float      f;
-    long       i;
+    int        i;
     ATX_Int32  i32;
     ATX_UInt32 ui32;
     char       buff[64];

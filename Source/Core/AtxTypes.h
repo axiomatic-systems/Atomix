@@ -157,23 +157,58 @@ typedef unsigned ATX_CONFIG_INT64_TYPE ATX_UInt64;
 typedef ATX_CONFIG_INT_32_64_TYPE ATX_Int3264;
 typedef unsigned ATX_CONFIG_INT_32_64_TYPE ATX_UInt3264;
 
+#if !defined(ATX_INT_MIN)
 #if defined(ATX_CONFIG_HAVE_INT_MIN)
 #define ATX_INT_MIN INT_MIN
 #endif
+#endif
+
+#if !defined(ATX_INT_MAX)
 #if defined(ATX_CONFIG_HAVE_INT_MAX)
 #define ATX_INT_MAX INT_MAX
 #endif
+#endif
+
+#if !defined(ATX_UINT_MAX)
 #if defined(ATX_CONFIG_HAVE_UINT_MAX)
 #define ATX_UINT_MAX UINT_MAX
 #endif
+#endif
+
+#if !defined(ATX_LONG_MIN)
 #if defined(ATX_CONFIG_HAVE_LONG_MIN)
 #define ATX_LONG_MIN LONG_MIN
 #endif
+#endif
+
+#if !defined(ATX_LONG_MAX)
 #if defined(ATX_CONFIG_HAVE_LONG_MAX)
 #define ATX_LONG_MAX LONG_MAX
 #endif
+#endif
+
+#if !defined(ATX_ULONG_MAX)
 #if defined(ATX_CONFIG_HAVE_ULONG_MAX)
 #define ATX_ULONG_MAX ULONG_MAX
+#endif
+#endif
+
+#if !defined(ATX_INT64_MIN)
+#if defined(ATX_CONFIG_HAVE_LONG_LONG_MIN)
+#define ATX_INT64_MIN LONG_LONG_MIN
+#endif
+#endif
+
+#if !defined(ATX_INT64_MAX)
+#if defined(ATX_CONFIG_HAVE_LONG_LONG_MAX)
+#define ATX_INT64_MAX LONG_LONG_MAX
+#endif
+#endif
+
+#if !defined(ATX_UINT64_MAX)
+#if defined(ATX_CONFIG_HAVE_ULONG_LONG_MAX)
+#define ATX_UINT64_MAX ULONG_LONG_MAX
+#endif
 #endif
 
 /*----------------------------------------------------------------------
