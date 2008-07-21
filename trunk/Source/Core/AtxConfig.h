@@ -86,6 +86,9 @@
 +---------------------------------------------------------------------*/
 /* GCC */
 #if defined(__GNUC__)
+#define ATX_CONFIG_HAVE_LONG_LONG_MIN
+#define ATX_CONFIG_HAVE_LONG_LONG_MAX
+#define ATX_CONFIG_HAVE_ULONG_LONG_MAX
 #define ATX_LocalFunctionName __FUNCTION__
 #define ATX_COMPILER_UNUSED(p) (void)p
 #else
@@ -97,6 +100,10 @@
 #define ATX_LocalFunctionName __FUNCTION__
 #define ATX_CONFIG_HAVE_INT64
 #define ATX_CONFIG_INT64_TYPE __int64
+#define ATX_INT64_MIN _I64_MIN
+#define ATX_INT64_MAX _I64_MAX
+#define ATX_UINT64_MAX _UI64_MAX
+#define 
 #define ATX_strdup     _strdup
 #if (_MSC_VER >= 1400) && !defined(_WIN32_WCE)
 #define ATX_vsnprintf(s,c,f,a)  _vsnprintf_s(s,c,_TRUNCATE,f,a)

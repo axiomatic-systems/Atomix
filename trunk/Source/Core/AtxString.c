@@ -673,7 +673,7 @@ ATX_String_Insert(ATX_String* self, const char* str, ATX_Ordinal where)
 |    ATX_String_ToInteger
 +---------------------------------------------------------------------*/
 ATX_Result 
-ATX_String_ToInteger(const ATX_String* self, long* value, ATX_Boolean relaxed)
+ATX_String_ToInteger(const ATX_String* self, int* value, ATX_Boolean relaxed)
 {
     return ATX_ParseInteger(ATX_String_GetChars(self), value, relaxed);
 }

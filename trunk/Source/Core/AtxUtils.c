@@ -178,7 +178,7 @@ ATX_ParseFloat(const char* str, float* result, ATX_Boolean relaxed)
         } else if (c == 'e' || c == 'E') {
             /* exponent */
             if (*str == '+' || *str == '-' || (*str >= '0' && *str <= '9')) {
-                long exponent = 0;
+                int exponent = 0;
                 if (ATX_SUCCEEDED(ATX_ParseInteger(str, &exponent, relaxed))) {
                     value *= (float)pow(10.0f, (float)exponent);
                     break;
@@ -208,15 +208,15 @@ ATX_ParseFloat(const char* str, float* result, ATX_Boolean relaxed)
 }
 
 /*----------------------------------------------------------------------
-|    ATX_ParseInteger
+|    ATX_ParseInteger64
 +---------------------------------------------------------------------*/
 ATX_Result 
-ATX_ParseInteger(const char* str, long* result, ATX_Boolean relaxed)
+ATX_ParseInteger64(const char* str, ATX_Int64* result, ATX_Boolean relaxed)
 {
     ATX_Boolean negative = ATX_FALSE;
     ATX_Boolean empty    = ATX_TRUE;
-    long        value    = 0;
-    long        max      = ATX_INT_MAX/10;
+    ATX_Int64   value    = 0;
+    ATX_Int64   max      = ATX_INT64_MAX/10;
     char        c;
 
     /* safe default value */
@@ -246,7 +246,7 @@ ATX_ParseInteger(const char* str, long* result, ATX_Boolean relaxed)
     }
 
     /* adjust the max for overflows when the value is negative */
-    if (negative && ((ATX_INT_MAX%10) == 9)) ++max;
+    if (negative && ((ATX_INT64_MAX%10) == 9)) ++max;
 
     while ((c = *str++)) {
         if (c >= '0' && c <= '9') {
@@ -278,15 +278,14 @@ ATX_ParseInteger(const char* str, long* result, ATX_Boolean relaxed)
 }
 
 /*----------------------------------------------------------------------
-|    ATX_ParseIntegerU
+|    ATX_ParseInteger64U
 +---------------------------------------------------------------------*/
 ATX_Result 
-ATX_ParseIntegerU(const char* str, unsigned long* result, ATX_Boolean relaxed)
+ATX_ParseInteger64U(const char* str, ATX_UInt64* result, ATX_Boolean relaxed)
 {
-    ATX_Boolean   empty = ATX_TRUE;
-    unsigned long value = 0;
-    unsigned long max   = ATX_UINT_MAX/10;
-    char          c;
+    ATX_Boolean empty = ATX_TRUE;
+    ATX_UInt64  value = 0;
+    char        c;
 
     /* safe default value */
     *result = 0;
@@ -306,8 +305,8 @@ ATX_ParseIntegerU(const char* str, unsigned long* result, ATX_Boolean relaxed)
 
     while ((c = *str++)) {
         if (c >= '0' && c <= '9') {
-            unsigned long new_value;
-            if (value > max)  return ATX_ERROR_OVERFLOW;
+            ATX_UInt64 new_value;
+            if (value > ATX_UINT64_MAX/10)  return ATX_ERROR_OVERFLOW;
             new_value = 10*value + (c-'0');
             if (new_value < value) return ATX_ERROR_OVERFLOW;
             value = new_value;
@@ -337,14 +336,14 @@ ATX_ParseIntegerU(const char* str, unsigned long* result, ATX_Boolean relaxed)
 ATX_Result 
 ATX_ParseInteger32(const char* str, ATX_Int32* value, ATX_Boolean relaxed)
 {
-    long value_l;
-    ATX_Result result = ATX_ParseInteger(str, &value_l, relaxed);
+    ATX_Int64 value_64;
+    ATX_Result result = ATX_ParseInteger64(str, &value_64, relaxed);
     *value = 0;
     if (ATX_SUCCEEDED(result)) {
-        if (value_l < ATX_INT_MIN || value_l > ATX_INT_MAX) {
+        if (value_64 < ATX_INT_MIN || value_64 > ATX_INT_MAX) {
             return ATX_ERROR_OVERFLOW;
         }
-        *value = (ATX_Int32)value_l;
+        *value = (ATX_Int32)value_64;
     }
     return result;
 }
@@ -355,12 +354,46 @@ ATX_ParseInteger32(const char* str, ATX_Int32* value, ATX_Boolean relaxed)
 ATX_Result 
 ATX_ParseInteger32U(const char* str, ATX_UInt32* value, ATX_Boolean relaxed)
 {
-    unsigned long value_l;
-    ATX_Result result = ATX_ParseIntegerU(str, &value_l, relaxed);
+    ATX_UInt64 value_64;
+    ATX_Result result = ATX_ParseInteger64U(str, &value_64, relaxed);
     *value = 0;
     if (ATX_SUCCEEDED(result)) {
-        if (value_l > ATX_UINT_MAX) return ATX_ERROR_OVERFLOW;
-        *value = (ATX_UInt32)value_l;
+        if (value_64 > ATX_UINT_MAX) return ATX_ERROR_OVERFLOW;
+        *value = (ATX_UInt32)value_64;
+    }
+    return result;
+}
+
+/*----------------------------------------------------------------------
+|    ATX_ParseInteger
++---------------------------------------------------------------------*/
+ATX_Result 
+ATX_ParseInteger(const char* str, int* value, ATX_Boolean relaxed)
+{
+    ATX_Int64 value_64;
+    ATX_Result result = ATX_ParseInteger64(str, &value_64, relaxed);
+    *value = 0;
+    if (ATX_SUCCEEDED(result)) {
+        if (value_64 < ATX_INT_MIN || value_64 > ATX_INT_MAX) {
+            return ATX_ERROR_OVERFLOW;
+        }
+        *value = (int)value_64;
+    }
+    return result;
+}
+
+/*----------------------------------------------------------------------
+|    ATX_ParseIntegerU
++---------------------------------------------------------------------*/
+ATX_Result 
+ATX_ParseIntegerU(const char* str, unsigned int* value, ATX_Boolean relaxed)
+{
+    ATX_UInt64 value_64;
+    ATX_Result result = ATX_ParseInteger64U(str, &value_64, relaxed);
+    *value = 0;
+    if (ATX_SUCCEEDED(result)) {
+        if (value_64 > ATX_UINT_MAX) return ATX_ERROR_OVERFLOW;
+        *value = (unsigned int)value_64;
     }
     return result;
 }

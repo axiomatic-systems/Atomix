@@ -35,6 +35,18 @@
 			name = Apps;
 			productName = Apps;
 		};
+		CAAA4C660E35183B00783AE4 /* All */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = CAAA4C940E35186200783AE4 /* Build configuration list for PBXAggregateTarget "All" */;
+			buildPhases = (
+			);
+			dependencies = (
+				CAAA4C6C0E35184400783AE4 /* PBXTargetDependency */,
+				CAAA4C6A0E35184200783AE4 /* PBXTargetDependency */,
+			);
+			name = All;
+			productName = All;
+		};
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
@@ -217,6 +229,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = CA0C9A250D15D16C00E23496;
 			remoteInfo = NetPump;
+		};
+		CAAA4C690E35184200783AE4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CA0C9A490D15D1C600E23496 /* Apps */;
+			remoteInfo = Apps;
+		};
+		CAAA4C6B0E35184400783AE4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CA0C9A370D15D1A700E23496 /* Tests */;
+			remoteInfo = Tests;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -816,6 +842,7 @@
 				CA0C9A250D15D16C00E23496 /* NetPump */,
 				CA0C9A370D15D1A700E23496 /* Tests */,
 				CA0C9A490D15D1C600E23496 /* Apps */,
+				CAAA4C660E35183B00783AE4 /* All */,
 			);
 		};
 /* End PBXProject section */
@@ -996,6 +1023,16 @@
 			isa = PBXTargetDependency;
 			target = CA0C9A250D15D16C00E23496 /* NetPump */;
 			targetProxy = CA0C9A4D0D15D1CC00E23496 /* PBXContainerItemProxy */;
+		};
+		CAAA4C6A0E35184200783AE4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CA0C9A490D15D1C600E23496 /* Apps */;
+			targetProxy = CAAA4C690E35184200783AE4 /* PBXContainerItemProxy */;
+		};
+		CAAA4C6C0E35184400783AE4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CA0C9A370D15D1A700E23496 /* Tests */;
+			targetProxy = CAAA4C6B0E35184400783AE4 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1338,6 +1375,27 @@
 			};
 			name = Release;
 		};
+		CAAA4C670E35183C00783AE4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = All;
+			};
+			name = Debug;
+		};
+		CAAA4C680E35183C00783AE4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				PRODUCT_NAME = All;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1445,6 +1503,15 @@
 			buildConfigurations = (
 				CA0C9A4A0D15D1C600E23496 /* Debug */,
 				CA0C9A4B0D15D1C600E23496 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CAAA4C940E35186200783AE4 /* Build configuration list for PBXAggregateTarget "All" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CAAA4C670E35183C00783AE4 /* Debug */,
+				CAAA4C680E35183C00783AE4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

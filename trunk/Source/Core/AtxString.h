@@ -132,7 +132,7 @@ extern ATX_String
 ATX_String_ToUppercase(const ATX_String* str);
 
 extern ATX_Result
-ATX_String_ToInteger(const ATX_String* str, long* value, ATX_Boolean relaxed);
+ATX_String_ToInteger(const ATX_String* str, int* value, ATX_Boolean relaxed);
 
 extern ATX_Result
 ATX_String_ToFloat(const ATX_String* str, float* value, ATX_Boolean relaxed);

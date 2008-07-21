@@ -84,16 +84,22 @@ extern ATX_Result
 ATX_ParseFloat(const char* str, float* result, ATX_Boolean relaxed);
 
 extern ATX_Result 
-ATX_ParseInteger(const char* str, long* result, ATX_Boolean relaxed);
+ATX_ParseInteger(const char* str, int* result, ATX_Boolean relaxed);
 
 extern ATX_Result 
-ATX_ParseIntegerU(const char* str, unsigned long* result, ATX_Boolean relaxed);
+ATX_ParseIntegerU(const char* str, unsigned int* result, ATX_Boolean relaxed);
 
 extern ATX_Result 
 ATX_ParseInteger32(const char* str, ATX_Int32* result, ATX_Boolean relaxed);
 
 extern ATX_Result 
 ATX_ParseInteger32U(const char* str, ATX_UInt32* result, ATX_Boolean relaxed);
+
+extern ATX_Result 
+ATX_ParseInteger64(const char* str, ATX_Int64* result, ATX_Boolean relaxed);
+
+extern ATX_Result 
+ATX_ParseInteger64U(const char* str, ATX_UInt64* result, ATX_Boolean relaxed);
 
 extern ATX_Result
 ATX_FloatToString(float value, char* buffer, ATX_Size buffer_size);
