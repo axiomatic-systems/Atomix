@@ -193,21 +193,27 @@ typedef unsigned ATX_CONFIG_INT_32_64_TYPE ATX_UInt3264;
 #endif
 #endif
 
-#if !defined(ATX_INT64_MIN)
-#if defined(ATX_CONFIG_HAVE_LLONG_MIN)
-#define ATX_INT64_MIN LLONG_MIN
-#endif
-#endif
-
 #if !defined(ATX_INT64_MAX)
 #if defined(ATX_CONFIG_HAVE_LLONG_MAX)
 #define ATX_INT64_MAX LLONG_MAX
+#else
+#define ATX_INT64_MAX 0x7FFFFFFFFFFFFFFFLL
+#endif
+#endif
+
+#if !defined(ATX_INT64_MIN)
+#if defined(ATX_CONFIG_HAVE_LLONG_MIN)
+#define ATX_INT64_MIN LLONG_MIN
+#else
+#define ATX_INT64_MIN (-ATX_INT64_MAX - 1LL) 
 #endif
 #endif
 
 #if !defined(ATX_UINT64_MAX)
 #if defined(ATX_CONFIG_HAVE_ULLONG_MAX)
 #define ATX_UINT64_MAX ULLONG_MAX
+#else
+#define ATX_UINT64_MAX 0xFFFFFFFFFFFFFFFFULL
 #endif
 #endif
 
