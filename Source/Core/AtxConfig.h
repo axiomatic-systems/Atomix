@@ -50,6 +50,9 @@
 #define ATX_CONFIG_HAVE_MEMCMP
 #define ATX_CONFIG_HAVE_ATEXIT
 #define ATX_CONFIG_HAVE_GETENV
+#define ATX_CONFIG_HAVE_LLONG_MIN
+#define ATX_CONFIG_HAVE_LLONG_MAX
+#define ATX_CONFIG_HAVE_ULLONG_MAX
 #endif /* ATX_CONFIG_HAS_STD_C */
 
 #if defined(ATX_CONFIG_HAVE_STRING_H)
@@ -86,9 +89,6 @@
 +---------------------------------------------------------------------*/
 /* GCC */
 #if defined(__GNUC__)
-#define ATX_CONFIG_HAVE_LONG_LONG_MIN
-#define ATX_CONFIG_HAVE_LONG_LONG_MAX
-#define ATX_CONFIG_HAVE_ULONG_LONG_MAX
 #define ATX_LocalFunctionName __FUNCTION__
 #define ATX_COMPILER_UNUSED(p) (void)p
 #else
