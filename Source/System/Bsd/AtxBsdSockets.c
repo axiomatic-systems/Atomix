@@ -621,7 +621,7 @@ BsdSocketInputStream_Tell(ATX_InputStream* self,
 +---------------------------------------------------------------------*/
 ATX_METHOD
 BsdSocketInputStream_GetSize(ATX_InputStream* self, 
-                             ATX_Size*        size)
+                             ATX_LargeSize*   size)
 {
     ATX_COMPILER_UNUSED(self);
 
@@ -635,7 +635,7 @@ BsdSocketInputStream_GetSize(ATX_InputStream* self,
 +---------------------------------------------------------------------*/
 ATX_METHOD
 BsdSocketInputStream_GetAvailable(ATX_InputStream* self, 
-                                  ATX_Size*        available)
+                                  ATX_LargeSize*   available)
 {
     ATX_COMPILER_UNUSED(self);
     ATX_COMPILER_UNUSED(available);
@@ -647,7 +647,7 @@ BsdSocketInputStream_GetAvailable(ATX_InputStream* self,
 +---------------------------------------------------------------------*/
 ATX_METHOD
 BsdSocketInputStream_GetAvailable(ATX_InputStream* _self, 
-                                  ATX_Size*        available)
+                                  ATX_LargeSize*   available)
 {
     BsdSocketStream* self = ATX_SELF(BsdSocketStream, ATX_InputStream);
     unsigned long    ready = 0;

@@ -12,6 +12,12 @@
 /*----------------------------------------------------------------------
 |       includes
 +---------------------------------------------------------------------*/
+#define _LARGEFILE_SOURCE
+#define _LARGEFILE_SOURCE64
+#define _FILE_OFFSET_BITS 64
+
+#include "AtxConfig.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -31,10 +37,10 @@
 |       types
 +---------------------------------------------------------------------*/
 typedef struct {
-    ATX_Cardinal reference_count;
-    FILE*        file;
-    ATX_Position position;
-    ATX_Size     size;
+    ATX_Cardinal  reference_count;
+    FILE*         file;
+    ATX_Position  position;
+    ATX_LargeSize size;
 } StdcFileWrapper;
 
 typedef struct {
@@ -55,7 +61,7 @@ typedef struct {
 
     /* members */
     ATX_String       name;
-    ATX_Size         size;
+    ATX_LargeSize    size;
     ATX_Flags        mode;
     StdcFileWrapper* file;
 } StdcFile;
@@ -65,7 +71,7 @@ typedef struct {
 +---------------------------------------------------------------------*/
 static ATX_Result
 StdcFileWrapper_Create(FILE*             file, 
-                       ATX_Size          size,
+                       ATX_LargeSize     size,
                        StdcFileWrapper** wrapper)
 {
     /* allocate a new object */
@@ -166,7 +172,7 @@ StdcFileStream_Destroy(StdcFileStream* self)
 ATX_METHOD
 StdcFileStream_Seek(StdcFileStream* self, ATX_Position where)
 {
-    if (fseek(self->file->file, where, SEEK_SET) == 0) {
+    if (ATX_fseek(self->file->file, where, SEEK_SET) == 0) {
         self->file->position = where;
         return ATX_SUCCESS;
     } else {
@@ -273,7 +279,7 @@ StdcFileInputStream_Tell(ATX_InputStream* _self,
 +---------------------------------------------------------------------*/
 ATX_METHOD
 StdcFileInputStream_GetSize(ATX_InputStream* _self, 
-                            ATX_Size*        size)
+                            ATX_LargeSize*   size)
 {
     StdcFileStream* self = ATX_SELF(StdcFileStream, ATX_InputStream);
     *size = self->file->size;
@@ -285,7 +291,7 @@ StdcFileInputStream_GetSize(ATX_InputStream* _self,
 +---------------------------------------------------------------------*/
 ATX_METHOD
 StdcFileInputStream_GetAvailable(ATX_InputStream* _self, 
-                                 ATX_Size*        size)
+                                 ATX_LargeSize*   size)
 {
     StdcFileStream* self = ATX_SELF(StdcFileStream, ATX_InputStream);
     *size = self->file->size - self->file->position;
@@ -537,8 +543,8 @@ StdcFile_Open(ATX_File* _self, ATX_Flags mode)
         else {
             /* Hack to get the filesize since PIPS stat() is broken. */
             fseek(stdc_file, 0L, SEEK_END); 
-            self->size = ftell(stdc_file);
-            fseek(stdc_file, 0L, SEEK_SET); /* return the beginning */
+            self->size = ATX_ftell(stdc_file);
+            ATX_fseek(stdc_file, 0L, SEEK_SET); /* return the beginning */
         }
 #endif
     }
@@ -575,7 +581,7 @@ StdcFile_Close(ATX_File* _self)
 |       StdcFile_GetSize
 +---------------------------------------------------------------------*/
 ATX_METHOD
-StdcFile_GetSize(ATX_File* _self, ATX_Size* size)
+StdcFile_GetSize(ATX_File* _self, ATX_LargeSize* size)
 {
     StdcFile* self = ATX_SELF(StdcFile, ATX_File);
 
