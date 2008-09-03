@@ -45,7 +45,7 @@ ATX_DECLARE_INTERFACE(ATX_File)
 ATX_BEGIN_INTERFACE_DEFINITION(ATX_File)
     ATX_Result (*Open)(ATX_File* self, ATX_Flags mode);
     ATX_Result (*Close)(ATX_File* self);
-    ATX_Result (*GetSize)(ATX_File* self, ATX_Size* size);
+    ATX_Result (*GetSize)(ATX_File* self, ATX_LargeSize* size);
     ATX_Result (*GetInputStream)(ATX_File* self, ATX_InputStream** stream);
     ATX_Result (*GetOutputStream)(ATX_File* self, ATX_OutputStream**  stream);
 ATX_END_INTERFACE_DEFINITION
@@ -59,7 +59,7 @@ extern "C" {
 
 ATX_Result ATX_File_Open(ATX_File* self, ATX_Flags mode);
 ATX_Result ATX_File_Close(ATX_File* self);
-ATX_Result ATX_File_GetSize(ATX_File* self, ATX_Size* size);
+ATX_Result ATX_File_GetSize(ATX_File* self, ATX_LargeSize* size);
 ATX_Result ATX_File_GetInputStream(ATX_File* self, ATX_InputStream** stream);
 ATX_Result ATX_File_GetOutputStream(ATX_File* self, ATX_OutputStream**  stream);
 

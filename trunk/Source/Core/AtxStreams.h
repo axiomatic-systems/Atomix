@@ -44,9 +44,9 @@ ATX_BEGIN_INTERFACE_DEFINITION(ATX_InputStream)
                        ATX_Size*        bytes_read);
     ATX_Result (*Seek)(ATX_InputStream* self, ATX_Position  offset);
     ATX_Result (*Tell)(ATX_InputStream* self, ATX_Position* offset);
-    ATX_Result (*GetSize)(ATX_InputStream* self, ATX_Size* size);
+    ATX_Result (*GetSize)(ATX_InputStream* self, ATX_LargeSize* size);
     ATX_Result (*GetAvailable)(ATX_InputStream* self, 
-                               ATX_Size*        available);
+                               ATX_LargeSize*   available);
 ATX_END_INTERFACE_DEFINITION
 
 /*----------------------------------------------------------------------

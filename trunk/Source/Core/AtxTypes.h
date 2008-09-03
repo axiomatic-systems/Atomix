@@ -75,11 +75,6 @@ typedef unsigned long ATX_Size;
 typedef signed long ATX_Offset;
 
 /**
-* A signed integer used to represent a positive offset from a base value.
-*/
-typedef unsigned long ATX_Position;
-
-/**
  * An address as a generic pointer, that can be dereferenced as a byte address.
  */
 typedef unsigned char* ATX_Address;
@@ -147,6 +142,13 @@ typedef unsigned ATX_CONFIG_INT64_TYPE ATX_UInt64;
 #else 
 #error ATX_CONFIG_INT64_TYPE not defined
 #endif
+
+/** 
+ * 64-bit size and position for file access
+ *
+ */
+typedef ATX_UInt64 ATX_LargeSize;
+typedef ATX_UInt64 ATX_Position;
 
 /**
  * Integer that matches the native machine word size.

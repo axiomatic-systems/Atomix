@@ -32,7 +32,7 @@ ATX_File_Close(ATX_File* self)
 }
 
 ATX_Result 
-ATX_File_GetSize(ATX_File* self, ATX_Size* size)
+ATX_File_GetSize(ATX_File* self, ATX_LargeSize* size)
 {
     return ATX_INTERFACE(self)->GetSize(self, size);
 }

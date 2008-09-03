@@ -13,6 +13,7 @@
 /*----------------------------------------------------------------------
 |   constants
 +---------------------------------------------------------------------*/
-#define ATX_ATOMIX_VERSION_STRING "1.3.3"
+#define ATX_ATOMIX_VERSION        0x01040000
+#define ATX_ATOMIX_VERSION_STRING "1.4.0"
 
 #endif /* _ATX_VERSION_H_ */

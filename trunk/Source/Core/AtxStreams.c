@@ -29,7 +29,7 @@ typedef struct {
     ATX_Cardinal           reference_count;
     ATX_InputStream*       parent;
     ATX_StreamTransformer* transformer;
-    ATX_Size               size;
+    ATX_LargeSize          size;
     ATX_Position           offset;
     ATX_Position           position;
 } ATX_SubInputStream;
@@ -175,9 +175,9 @@ ATX_InputStream_Skip(ATX_InputStream* self, ATX_Size count)
 ATX_Result
 ATX_InputStream_Load(ATX_InputStream* self, ATX_Size max_read, ATX_DataBuffer** buffer)
 {
-    ATX_Result result;
-    ATX_Size   total_bytes_read;
-    ATX_Size   size = 0;
+    ATX_Result    result;
+    ATX_LargeSize total_bytes_read;
+    ATX_LargeSize size = 0;
 
     /* create a buffer if none was given */
     if (*buffer == NULL) {
@@ -200,10 +200,10 @@ ATX_InputStream_Load(ATX_InputStream* self, ATX_Size max_read, ATX_DataBuffer** 
     /* read the data from the file */
     total_bytes_read = 0;
     do {
-        ATX_Size  available = 0;
-        ATX_Size  bytes_to_read;
-        ATX_Size  bytes_read;
-        ATX_Byte* data;
+        ATX_LargeSize available = 0;
+        ATX_LargeSize bytes_to_read;
+        ATX_Size      bytes_read;
+        ATX_Byte*     data;
 
         /* check if we know how much data is available */
         result = ATX_InputStream_GetAvailable(self, &available);
@@ -227,10 +227,10 @@ ATX_InputStream_Load(ATX_InputStream* self, ATX_Size max_read, ATX_DataBuffer** 
 
         /* read the data */
         data = ATX_DataBuffer_UseData(*buffer)+total_bytes_read;
-        result = ATX_InputStream_Read(self, (void*)data, bytes_to_read, &bytes_read);
+        result = ATX_InputStream_Read(self, (void*)data, (ATX_Size)bytes_to_read, &bytes_read);
         if (ATX_SUCCEEDED(result) && bytes_read != 0) {
             total_bytes_read += bytes_read;
-            ATX_DataBuffer_SetDataSize(*buffer, total_bytes_read);
+            ATX_DataBuffer_SetDataSize(*buffer, (ATX_Size)total_bytes_read);
         }
     } while(ATX_SUCCEEDED(result) && (size==0 || total_bytes_read < size));
 
@@ -334,7 +334,7 @@ ATX_SubInputStream_Create(ATX_InputStream*       parent,
 
     /* check the size and offset */
     {
-        ATX_Size parent_size;
+        ATX_LargeSize parent_size;
 
         stream->offset   = offset;
         stream->size     = size;
@@ -344,7 +344,7 @@ ATX_SubInputStream_Create(ATX_InputStream*       parent,
         if (ATX_SUCCEEDED(result)) {
             if (parent_size > 0) {
                 /* parent size known */
-                if ((ATX_Size)offset >= parent_size) {
+                if ((ATX_LargeSize)offset >= parent_size) {
                     *object = NULL;
                     ATX_FreeMemory((void*)stream);
                     return ATX_ERROR_INVALID_PARAMETERS;
@@ -478,7 +478,7 @@ ATX_SubInputStream_Tell(ATX_InputStream* _self,
 +---------------------------------------------------------------------*/
 ATX_METHOD
 ATX_SubInputStream_GetSize(ATX_InputStream* _self,
-                           ATX_Size*        size)
+                           ATX_LargeSize*   size)
 {
     ATX_SubInputStream* self = ATX_SELF(ATX_SubInputStream, ATX_InputStream);
     if (size) *size = self->size;
@@ -490,11 +490,11 @@ ATX_SubInputStream_GetSize(ATX_InputStream* _self,
 +---------------------------------------------------------------------*/
 ATX_METHOD
 ATX_SubInputStream_GetAvailable(ATX_InputStream* _self,
-                                ATX_Size*        available)
+                                ATX_LargeSize*   available)
 {
     ATX_SubInputStream* self = ATX_SELF(ATX_SubInputStream, ATX_InputStream);
-    ATX_Size            max_possible;
-    ATX_Size            parent_available = 0;
+    ATX_LargeSize       max_possible;
+    ATX_LargeSize       parent_available = 0;
     ATX_Result          result;
 
     /* compute the max possible value */
@@ -728,7 +728,7 @@ ATX_MemoryStream_InputTell(ATX_InputStream* _self,
 +---------------------------------------------------------------------*/
 ATX_METHOD
 ATX_MemoryStream_GetSize(ATX_InputStream* _self,
-                         ATX_Size*        size)
+                         ATX_LargeSize*   size)
 {
     ATX_MemoryStream* self = ATX_SELF(ATX_MemoryStream, ATX_InputStream);
     if (size) *size = ATX_DataBuffer_GetDataSize(self->buffer);
@@ -740,7 +740,7 @@ ATX_MemoryStream_GetSize(ATX_InputStream* _self,
 +---------------------------------------------------------------------*/
 ATX_METHOD
 ATX_MemoryStream_GetAvailable(ATX_InputStream* _self,
-                              ATX_Size*        available)
+                              ATX_LargeSize*   available)
 {
     ATX_MemoryStream* self = ATX_SELF(ATX_MemoryStream, ATX_InputStream);
     *available = ATX_DataBuffer_GetDataSize(self->buffer)-self->read_offset; 
