@@ -25,11 +25,11 @@
 |   types
 +---------------------------------------------------------------------*/
 typedef struct {
-    ATX_Cardinal reference_count;
-    HANDLE       handle;
-    ATX_Position position;
-    ATX_Size     size;
-    ATX_Boolean  append_mode;
+    ATX_Cardinal  reference_count;
+    HANDLE        handle;
+    ATX_Position  position;
+    ATX_LargeSize size;
+    ATX_Boolean   append_mode;
 } Win32FileHandleWrapper;
 
 typedef struct {
@@ -50,7 +50,7 @@ typedef struct {
 
     /* members */
     ATX_CString             name;
-    ATX_Size                size;
+    ATX_LargeSize           size;
     ATX_Flags               mode;
     Win32FileHandleWrapper* file;
 } Win32File;
@@ -60,7 +60,7 @@ typedef struct {
 +---------------------------------------------------------------------*/
 static ATX_Result
 Win32FileHandleWrapper_Create(HANDLE                   handle, 
-                              ATX_Size                 size,
+                              ATX_LargeSize            size,
                               ATX_Boolean              append_mode,
                               Win32FileHandleWrapper** wrapper)
 {
@@ -168,7 +168,9 @@ Win32FileStream_Destroy(Win32FileStream* self)
 ATX_METHOD
 Win32FileStream_Seek(Win32FileStream* self, ATX_Position where)
 {
-    SetFilePointer(self->file->handle, where, 0, FILE_BEGIN);
+    LARGE_INTEGER position;
+    position.QuadPart = where;
+    SetFilePointerEx(self->file->handle, position, NULL, FILE_BEGIN);
     self->file->position = where;
     return ATX_SUCCESS;
 }
@@ -269,7 +271,7 @@ Win32FileInputStream_Tell(ATX_InputStream* _self,
 +---------------------------------------------------------------------*/
 ATX_METHOD
 Win32FileInputStream_GetSize(ATX_InputStream* _self, 
-                             ATX_Size*        size)
+                             ATX_LargeSize*   size)
 {
     Win32FileStream* self = ATX_SELF(Win32FileStream, ATX_InputStream);
     *size = self->file->size;
@@ -281,7 +283,7 @@ Win32FileInputStream_GetSize(ATX_InputStream* _self,
 +---------------------------------------------------------------------*/
 ATX_METHOD
 Win32FileInputStream_GetAvailable(ATX_InputStream* _self, 
-                                  ATX_Size*        size)
+                                  ATX_LargeSize*   size)
 {
     Win32FileStream* self = ATX_SELF(Win32FileStream, ATX_InputStream);
     *size = self->file->size - self->file->position;
@@ -627,7 +629,7 @@ Win32File_Close(ATX_File* _self)
 |   Win32File_GetSize
 +---------------------------------------------------------------------*/
 ATX_METHOD
-Win32File_GetSize(ATX_File* _self, ATX_Size* size)
+Win32File_GetSize(ATX_File* _self, ATX_LargeSize* size)
 {
     Win32File* self = ATX_SELF(Win32File, ATX_File);
 
