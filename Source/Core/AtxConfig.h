@@ -100,7 +100,10 @@
 #define ATX_INT64_MIN _I64_MIN
 #define ATX_INT64_MAX _I64_MAX
 #define ATX_UINT64_MAX _UI64_MAX
-#define ATX_strdup     _strdup
+#define ATX_strdup _strdup
+#define ATX_fseek  _fseeki64
+#define ATX_ftell  _ftelli64
+#define ATX_INT64_PRINTF_FORMAT "%I64"
 #if (_MSC_VER >= 1400) && !defined(_WIN32_WCE)
 #define ATX_vsnprintf(s,c,f,a)  _vsnprintf_s(s,c,_TRUNCATE,f,a)
 #define ATX_snprintf(s,c,f,...) _snprintf_s(s,c,_TRUNCATE,f,__VA_ARGS__)
@@ -138,6 +141,12 @@ typedef __w64 long ATX_PointerLong;
 #undef ATX_CONFIG_HAVE_UNISTD_H
 #endif
 
+/* Symbian */
+#if defined(__SYMBIAN32__)
+#define ATX_fseek fseek  /* no fseeko ? */
+#define ATX_ftell ftell  /* no ftello ? */
+#endif
+
 /*----------------------------------------------------------------------
 |   defaults
 +---------------------------------------------------------------------*/
@@ -153,6 +162,10 @@ typedef __w64 long ATX_PointerLong;
 #define ATX_CONFIG_INT64_TYPE long long
 #endif
 
+#if !defined(ATX_INT64_PRINTF_FORMAT)
+#define ATX_INT64_PRINTF_FORMAT "%ll"
+#endif
+
 /*----------------------------------------------------------------------
 |    defaults
 +---------------------------------------------------------------------*/
@@ -160,17 +173,29 @@ typedef __w64 long ATX_PointerLong;
 #if !defined(ATX_strdup)
 #define ATX_strdup strdup
 #endif
+
 #if !defined(ATX_snprintf)
 #define ATX_snprintf snprintf
 #endif
+
 #if !defined(ATX_strncpy)
 #define ATX_strncpy strncpy
 #endif
+
 #if !defined(ATX_vsnprintf)
 #define ATX_vsnprintf vsnprintf
 #endif
+
 #if !defined(ATX_LocalFunctionName)
 #define ATX_LocalFunctionName (NULL)
+#endif
+
+#if !defined(ATX_fseek)
+#define ATX_fseek fseeko
+#endif
+
+#if !defined(ATX_ftell)
+#define ATX_ftell ftello
 #endif
 
 #endif /* _ATX_CONFIG_H_ */
