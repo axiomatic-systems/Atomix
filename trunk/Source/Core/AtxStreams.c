@@ -703,7 +703,7 @@ ATX_MemoryStream_InputSeek(ATX_InputStream* _self,
                            ATX_Position     offset)
 {
     ATX_MemoryStream* self = ATX_SELF(ATX_MemoryStream, ATX_InputStream);
-    if ((ATX_Size)offset > ATX_DataBuffer_GetDataSize(self->buffer)) {
+    if (offset > ATX_DataBuffer_GetDataSize(self->buffer)) {
         return ATX_ERROR_INVALID_PARAMETERS;
     } else {
         self->read_offset = offset;
@@ -762,7 +762,7 @@ ATX_MemoryStream_Write(ATX_OutputStream* _self,
 
     ATX_CopyMemory(ATX_DataBuffer_UseData(self->buffer)+self->write_offset, data, bytes_to_write);
     self->write_offset += bytes_to_write;
-    if ((ATX_Size)self->write_offset > ATX_DataBuffer_GetDataSize(self->buffer)) {
+    if (self->write_offset > ATX_DataBuffer_GetDataSize(self->buffer)) {
         ATX_DataBuffer_SetDataSize(self->buffer, self->write_offset);
     }
     if (bytes_written) *bytes_written = bytes_to_write;
@@ -778,7 +778,7 @@ ATX_MemoryStream_OutputSeek(ATX_OutputStream* _self,
                             ATX_Position      offset)
 {
     ATX_MemoryStream* self = ATX_SELF(ATX_MemoryStream, ATX_OutputStream);
-    if ((ATX_Size)offset <= ATX_DataBuffer_GetDataSize(self->buffer)) {
+    if (offset <= ATX_DataBuffer_GetDataSize(self->buffer)) {
         self->write_offset = offset;
         return ATX_SUCCESS;
     } else {

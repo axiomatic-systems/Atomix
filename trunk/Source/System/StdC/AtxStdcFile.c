@@ -238,7 +238,7 @@ StdcFileInputStream_Read(ATX_InputStream* _self,
     nb_read = fread(buffer, 1, (size_t)bytes_to_read, self->file->file);
     if (nb_read > 0 || bytes_to_read == 0) {
         if (bytes_read) *bytes_read = (ATX_Size)nb_read;
-        self->file->position += (ATX_Size)nb_read;
+        self->file->position += nb_read;
         return ATX_SUCCESS;
     } else {
         if (bytes_read) *bytes_read = 0;
@@ -336,7 +336,7 @@ StdcFileOutputStream_Write(ATX_OutputStream* _self,
     nb_written = fwrite(buffer, 1, (size_t)bytes_to_write, self->file->file);
     if (nb_written > 0 || bytes_to_write == 0) {
         if (bytes_written) *bytes_written = (ATX_Size)nb_written;
-        self->file->position += (ATX_Size)nb_written;
+        self->file->position += nb_written;
         return ATX_SUCCESS;
     } else {
         if (bytes_written) *bytes_written = 0;
