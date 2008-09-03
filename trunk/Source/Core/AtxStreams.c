@@ -38,6 +38,7 @@ typedef struct {
 |   constants
 +---------------------------------------------------------------------*/
 #define ATX_INPUT_STREAM_LOAD_DEFAULT_READ_CHUNK 4096
+#define ATX_INPUT_STREAM_LOAD_MAX_SIZE           0x100000
 
 /*----------------------------------------------------------------------
 |   ATX_InputStream_ReadLine
@@ -187,15 +188,23 @@ ATX_InputStream_Load(ATX_InputStream* self, ATX_Size max_read, ATX_DataBuffer** 
     /* reset the buffer */
     ATX_DataBuffer_SetDataSize(*buffer, 0);
 
+    /* check args */
+    if (max_read > ATX_INPUT_STREAM_LOAD_MAX_SIZE) {
+        return ATX_ERROR_OUT_OF_RANGE;
+    }
+
     /* try to get the stream size */
     if (ATX_FAILED(ATX_InputStream_GetSize(self, &size))) {
         size = max_read;
     }  else {
+        if (size > ATX_INPUT_STREAM_LOAD_MAX_SIZE) {
+            return ATX_ERROR_OUT_OF_RANGE;
+        }
         if (max_read && max_read < size) size = max_read;
     }
 
     /* pre-allocate the buffer */
-    if (size) ATX_CHECK(ATX_DataBuffer_Reserve(*buffer, size));
+    if (size) ATX_CHECK(ATX_DataBuffer_Reserve(*buffer, (ATX_Size)size));
 
     /* read the data from the file */
     total_bytes_read = 0;
@@ -222,8 +231,14 @@ ATX_InputStream_Load(ATX_InputStream* self, ATX_Size max_read, ATX_DataBuffer** 
         /* stop if we've read everything */
         if (bytes_to_read == 0) break;
 
+        /* check that we don't read too much */
+        if (total_bytes_read+bytes_to_read > ATX_INPUT_STREAM_LOAD_MAX_SIZE) {
+            ATX_DataBuffer_SetBufferSize(*buffer, 0);
+            return ATX_ERROR_OUT_OF_RANGE;
+        }
+
         /* allocate space in the buffer */
-        ATX_CHECK(ATX_DataBuffer_Reserve(*buffer, total_bytes_read+bytes_to_read));
+        ATX_CHECK(ATX_DataBuffer_Reserve(*buffer, (ATX_Size)(total_bytes_read+bytes_to_read)));
 
         /* read the data */
         data = ATX_DataBuffer_UseData(*buffer)+total_bytes_read;
@@ -311,7 +326,7 @@ ATX_DECLARE_INTERFACE_MAP(ATX_SubInputStream, ATX_Referenceable)
 ATX_Result
 ATX_SubInputStream_Create(ATX_InputStream*       parent, 
                           ATX_Position           offset,
-                          ATX_Size               size,
+                          ATX_LargeSize          size,
                           ATX_StreamTransformer* transformer,
                           ATX_InputStream**      object)
 { 
@@ -405,7 +420,7 @@ ATX_SubInputStream_Read(ATX_InputStream* _self,
     /* clip the request */
     if (self->size > 0) {
         if (bytes_to_read > self->size - self->position) {
-            bytes_to_read = self->size - self->position;
+            bytes_to_read = (ATX_Size)(self->size - self->position);
             if (bytes_to_read == 0) {
                 if (bytes_read != NULL) *bytes_read = 0;
                 return ATX_ERROR_EOS;
@@ -682,7 +697,7 @@ ATX_MemoryStream_Read(ATX_InputStream* _self,
     /* clip to what's available */
     available = ATX_DataBuffer_GetDataSize(self->buffer);
     if (self->read_offset+bytes_to_read > available) {
-        bytes_to_read = available-self->read_offset;
+        bytes_to_read = (ATX_Size)(available-self->read_offset);
     }
 
     /* copy the data */
@@ -758,12 +773,12 @@ ATX_MemoryStream_Write(ATX_OutputStream* _self,
 {
     ATX_MemoryStream* self = ATX_SELF(ATX_MemoryStream, ATX_OutputStream);
 
-    ATX_CHECK(ATX_DataBuffer_Reserve(self->buffer, self->write_offset+bytes_to_write));
+    ATX_CHECK(ATX_DataBuffer_Reserve(self->buffer, (ATX_Size)(self->write_offset+bytes_to_write)));
 
     ATX_CopyMemory(ATX_DataBuffer_UseData(self->buffer)+self->write_offset, data, bytes_to_write);
     self->write_offset += bytes_to_write;
     if (self->write_offset > ATX_DataBuffer_GetDataSize(self->buffer)) {
-        ATX_DataBuffer_SetDataSize(self->buffer, self->write_offset);
+        ATX_DataBuffer_SetDataSize(self->buffer, (ATX_Size)self->write_offset);
     }
     if (bytes_written) *bytes_written = bytes_to_write;
 
