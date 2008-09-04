@@ -79,10 +79,10 @@ ATX_File_Save(ATX_File* file, ATX_DataBuffer* buffer)
     ATX_OutputStream* output = NULL;
     ATX_Result        result;
 
-    /* get the input stream for the file */
+    /* get the output stream for the file */
     ATX_CHECK(ATX_File_GetOutputStream(file, &output));
 
-    /* read the stream */
+    /* write the stream */
     result = ATX_OutputStream_WriteFully(output, 
         ATX_DataBuffer_GetData(buffer),
         ATX_DataBuffer_GetDataSize(buffer));
