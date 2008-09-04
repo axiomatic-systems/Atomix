@@ -103,7 +103,7 @@
 #define ATX_strdup _strdup
 #define ATX_fseek  _fseeki64
 #define ATX_ftell  _ftelli64
-#define ATX_INT64_PRINTF_FORMAT "%I64"
+#define ATX_INT64_PRINTF_FORMAT "I64"
 #if (_MSC_VER >= 1400) && !defined(_WIN32_WCE)
 #define ATX_vsnprintf(s,c,f,a)  _vsnprintf_s(s,c,_TRUNCATE,f,a)
 #define ATX_snprintf(s,c,f,...) _snprintf_s(s,c,_TRUNCATE,f,__VA_ARGS__)
@@ -163,7 +163,7 @@ typedef __w64 long ATX_PointerLong;
 #endif
 
 #if !defined(ATX_INT64_PRINTF_FORMAT)
-#define ATX_INT64_PRINTF_FORMAT "%ll"
+#define ATX_INT64_PRINTF_FORMAT "ll"
 #endif
 
 /*----------------------------------------------------------------------
