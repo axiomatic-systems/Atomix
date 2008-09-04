@@ -20,6 +20,12 @@
 #include "AtxFile.h"
 #include "AtxReferenceable.h"
 #include "AtxDestroyable.h"
+#include "AtxLogging.h"
+
+/*----------------------------------------------------------------------
+|   logging
++---------------------------------------------------------------------*/
+ATX_SET_LOCAL_LOGGER("atomix.system.win32.file")
 
 /*----------------------------------------------------------------------
 |   types
@@ -596,8 +602,15 @@ Win32File_Open(ATX_File* _self, ATX_Flags mode)
         DWORD error = GetLastError();
         switch (error) {
         case ERROR_FILE_NOT_FOUND:
+        case ERROR_PATH_NOT_FOUND:
             return ATX_ERROR_NO_SUCH_FILE;
+
+        case ERROR_ACCESS_DENIED:
+        case ERROR_SHARING_VIOLATION:
+            return ATX_ERROR_ACCESS_DENIED;
+
         default:
+            ATX_LOG_FINEST_1("CreateFile() error %x", error);
             return ATX_FAILURE;
         }
     }
