@@ -384,7 +384,7 @@ Win32FileOutputStream_Tell(ATX_OutputStream* _self,
 ATX_METHOD
 Win32FileOutputStream_Flush(ATX_OutputStream* _self)
 {
-	ATX_COMPILER_UNUSED(_self);
+    ATX_COMPILER_UNUSED(_self);
     return ATX_SUCCESS;
 }
 

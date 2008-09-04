@@ -198,4 +198,12 @@ typedef __w64 long ATX_PointerLong;
 #define ATX_ftell ftello
 #endif
 
+/*----------------------------------------------------------------------
+|    defaults, Symbian
++---------------------------------------------------------------------*/
+#if defined(__SYMBIAN32__)
+#define ATX_LOG_DEFAULT_CONFIG_SOURCE "file:E:\\Sushi\\logging.properties"
+#define ATX_LOG_ROOT_DEFAULT_FILE_HANDLER_FILENAME "E:\\Sushi\\sushilog.txt"
+#endif
+
 #endif /* _ATX_CONFIG_H_ */

@@ -2,7 +2,7 @@
 |
 |   Atomix - Logging Support
 |
-|   (c) 2002-2006 Gilles Boccon-Gibod
+|   (c) 2002-2008 Gilles Boccon-Gibod
 |   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
 ****************************************************************/

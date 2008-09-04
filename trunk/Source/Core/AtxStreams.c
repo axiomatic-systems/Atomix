@@ -828,6 +828,7 @@ ATX_MemoryStream_Flush(ATX_OutputStream* self)
 +---------------------------------------------------------------------*/
 ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(ATX_MemoryStream)
     ATX_GET_INTERFACE_ACCEPT(ATX_MemoryStream, ATX_InputStream)
+    ATX_GET_INTERFACE_ACCEPT(ATX_MemoryStream, ATX_OutputStream)
     ATX_GET_INTERFACE_ACCEPT(ATX_MemoryStream, ATX_Referenceable)
 ATX_END_GET_INTERFACE_IMPLEMENTATION
 
