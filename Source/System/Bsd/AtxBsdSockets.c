@@ -1048,19 +1048,6 @@ ATX_UdpSocket_Create(ATX_DatagramSocket** object)
 }
 
 /*----------------------------------------------------------------------
-|   BsdUdpSocket_Destroy
-+---------------------------------------------------------------------*/
-ATX_METHOD
-BsdUdpSocket_Destroy(ATX_Destroyable* _self)
-{
-    BsdSocket* self = ATX_SELF(BsdSocket, ATX_Destroyable);
-
-    BsdSocket_Destruct(self);
-    ATX_FreeMemory((void*)self);
-    return ATX_SUCCESS;
-}
-
-/*----------------------------------------------------------------------
 |   BsdUdpSocket_Connect
 +---------------------------------------------------------------------*/
 ATX_METHOD
@@ -1236,7 +1223,7 @@ ATX_END_INTERFACE_MAP
 ATX_IMPLEMENT_GET_INTERFACE_ADAPTER_EX(BsdUdpSocket, BsdSocket, ATX_Destroyable)
 ATX_INTERFACE_MAP(BsdUdpSocket, ATX_Destroyable) = {
     BsdUdpSocket_ATX_Destroyable_GetInterface,
-    BsdUdpSocket_Destroy
+    BsdSocket_Destroy
 };
 
 /*----------------------------------------------------------------------
@@ -1396,6 +1383,13 @@ ATX_BEGIN_INTERFACE_MAP(BsdTcpClientSocket, ATX_Socket)
     BsdSocket_GetInputStream,
     BsdSocket_GetOutputStream,
     BsdSocket_GetInfo
+ATX_END_INTERFACE_MAP
+
+/*----------------------------------------------------------------------
+|   ATX_Destroyable interface
++---------------------------------------------------------------------*/
+ATX_BEGIN_INTERFACE_MAP(BsdTcpClientSocket, ATX_Destroyable)
+    BsdSocket_Destroy
 ATX_END_INTERFACE_MAP
 
 /*----------------------------------------------------------------------
