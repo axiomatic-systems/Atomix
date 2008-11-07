@@ -464,7 +464,7 @@ ATX_LogManager_ConfigureLogger(ATX_Logger* logger)
             const char*    cursor = handlers_list;
             const char*    name_start = handlers_list;
             ATX_String     handler_name = ATX_EMPTY_STRING;
-            ATX_LogHandler handler;
+            ATX_LogHandler handler = {NULL, NULL};
             for (;;) {
                 if (*cursor == '\0' || *cursor == ',') {
                     if (cursor != name_start) {
