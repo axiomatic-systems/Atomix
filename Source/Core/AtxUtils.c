@@ -252,7 +252,7 @@ ATX_ParseInteger64(const char* str, ATX_Int64* result, ATX_Boolean relaxed)
         if (c >= '0' && c <= '9') {
             if (value < 0 || value > max) return ATX_ERROR_OVERFLOW;
             value = 10*value + (c-'0');
-            if (value < 0 && (!negative || value != ATX_INT_MIN)) return ATX_ERROR_OVERFLOW;
+            if (value < 0 && (!negative || value != ATX_INT64_MIN)) return ATX_ERROR_OVERFLOW;
             empty = ATX_FALSE;
         } else {
             if (relaxed) {
