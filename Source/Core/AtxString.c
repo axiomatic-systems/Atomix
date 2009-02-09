@@ -124,16 +124,17 @@ ATX_String_CreateFromSubString(const char* str,
 
     /* shortcut */
     if (str != NULL && length != 0) {
-        /* truncate length */     
-        ATX_Size str_length = ATX_StringLength(str);
-        if (first < str_length) {
-            if (first+length > str_length) {
-                length = str_length-first;
-            }
-            if (length != 0) {
-                result.chars = ATX_StringBuffer_CreateFromStringN(str+first, length);
-                return result;
-            }
+        /* possibly truncate length */
+        ATX_Size str_length = 0;
+        const char* src_str = str + first;
+        while (*src_str) {
+            ++str_length;
+            ++src_str;
+            if (str_length >= length) break;
+        }
+        if (str_length != 0) {
+            result.chars = ATX_StringBuffer_CreateFromStringN(str+first, str_length);
+            return result;
         }
     } 
     result.chars = NULL;

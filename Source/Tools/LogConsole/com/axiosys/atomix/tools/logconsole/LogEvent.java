@@ -34,6 +34,6 @@ public class LogEvent {
     }
 
     public String toString() {
-        return "["+logger+"] " + sourceFile + ":" + sourceLine + ", " + timeStamp + ", " + level + ": " + message;  
+        return "["+logger+"] " + ":" + sourceLine + ", " + timeStamp + ", " + level + ": " + message;  
     }
 }

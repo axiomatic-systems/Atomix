@@ -688,7 +688,7 @@ ATX_Logger_Log(ATX_Logger*  self,
         va_start(args, msg);
         /* try to format the message (it might not fit) */
         result = ATX_FormatStringVN(message, buffer_size-1, msg, args);
-	va_end(args);
+        va_end(args);
         if (result >= (int)(buffer_size-1)) result = -1;
         message[buffer_size-1] = 0; /* force a NULL termination */
         if (result >= 0) break;
