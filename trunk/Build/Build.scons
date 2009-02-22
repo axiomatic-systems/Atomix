@@ -78,7 +78,7 @@ class LibraryModule(Module):
         build_source_dirs = [source_root+'/'+dir for dir in Split(build_source_dirs)]
         include_dirs      = [source_root+'/'+dir for dir in Split(include_dirs)]
         Module.__init__(self, name, Split(included_modules)+Split(include_dirs)+Split(build_source_dirs), linked_modules)
-        self.env                = env.Copy()
+        self.env                = env.Clone()
         self.name               = name
         self.build_include_dirs = [source_root+'/'+dir for dir in Split(build_include_dirs)]
         
