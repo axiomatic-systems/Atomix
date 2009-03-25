@@ -151,10 +151,10 @@ ATX_END_INTERFACE_DEFINITION
 /*----------------------------------------------------------------------
 |   convenience macros
 +---------------------------------------------------------------------*/
-#define ATX_ServerSocket_Send(object, packet, address) \
+#define ATX_DatagramSocket_Send(object, packet, address) \
 ATX_INTERFACE(object)->Send(object, packet, address)
 
-#define ATX_ServerSocket_Receive(object, packet, address) \
+#define ATX_DatagramSocket_Receive(object, packet, address) \
 ATX_INTERFACE(object)->Receive(object, packet, address)
 
 /*----------------------------------------------------------------------
