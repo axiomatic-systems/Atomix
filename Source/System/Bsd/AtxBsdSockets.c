@@ -370,7 +370,7 @@ ATX_IpAddress_ResolveName(ATX_IpAddress* address,
             host_entry->h_addrtype != AF_INET) {
             return ATX_ERROR_HOST_UNKNOWN;
         }
-        ATX_CopyMemory(address, host_entry->h_addr, 4);
+        ATX_CopyMemory(&(*address)[0], host_entry->h_addr, 4);
     }
 
     return ATX_SUCCESS;

@@ -62,6 +62,11 @@ typedef struct {
     ATX_OutputStream* stream;
 } ATX_LogTcpHandler;
 
+typedef struct {
+    ATX_DatagramSocket* socket;
+    ATX_SocketAddress   address;
+} ATX_LogUdpHandler;
+
 /*----------------------------------------------------------------------
 |   constants
 +---------------------------------------------------------------------*/
@@ -85,6 +90,9 @@ typedef struct {
 
 #define ATX_LOG_TCP_HANDLER_DEFAULT_PORT            7723
 #define ATX_LOG_TCP_HANDLER_DEFAULT_CONNECT_TIMEOUT 5000 /* 5 seconds */
+
+#define ATX_LOG_UDP_HANDLER_DEFAULT_PORT             7724
+#define ATX_LOG_UDP_HANDLER_DEFAULT_RESOLVER_TIMEOUT 10000 /* 10 seconds */
 
 #if defined(_WIN32) || defined(_WIN32_WCE)
 #define ATX_LOG_CONSOLE_HANDLER_DEFAULT_COLOR_MODE ATX_FALSE
@@ -129,6 +137,8 @@ static ATX_Result ATX_LogFileHandler_Create(const char*     logger_name,
                                             ATX_LogHandler* handler);
 static ATX_Result ATX_LogTcpHandler_Create(const char*     logger_name, 
                                            ATX_LogHandler* handler);
+static ATX_Result ATX_LogUdpHandler_Create(const char*     logger_name, 
+                                           ATX_LogHandler* handler);
 static ATX_Result ATX_LogNullHandler_Create(const char*     logger_name, 
                                             ATX_LogHandler* handler);
 
@@ -148,6 +158,8 @@ ATX_LogHandler_Create(const char*     logger_name,
         return ATX_LogConsoleHandler_Create(logger_name, handler);
     } else if (ATX_StringsEqual(handler_name, "TcpHandler")) {
         return ATX_LogTcpHandler_Create(logger_name, handler);
+    } else if (ATX_StringsEqual(handler_name, "UdpHandler")) {
+        return ATX_LogUdpHandler_Create(logger_name, handler);
     }
 
     return ATX_ERROR_NO_SUCH_CLASS;
@@ -1222,13 +1234,55 @@ ATX_LogTcpHandler_Connect(ATX_LogTcpHandler* self)
 }
 
 /*----------------------------------------------------------------------
+|   ATX_LogTcpHandler_FormatRecord
++---------------------------------------------------------------------*/
+static void
+ATX_LogTcpHandler_FormatRecord(const ATX_LogRecord* record, ATX_String* msg)
+{
+    /* format the record */
+    const char* level_name = ATX_Log_GetLogLevelName(record->level);
+    char        level_string[16];
+    char        buffer[64];
+
+    /* format and emit the record */
+    if (level_name[0] == '\0') {
+        ATX_IntegerToString(record->level, level_string, sizeof(level_string));
+        level_name = level_string;
+    }
+    ATX_String_Reserve(msg, 2048);
+    ATX_String_Append(msg, "Logger: ");
+    ATX_String_Append(msg, record->logger_name);
+    ATX_String_Append(msg, "\r\nLevel: ");
+    ATX_String_Append(msg, level_name);
+    ATX_String_Append(msg, "\r\nSource-File: ");
+    ATX_String_Append(msg, record->source_file);
+    ATX_String_Append(msg, "\r\nSource-Function: ");
+    ATX_String_Append(msg, record->source_function);
+    ATX_String_Append(msg, "\r\nSource-Line: ");
+    ATX_IntegerToStringU(record->source_line, buffer, sizeof(buffer));
+    ATX_String_Append(msg, buffer);
+    ATX_String_Append(msg, "\r\nTimeStamp: ");
+    ATX_IntegerToStringU(record->timestamp.seconds, buffer, sizeof(buffer));
+    ATX_String_Append(msg, buffer);
+    ATX_String_Append(msg, ":");
+    ATX_IntegerToStringU(record->timestamp.nanoseconds/1000000L, buffer, sizeof(buffer));
+    ATX_String_Append(msg, buffer);
+    ATX_String_Append(msg, "\r\nContent-Length: ");
+    ATX_IntegerToString(ATX_StringLength(record->message), buffer, sizeof(buffer));
+    ATX_String_Append(msg, buffer);    
+    ATX_String_Append(msg, "\r\n\r\n");
+    ATX_String_Append(msg, record->message);
+}
+
+/*----------------------------------------------------------------------
 |   ATX_LogTcpHandler_Log
 +---------------------------------------------------------------------*/
 static void
 ATX_LogTcpHandler_Log(ATX_LogHandler* _self, const ATX_LogRecord* record)
 {
     ATX_LogTcpHandler* self = (ATX_LogTcpHandler*)_self->instance;
-
+    ATX_String         msg  = ATX_EMPTY_STRING;
+    
     /* ensure we're connected */
     if (self->stream == NULL) {
         if (ATX_FAILED(ATX_LogTcpHandler_Connect(self))) {
@@ -1236,47 +1290,16 @@ ATX_LogTcpHandler_Log(ATX_LogHandler* _self, const ATX_LogRecord* record)
         }
     }
 
-    {
-        /* format the record */
-        ATX_String  msg = ATX_EMPTY_STRING;
-        const char* level_name = ATX_Log_GetLogLevelName(record->level);
-        char        level_string[16];
-        char        buffer[64];
+    /* format the record */
+    ATX_LogTcpHandler_FormatRecord(record, &msg);
+    
 
-        /* format and emit the record */
-        if (level_name[0] == '\0') {
-            ATX_IntegerToString(record->level, level_string, sizeof(level_string));
-            level_name = level_string;
-        }
-        ATX_String_Reserve(&msg, 2048);
-        ATX_String_Append(&msg, "Logger: ");
-        ATX_String_Append(&msg, record->logger_name);
-        ATX_String_Append(&msg, "\r\nLevel: ");
-        ATX_String_Append(&msg, level_name);
-        ATX_String_Append(&msg, "\r\nSource-File: ");
-        ATX_String_Append(&msg, record->source_file);
-        ATX_String_Append(&msg, "\r\nSource-Line: ");
-        ATX_IntegerToStringU(record->source_line, buffer, sizeof(buffer));
-        ATX_String_Append(&msg, buffer);
-        ATX_String_Append(&msg, "\r\nTimeStamp: ");
-        ATX_IntegerToStringU(record->timestamp.seconds, buffer, sizeof(buffer));
-        ATX_String_Append(&msg, buffer);
-        ATX_String_Append(&msg, ":");
-        ATX_IntegerToStringU(record->timestamp.nanoseconds/1000000L, buffer, sizeof(buffer));
-        ATX_String_Append(&msg, buffer);
-        ATX_String_Append(&msg, "\r\nContent-Length: ");
-        ATX_IntegerToString(ATX_StringLength(record->message), buffer, sizeof(buffer));
-        ATX_String_Append(&msg, buffer);    
-        ATX_String_Append(&msg, "\r\n\r\n");
-        ATX_String_Append(&msg, record->message);
-
-        /* emit the formatted record */
-        if (ATX_FAILED(ATX_OutputStream_WriteString(self->stream, ATX_CSTR(msg)))) {
-            ATX_RELEASE_OBJECT(self->stream);
-        }
-
-        ATX_String_Destruct(&msg);
+    /* emit the formatted record */
+    if (ATX_FAILED(ATX_OutputStream_WriteString(self->stream, ATX_CSTR(msg)))) {
+        ATX_RELEASE_OBJECT(self->stream);
     }
+
+    ATX_String_Destruct(&msg);
 }
 
 /*----------------------------------------------------------------------
@@ -1353,4 +1376,117 @@ static const ATX_LogHandlerInterface
 ATX_LogTcpHandler_Interface = {
     ATX_LogTcpHandler_Log,
     ATX_LogTcpHandler_Destroy
+};
+
+/*----------------------------------------------------------------------
+|   ATX_LogTUdpHandler forward references
++---------------------------------------------------------------------*/
+static const ATX_LogHandlerInterface ATX_LogUdpHandler_Interface;
+
+/*----------------------------------------------------------------------
+|   ATX_LogUdpHandler_Log
++---------------------------------------------------------------------*/
+static void
+ATX_LogUdpHandler_Log(ATX_LogHandler* _self, const ATX_LogRecord* record)
+{
+    ATX_LogUdpHandler* self = (ATX_LogUdpHandler*)_self->instance;
+    ATX_DataBuffer*    buffer;
+    
+    /* format the record */
+    ATX_String msg = ATX_EMPTY_STRING;
+    ATX_LogTcpHandler_FormatRecord(record, &msg);
+
+    /* send the record in a datagram */
+    ATX_DataBuffer_Create(0, &buffer);
+    ATX_DataBuffer_SetBuffer(buffer, (void*)ATX_String_UseChars(&msg), ATX_String_GetLength(&msg)+1);
+    ATX_DataBuffer_SetDataSize(buffer, ATX_String_GetLength(&msg)+1);
+    ATX_DatagramSocket_Send(self->socket, buffer, &self->address);
+    
+    /* cleanup */
+    ATX_DataBuffer_Destroy(buffer);
+    ATX_String_Destruct(&msg);
+}
+
+/*----------------------------------------------------------------------
+|   ATX_LogUdpHandler_Destroy
++---------------------------------------------------------------------*/
+static void
+ATX_LogUdpHandler_Destroy(ATX_LogHandler* _self)
+{
+    ATX_LogUdpHandler* self = (ATX_LogUdpHandler*)_self->instance;
+
+    /* destroy fields */
+    ATX_DESTROY_OBJECT(self->socket);
+
+    /* free the object memory */
+    ATX_FreeMemory((void*)self);
+}
+
+/*----------------------------------------------------------------------
+|   ATX_LogUdpHandler_Create
++---------------------------------------------------------------------*/
+static ATX_Result
+ATX_LogUdpHandler_Create(const char* logger_name, ATX_LogHandler* handler)
+{
+    ATX_LogUdpHandler* instance;
+    const ATX_String*  hostname_prop;
+    const char*        hostname = "localhost";
+    const ATX_String*  port_prop;
+    ATX_UInt16         port = ATX_LOG_UDP_HANDLER_DEFAULT_PORT;
+    ATX_Result         result = ATX_SUCCESS;
+
+    /* compute a prefix for the configuration of this handler */
+    ATX_String logger_prefix = ATX_String_Create(logger_name);
+    ATX_CHECK(ATX_String_Append(&logger_prefix, ".UdpHandler"));
+
+    /* allocate a new object */
+    instance = ATX_AllocateZeroMemory(sizeof(ATX_LogUdpHandler));
+
+    /* setup the interface */
+    handler->instance = (ATX_LogHandlerInstance*)instance;
+    handler->iface    = &ATX_LogUdpHandler_Interface;
+
+    /* construct fields */
+    result = ATX_UdpSocket_Create(&instance->socket);
+    if (ATX_FAILED(result)) {
+        ATX_String_Destruct(&logger_prefix);
+        ATX_FreeMemory(instance);
+        return result;
+    }
+    
+    /* configure the object */
+    hostname_prop = ATX_LogManager_GetConfigValue(ATX_CSTR(logger_prefix), ".hostname");
+    if (hostname_prop) {
+        hostname = ATX_CSTR(*hostname_prop);
+    }
+    port_prop = ATX_LogManager_GetConfigValue(ATX_CSTR(logger_prefix), ".port");
+    if (port_prop) {
+        int port_int;
+        if (ATX_SUCCEEDED(ATX_String_ToInteger(port_prop, &port_int, ATX_TRUE))) {
+            port = (ATX_UInt16)port_int;
+        }
+    }
+    
+    /* resolve the name */
+    result = ATX_IpAddress_ResolveName(&instance->address.ip_address, hostname, ATX_LOG_UDP_HANDLER_DEFAULT_RESOLVER_TIMEOUT);
+    if (ATX_FAILED(result)) {
+        ATX_String_Destruct(&logger_prefix);
+        ATX_LogUdpHandler_Destroy(handler);
+        return result;
+    }
+    instance->address.port = port;
+    
+    /* cleanup */
+    ATX_String_Destruct(&logger_prefix);
+
+    return result;
+}
+
+/*----------------------------------------------------------------------
+|   ATX_LogUdpHandler_Interface
++---------------------------------------------------------------------*/
+static const ATX_LogHandlerInterface 
+ATX_LogUdpHandler_Interface = {
+    ATX_LogUdpHandler_Log,
+    ATX_LogUdpHandler_Destroy
 };
