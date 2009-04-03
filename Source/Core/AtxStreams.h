@@ -86,6 +86,12 @@ ATX_Result ATX_InputStream_ReadLineString(ATX_InputStream* stream,
                                           ATX_String*      string,
                                           ATX_Size         max_length);
 
+ATX_Result ATX_InputStream_ReadUI64(ATX_InputStream* stream,
+                                    ATX_UInt64*      value);
+
+ATX_Result ATX_InputStream_ReadUI32(ATX_InputStream* stream,
+                                    ATX_UInt32*      value);
+
 ATX_Result ATX_InputStream_ReadFully(ATX_InputStream* stream,
                                      ATX_Any          buffer,
                                      ATX_Size         bytes_to_read);

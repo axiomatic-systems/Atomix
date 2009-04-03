@@ -63,6 +63,23 @@ ATX_BytesToInt32Be(const unsigned char* buffer)
 }
 
 /*----------------------------------------------------------------------
+|    ATX_BytesToInt64Be
++---------------------------------------------------------------------*/
+ATX_UInt64 
+ATX_BytesToInt64Be(const unsigned char* buffer)
+{
+    return 
+        ( ((ATX_UInt64)buffer[0])<<56 ) |
+        ( ((ATX_UInt64)buffer[1])<<48 ) |
+        ( ((ATX_UInt64)buffer[2])<<40 ) |
+        ( ((ATX_UInt64)buffer[3])<<32 ) |
+        ( ((ATX_UInt64)buffer[4])<<24 ) |
+        ( ((ATX_UInt64)buffer[5])<<16 ) |
+        ( ((ATX_UInt64)buffer[6])<<8  ) |
+        ( ((ATX_UInt64)buffer[7])     );    
+}
+
+/*----------------------------------------------------------------------
 |    ATX_BytesToInt16Be
 +---------------------------------------------------------------------*/
 ATX_UInt16 

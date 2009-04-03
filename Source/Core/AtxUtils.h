@@ -117,6 +117,7 @@ extern void ATX_BytesFromInt32Be(unsigned char* buffer, ATX_UInt32 value);
 extern void ATX_BytesFromInt16Be(unsigned char* buffer, ATX_UInt16 value);
 extern ATX_UInt32 ATX_BytesToInt32Be(const unsigned char* buffer);
 extern ATX_UInt16 ATX_BytesToInt16Be(const unsigned char* buffer);
+extern ATX_UInt64 ATX_BytesToInt64Be(const unsigned char* buffer);
 
 extern void ATX_BytesFromInt32Le(unsigned char* buffer, ATX_UInt32 value);
 extern void ATX_BytesFromInt16Le(unsigned char* buffer, ATX_UInt16 value);
