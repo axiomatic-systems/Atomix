@@ -60,11 +60,13 @@ typedef struct {
     ATX_String        host;
     ATX_UInt16        port;
     ATX_OutputStream* stream;
+    ATX_UInt32        sequence_number;
 } ATX_LogTcpHandler;
 
 typedef struct {
     ATX_DatagramSocket* socket;
     ATX_SocketAddress   address;
+    ATX_UInt32          sequence_number;
 } ATX_LogUdpHandler;
 
 /*----------------------------------------------------------------------
@@ -1237,7 +1239,9 @@ ATX_LogTcpHandler_Connect(ATX_LogTcpHandler* self)
 |   ATX_LogTcpHandler_FormatRecord
 +---------------------------------------------------------------------*/
 static void
-ATX_LogTcpHandler_FormatRecord(const ATX_LogRecord* record, ATX_String* msg)
+ATX_LogTcpHandler_FormatRecord(const ATX_LogRecord* record, 
+                               ATX_String*          msg,
+                               ATX_UInt32           sequence_number)
 {
     /* format the record */
     const char* level_name = ATX_Log_GetLogLevelName(record->level);
@@ -1267,6 +1271,9 @@ ATX_LogTcpHandler_FormatRecord(const ATX_LogRecord* record, ATX_String* msg)
     ATX_String_Append(msg, ":");
     ATX_IntegerToStringU(record->timestamp.nanoseconds/1000000L, buffer, sizeof(buffer));
     ATX_String_Append(msg, buffer);
+    ATX_String_Append(msg, "\r\nSequence-Number: ");
+    ATX_IntegerToStringU(sequence_number, buffer, sizeof(buffer));
+    ATX_String_Append(msg, buffer);
     ATX_String_Append(msg, "\r\nContent-Length: ");
     ATX_IntegerToString(ATX_StringLength(record->message), buffer, sizeof(buffer));
     ATX_String_Append(msg, buffer);    
@@ -1291,7 +1298,7 @@ ATX_LogTcpHandler_Log(ATX_LogHandler* _self, const ATX_LogRecord* record)
     }
 
     /* format the record */
-    ATX_LogTcpHandler_FormatRecord(record, &msg);
+    ATX_LogTcpHandler_FormatRecord(record, &msg, self->sequence_number++);
     
 
     /* emit the formatted record */
@@ -1394,7 +1401,7 @@ ATX_LogUdpHandler_Log(ATX_LogHandler* _self, const ATX_LogRecord* record)
     
     /* format the record */
     ATX_String msg = ATX_EMPTY_STRING;
-    ATX_LogTcpHandler_FormatRecord(record, &msg);
+    ATX_LogTcpHandler_FormatRecord(record, &msg, self->sequence_number++);
 
     /* send the record in a datagram */
     ATX_DataBuffer_Create(0, &buffer);

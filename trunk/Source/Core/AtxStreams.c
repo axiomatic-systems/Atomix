@@ -132,6 +132,50 @@ ATX_InputStream_ReadLineString(ATX_InputStream* self,
 }
 
 /*----------------------------------------------------------------------
+|   ATX_InputStream_ReadUI32
++---------------------------------------------------------------------*/
+ATX_Result
+ATX_InputStream_ReadUI32(ATX_InputStream* self, ATX_UInt32* value)
+{
+    unsigned char buffer[4];
+
+    /* read bytes from the stream */
+    ATX_Result result;
+    result = ATX_InputStream_ReadFully(self, (void*)buffer, 4);
+    if (ATX_FAILED(result)) {
+        *value = 0;
+        return result;
+    }
+
+    /* convert bytes to value */
+    *value = ATX_BytesToInt32Be(buffer);
+    
+    return ATX_SUCCESS;   
+}
+
+/*----------------------------------------------------------------------
+|   ATX_InputStream_ReadUI64
++---------------------------------------------------------------------*/
+ATX_Result
+ATX_InputStream_ReadUI64(ATX_InputStream* self, ATX_UInt64* value)
+{
+    unsigned char buffer[8];
+
+    /* read bytes from the stream */
+    ATX_Result result;
+    result = ATX_InputStream_ReadFully(self, (void*)buffer, 8);
+    if (ATX_FAILED(result)) {
+        *value = 0;
+        return result;
+    }
+
+    /* convert bytes to value */
+    *value = ATX_BytesToInt64Be(buffer);
+    
+    return ATX_SUCCESS;   
+}
+
+/*----------------------------------------------------------------------
 |   ATX_InputStream_ReadFully
 +---------------------------------------------------------------------*/
 ATX_Result
