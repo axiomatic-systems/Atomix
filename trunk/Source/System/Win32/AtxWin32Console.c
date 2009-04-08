@@ -23,7 +23,6 @@
 void
 ATX_ConsoleOutput(const char* message)
 {
-    OutputDebugString(message);
     printf("%s", message);
 }
 

@@ -48,6 +48,7 @@ typedef struct {
 } ATX_LogManager;
 
 typedef struct {
+    ATX_UInt32  outputs;
     ATX_Boolean use_colors;
     ATX_Flags   format_filter;
 } ATX_LogConsoleHandler;
@@ -101,6 +102,9 @@ typedef struct {
 #else
 #define ATX_LOG_CONSOLE_HANDLER_DEFAULT_COLOR_MODE ATX_TRUE
 #endif
+#define ATX_LOG_CONSOLE_HANDLER_DEFAULT_OUTPUTS   1
+#define ATX_LOG_CONSOLE_HANDLER_OUTPUT_TO_DEBUG   1
+#define ATX_LOG_CONSOLE_HANDLER_OUTPUT_TO_CONSOLE 2
 
 #define ATX_LOG_FORMAT_FILTER_NO_SOURCE        1
 #define ATX_LOG_FORMAT_FILTER_NO_TIMESTAMP     2
@@ -1011,7 +1015,12 @@ ATX_LogConsoleHandler_Log(ATX_LogHandler* _self, const ATX_LogRecord* record)
         ATX_Log_FormatRecordToStream(record, output_stream, self->use_colors, self->format_filter);
         ATX_OutputStream_WriteFully(output_stream, "\0", 1);
         ATX_MemoryStream_GetBuffer(memory_stream, &buffer);
-        ATX_ConsoleOutput((const char*)ATX_DataBuffer_GetData(buffer));
+        if (self->outputs & ATX_LOG_CONSOLE_HANDLER_OUTPUT_TO_CONSOLE) {
+            ATX_ConsoleOutput((const char*)ATX_DataBuffer_GetData(buffer));
+        }
+        if (self->outputs & ATX_LOG_CONSOLE_HANDLER_OUTPUT_TO_DEBUG) {
+            ATX_DebugOutput((const char*)ATX_DataBuffer_GetData(buffer));
+        }
         ATX_RELEASE_OBJECT(output_stream);
     }
     ATX_MemoryStream_Destroy(memory_stream);
@@ -1061,6 +1070,16 @@ ATX_LogConsoleHandler_Create(const char*     logger_name,
             }
         }
     }
+    {
+        ATX_String* outputs;
+        instance->outputs = ATX_LOG_CONSOLE_HANDLER_DEFAULT_OUTPUTS;
+        outputs = ATX_LogManager_GetConfigValue(ATX_CSTR(logger_prefix),".outputs");
+        if (outputs) {
+            int flags;
+            ATX_String_ToInteger(outputs, &flags, ATX_TRUE);
+            instance->outputs = flags;
+        }
+    } 
     {
         ATX_String* filter;
         instance->format_filter = 0;
