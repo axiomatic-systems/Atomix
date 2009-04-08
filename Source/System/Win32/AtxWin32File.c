@@ -429,18 +429,17 @@ ATX_IMPLEMENT_REFERENCEABLE_INTERFACE(Win32FileStream, reference_count)
 ATX_DECLARE_INTERFACE_MAP(Win32File, ATX_File)
 ATX_DECLARE_INTERFACE_MAP(Win32File, ATX_Destroyable)
 
-#if defined (_WIN32_WCE)
 /*----------------------------------------------------------------------
 |   FindFirstFile_UTF8
 +---------------------------------------------------------------------*/
 static HANDLE
-FindFirstFile_UTF8(LPCSTR filename, LPWIN32_FIND_DATA info)
+FindFirstFile_UTF8(LPCSTR filename, LPWIN32_FIND_DATAW info)
 {
     HANDLE handle;
     unsigned int filename_length = ATX_StringLength(filename);
     WCHAR* filename_w = ATX_AllocateMemory(2*(filename_length+1));
     MultiByteToWideChar(CP_UTF8, 0, filename, -1, filename_w, filename_length+1);
-    handle = FindFirstFile(filename_w, info);
+    handle = FindFirstFileW(filename_w, info);
     ATX_FreeMemory(filename_w);
 
     return handle;
@@ -462,13 +461,11 @@ CreateFile_UTF8(LPCSTR lpFileName,
     unsigned int filename_length = ATX_StringLength(lpFileName);
     WCHAR* filename_w = ATX_AllocateMemory(2*(filename_length+1));
     MultiByteToWideChar(CP_UTF8, 0, lpFileName, -1, filename_w, filename_length+1);
-    handle = CreateFile(filename_w, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
+    handle = CreateFileW(filename_w, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
     ATX_FreeMemory(filename_w);
 
     return handle;
 }
-
-#endif 
 
 /*----------------------------------------------------------------------
 |   ATX_File_Create
@@ -497,13 +494,9 @@ ATX_File_Create(const char* filename, ATX_File** object)
     } else 
 #endif
     {
-        WIN32_FIND_DATA info;
-        HANDLE          f;
-#if defined(_WIN32_WCE)
+        WIN32_FIND_DATAW info;
+        HANDLE           f;
         f = FindFirstFile_UTF8(filename, &info);
-#else
-        f = FindFirstFile(filename, &info);
-#endif
 
         if (f == INVALID_HANDLE_VALUE) {
             file->size = 0;
@@ -585,11 +578,7 @@ Win32File_Open(ATX_File* _self, ATX_Flags mode)
 #endif
     {
         /* try to open the file */
-#if defined(_WIN32_WCE)
         handle = CreateFile_UTF8(
-#else
-        handle = CreateFile(
-#endif
                             filename, 
                             access_mode, 
                             share_mode, 
