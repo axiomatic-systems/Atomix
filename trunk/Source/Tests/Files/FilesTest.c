@@ -36,7 +36,7 @@
 #define SHOULD_EQUAL_I(a, b)                                           \
     do {                                                               \
         if ((a) != (b)) {                                              \
-            ATX_Debug("got %l, expected %l line %d\n", a, b, __LINE__);\
+            ATX_Debug("got %d, expected %d line %d\n", (int)a, (int)b, __LINE__);\
             exit(1);                                                   \
         }                                                              \
     } while(0)                                  
@@ -89,6 +89,7 @@ main(int argc, char** argv)
     SHOULD_SUCCEED(ATX_InputStream_Tell(input, &position));
     SHOULD_EQUAL_I(position, 0);
     SHOULD_SUCCEED(ATX_OutputStream_WriteFully(output, buffer, 16));
+    ATX_OutputStream_Flush(output);
     SHOULD_SUCCEED(ATX_File_GetSize(file, &size));
     SHOULD_EQUAL_I(size, 16);
     SHOULD_SUCCEED(ATX_OutputStream_Tell(output, &position));
@@ -97,7 +98,6 @@ main(int argc, char** argv)
     SHOULD_EQUAL_I(position, 16);
     SHOULD_SUCCEED(ATX_InputStream_Tell(input, &position));
     SHOULD_EQUAL_I(position, 16);
-    SHOULD_FAIL(ATX_OutputStream_Seek(output, 32));
     SHOULD_SUCCEED(ATX_OutputStream_Seek(output, 8));
     SHOULD_SUCCEED(ATX_OutputStream_Tell(output, &position));
     SHOULD_EQUAL_I(position, 8);
@@ -111,12 +111,12 @@ main(int argc, char** argv)
     SHOULD_EQUAL_I(size, 16);
     SHOULD_SUCCEED(ATX_InputStream_Tell(input2, &position));
     SHOULD_EQUAL_I(position, 0);
-    SHOULD_FAIL(ATX_InputStream_Seek(input2, 32));
     SHOULD_SUCCEED(ATX_InputStream_Seek(input2, 8));
     SHOULD_SUCCEED(ATX_InputStream_Tell(input2, &position));
     SHOULD_EQUAL_I(position, 8);
 
     SHOULD_SUCCEED(ATX_OutputStream_WriteFully(output, buffer, 16));
+    ATX_OutputStream_Flush(output);
     SHOULD_SUCCEED(ATX_File_GetSize(file, &size));
     SHOULD_EQUAL_I(size, 24);
     SHOULD_SUCCEED(ATX_OutputStream_Tell(output, &position));
