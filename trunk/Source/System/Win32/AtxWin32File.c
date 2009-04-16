@@ -2,7 +2,7 @@
 ||
 |   Atomix - File Streams: Win32 Implementation
 |
-|   (c) 2002-2006 Gilles Boccon-Gibod
+|   (c) 2002-20069 Gilles Boccon-Gibod
 |   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
@@ -33,8 +33,8 @@ ATX_SET_LOCAL_LOGGER("atomix.system.win32.file")
 typedef struct {
     ATX_Cardinal  reference_count;
     HANDLE        handle;
-    ATX_Position  position;
     ATX_LargeSize size;
+    ATX_Position  position;
     ATX_Boolean   append_mode;
 } Win32FileHandleWrapper;
 
@@ -56,17 +56,43 @@ typedef struct {
 
     /* members */
     ATX_CString             name;
-    ATX_LargeSize           size;
     ATX_Flags               mode;
     Win32FileHandleWrapper* file;
 } Win32File;
+
+/*----------------------------------------------------------------------
+|   MapError
++---------------------------------------------------------------------*/
+static ATX_Result 
+MapError(DWORD err) {
+    switch (err) {
+        case ERROR_SUCCESS:           return ATX_SUCCESS;
+        case ERROR_FILE_NOT_FOUND:
+        case ERROR_PATH_NOT_FOUND:    return ATX_ERROR_NO_SUCH_FILE;
+        case ERROR_ACCESS_DENIED:
+        case ERROR_SHARING_VIOLATION: return ATX_ERROR_ACCESS_DENIED;
+        case ERROR_HANDLE_EOF:        return ATX_ERROR_EOS;
+        default:                      return ATX_FAILURE;
+    }
+}
+
+/*----------------------------------------------------------------------
+|   Win32FileHandleWrapper_UpdateSize
++---------------------------------------------------------------------*/
+static void
+Win32FileHandleWrapper_UpdateSize(Win32FileHandleWrapper* self)
+{
+    LARGE_INTEGER file_size;
+    if (GetFileSizeEx(self->handle, &file_size)) {
+        self->size = file_size.QuadPart;
+    }
+}
 
 /*----------------------------------------------------------------------
 |   Win32FileHandleWrapper_Create
 +---------------------------------------------------------------------*/
 static ATX_Result
 Win32FileHandleWrapper_Create(HANDLE                   handle, 
-                              ATX_LargeSize            size,
                               ATX_Boolean              append_mode,
                               Win32FileHandleWrapper** wrapper)
 {
@@ -76,10 +102,11 @@ Win32FileHandleWrapper_Create(HANDLE                   handle,
 
     /* construct the object */
     (*wrapper)->handle          = handle;
-    (*wrapper)->position        = 0;
-    (*wrapper)->size            = size;
     (*wrapper)->append_mode     = append_mode;
     (*wrapper)->reference_count = 1;
+
+    /* initialize the object */
+    Win32FileHandleWrapper_UpdateSize(*wrapper);
 
     return ATX_SUCCESS;
 }
@@ -175,8 +202,18 @@ ATX_METHOD
 Win32FileStream_Seek(Win32FileStream* self, ATX_Position where)
 {
     LARGE_INTEGER position;
+
+    if (where > self->file->size) {
+        Win32FileHandleWrapper_UpdateSize(self->file);
+    }
+    if (where > self->file->size) {
+        return ATX_ERROR_OUT_OF_RANGE;
+    }
+
     position.QuadPart = where;
-    SetFilePointerEx(self->file->handle, position, NULL, FILE_BEGIN);
+    if (!SetFilePointerEx(self->file->handle, position, NULL, FILE_BEGIN)) {
+        return MapError(GetLastError());
+    }
     self->file->position = where;
     return ATX_SUCCESS;
 }
@@ -242,11 +279,7 @@ Win32FileInputStream_Read(ATX_InputStream* _self,
         }
     } else {
         if (bytes_read) *bytes_read = 0;
-        if (GetLastError() == ERROR_HANDLE_EOF ) {
-            return ATX_ERROR_EOS;
-        } else {
-            return ATX_FAILURE;
-        }
+        return MapError(GetLastError());
     }
 }
 
@@ -257,8 +290,7 @@ ATX_METHOD
 Win32FileInputStream_Seek(ATX_InputStream* _self, 
                           ATX_Position     where)
 {
-    return Win32FileStream_Seek(ATX_SELF(Win32FileStream, ATX_InputStream), 
-                                where);
+    return Win32FileStream_Seek(ATX_SELF(Win32FileStream, ATX_InputStream), where);
 }
 
 /*----------------------------------------------------------------------
@@ -268,8 +300,7 @@ ATX_METHOD
 Win32FileInputStream_Tell(ATX_InputStream* _self, 
                           ATX_Position*    where)
 {
-    return Win32FileStream_Tell(ATX_SELF(Win32FileStream, ATX_InputStream), 
-                                where);
+    return Win32FileStream_Tell(ATX_SELF(Win32FileStream, ATX_InputStream), where);
 }
 
 /*----------------------------------------------------------------------
@@ -280,6 +311,7 @@ Win32FileInputStream_GetSize(ATX_InputStream* _self,
                              ATX_LargeSize*   size)
 {
     Win32FileStream* self = ATX_SELF(Win32FileStream, ATX_InputStream);
+    Win32FileHandleWrapper_UpdateSize(self->file);
     *size = self->file->size;
     return ATX_SUCCESS;
 }
@@ -292,6 +324,7 @@ Win32FileInputStream_GetAvailable(ATX_InputStream* _self,
                                   ATX_LargeSize*   size)
 {
     Win32FileStream* self = ATX_SELF(Win32FileStream, ATX_InputStream);
+    Win32FileHandleWrapper_UpdateSize(self->file);
     *size = self->file->size - self->file->position;
     return ATX_SUCCESS;
 }
@@ -334,10 +367,11 @@ Win32FileOutputStream_Write(ATX_OutputStream* _self,
 
     /* in append mode, seek to the end of the file */
     if (self->file->append_mode) {
-        DWORD file_size = 0;
-        SetFilePointer(self->file->handle, 0, 0, FILE_END);
-        GetFileSize(self->file->handle, &file_size);
-        self->file->position = file_size;
+        LARGE_INTEGER file_size;
+        LARGE_INTEGER from;
+        from.QuadPart = 0;
+        SetFilePointerEx(self->file->handle, from, &file_size, FILE_END);
+        self->file->position = file_size.QuadPart;
     }
 
     /* write to the file */
@@ -352,7 +386,7 @@ Win32FileOutputStream_Write(ATX_OutputStream* _self,
         return ATX_SUCCESS;
     } else {
         if (bytes_written) *bytes_written = 0;
-        return ATX_FAILURE;
+        return MapError(GetLastError());
     }
 }
 
@@ -430,22 +464,6 @@ ATX_DECLARE_INTERFACE_MAP(Win32File, ATX_File)
 ATX_DECLARE_INTERFACE_MAP(Win32File, ATX_Destroyable)
 
 /*----------------------------------------------------------------------
-|   FindFirstFile_UTF8
-+---------------------------------------------------------------------*/
-static HANDLE
-FindFirstFile_UTF8(LPCSTR filename, LPWIN32_FIND_DATAW info)
-{
-    HANDLE handle;
-    unsigned int filename_length = ATX_StringLength(filename);
-    WCHAR* filename_w = ATX_AllocateMemory(2*(filename_length+1));
-    MultiByteToWideChar(CP_UTF8, 0, filename, -1, filename_w, filename_length+1);
-    handle = FindFirstFileW(filename_w, info);
-    ATX_FreeMemory(filename_w);
-
-    return handle;
-}
-
-/*----------------------------------------------------------------------
 |   CreateFile_UTF8
 +---------------------------------------------------------------------*/
 static HANDLE
@@ -490,21 +508,8 @@ ATX_File_Create(const char* filename, ATX_File** object)
     if (ATX_StringsEqual(filename, ATX_FILE_STANDARD_INPUT)  ||
         ATX_StringsEqual(filename, ATX_FILE_STANDARD_OUTPUT) ||
         ATX_StringsEqual(filename, ATX_FILE_STANDARD_ERROR)) {
-        file->size = 0;
     } else 
 #endif
-    {
-        WIN32_FIND_DATAW info;
-        HANDLE           f;
-        f = FindFirstFile_UTF8(filename, &info);
-
-        if (f == INVALID_HANDLE_VALUE) {
-            file->size = 0;
-        } else {
-            file->size = info.nFileSizeLow;
-            FindClose(f);
-        }
-    }
 
     /* setup the interfaces */
     ATX_SET_INTERFACE(file, Win32File, ATX_File);
@@ -589,26 +594,15 @@ Win32File_Open(ATX_File* _self, ATX_Flags mode)
     }
     if (handle == INVALID_HANDLE_VALUE) {
         DWORD error = GetLastError();
-        switch (error) {
-        case ERROR_FILE_NOT_FOUND:
-        case ERROR_PATH_NOT_FOUND:
-            return ATX_ERROR_NO_SUCH_FILE;
-
-        case ERROR_ACCESS_DENIED:
-        case ERROR_SHARING_VIOLATION:
-            return ATX_ERROR_ACCESS_DENIED;
-
-        default:
-            ATX_LOG_FINEST_1("CreateFile() error %x", error);
-            return ATX_FAILURE;
-        }
+        ATX_LOG_FINE_1("CreateFile() error %x", error);
+        return MapError(error);
     }
 
     /* remember the mode */
     self->mode = mode;
 
     /* create a handle wrapper */
-    return Win32FileHandleWrapper_Create(handle, self->size, (mode&ATX_FILE_OPEN_MODE_APPEND)?ATX_TRUE:ATX_FALSE, &self->file);
+    return Win32FileHandleWrapper_Create(handle, (mode&ATX_FILE_OPEN_MODE_APPEND)?ATX_TRUE:ATX_FALSE, &self->file);
 }
 
 /*----------------------------------------------------------------------
@@ -638,12 +632,14 @@ Win32File_GetSize(ATX_File* _self, ATX_LargeSize* size)
     /* check that the file is open */
     if (self->file == NULL) return ATX_ERROR_FILE_NOT_OPEN;
 
-    /* return the size */
-    if (size) *size = self->size;
+    /* update and return the size */
+    if (size) {
+        Win32FileHandleWrapper_UpdateSize(self->file);
+        *size = self->file->size;
+    }
 
     return ATX_SUCCESS;
 }
-
 
 /*----------------------------------------------------------------------
 |   Win32File_GetInputStream
