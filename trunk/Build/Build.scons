@@ -148,5 +148,5 @@ LibraryModule(name               = 'Atomix',
               linked_modules     = env['ATX_EXTRA_LIBS'])
             
 Application('NetPump', 'Source/Apps/NetPump')
-for test in ['Strings', 'Misc', 'Properties', 'RingBuffer', 'Http', 'Logging', 'Containers']:
+for test in ['Strings', 'Misc', 'Properties', 'RingBuffer', 'Http', 'Logging', 'Containers', 'Files']:
     Application(test+'Test', 'Source/Tests/'+test)
