@@ -13,6 +13,7 @@
 			buildPhases = (
 			);
 			dependencies = (
+				CAA3D5A90F97CD7E00BAE44C /* PBXTargetDependency */,
 				CA0C9A3C0D15D1B100E23496 /* PBXTargetDependency */,
 				CA0C9A3E0D15D1B100E23496 /* PBXTargetDependency */,
 				CA0C9A400D15D1B100E23496 /* PBXTargetDependency */,
@@ -115,6 +116,8 @@
 		CA0C9A1C0D15D13B00E23496 /* LoggingTest.c in Sources */ = {isa = PBXBuildFile; fileRef = CA0C99100D15C2C400E23496 /* LoggingTest.c */; };
 		CA0C9A2F0D15D17D00E23496 /* NetPump.c in Sources */ = {isa = PBXBuildFile; fileRef = CA0C98BE0D15C2C300E23496 /* NetPump.c */; };
 		CA0C9A300D15D18300E23496 /* libAtomix.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D2AAC046055464E500DB518D /* libAtomix.a */; };
+		CAA3D5A70F97CD6F00BAE44C /* libAtomix.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D2AAC046055464E500DB518D /* libAtomix.a */; };
+		CAA3D5AC0F97CD9300BAE44C /* FilesTest.c in Sources */ = {isa = PBXBuildFile; fileRef = CAA3D5AB0F97CD9300BAE44C /* FilesTest.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -230,6 +233,20 @@
 			remoteGlobalIDString = CA0C9A250D15D16C00E23496;
 			remoteInfo = NetPump;
 		};
+		CAA3D5A50F97CD6A00BAE44C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
+			remoteInfo = Atomix;
+		};
+		CAA3D5A80F97CD7E00BAE44C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CAA3D5A00F97CD6500BAE44C;
+			remoteInfo = FilesTest;
+		};
 		CAAA4C690E35184200783AE4 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
@@ -313,6 +330,8 @@
 		CA0C99FD0D15D0E900E23496 /* MiscTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MiscTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA0C9A120D15D12100E23496 /* LoggingTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LoggingTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA0C9A260D15D16C00E23496 /* NetPump */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NetPump; sourceTree = BUILT_PRODUCTS_DIR; };
+		CAA3D5A10F97CD6500BAE44C /* FilesTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FilesTest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CAA3D5AB0F97CD9300BAE44C /* FilesTest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = FilesTest.c; sourceTree = "<group>"; };
 		D2AAC046055464E500DB518D /* libAtomix.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libAtomix.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -381,6 +400,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CAA3D59F0F97CD6500BAE44C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CAA3D5A70F97CD6F00BAE44C /* libAtomix.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D289987405E68DCB004EDB86 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -413,6 +440,7 @@
 				CA0C99FD0D15D0E900E23496 /* MiscTest */,
 				CA0C9A120D15D12100E23496 /* LoggingTest */,
 				CA0C9A260D15D16C00E23496 /* NetPump */,
+				CAA3D5A10F97CD6500BAE44C /* FilesTest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -559,6 +587,7 @@
 		CA0C990A0D15C2C400E23496 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				CAA3D5AA0F97CD9300BAE44C /* Files */,
 				CA0C990B0D15C2C400E23496 /* Containers */,
 				CA0C990D0D15C2C400E23496 /* Http */,
 				CA0C990F0D15C2C400E23496 /* Logging */,
@@ -624,6 +653,14 @@
 				CA0C99180D15C2C400E23496 /* StringsTest.c */,
 			);
 			path = Strings;
+			sourceTree = "<group>";
+		};
+		CAA3D5AA0F97CD9300BAE44C /* Files */ = {
+			isa = PBXGroup;
+			children = (
+				CAA3D5AB0F97CD9300BAE44C /* FilesTest.c */,
+			);
+			path = Files;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -802,6 +839,23 @@
 			productReference = CA0C9A260D15D16C00E23496 /* NetPump */;
 			productType = "com.apple.product-type.tool";
 		};
+		CAA3D5A00F97CD6500BAE44C /* FilesTest */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CAA3D5AD0F97CD9300BAE44C /* Build configuration list for PBXNativeTarget "FilesTest" */;
+			buildPhases = (
+				CAA3D59E0F97CD6500BAE44C /* Sources */,
+				CAA3D59F0F97CD6500BAE44C /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CAA3D5A60F97CD6A00BAE44C /* PBXTargetDependency */,
+			);
+			name = FilesTest;
+			productName = FilesTest;
+			productReference = CAA3D5A10F97CD6500BAE44C /* FilesTest */;
+			productType = "com.apple.product-type.tool";
+		};
 		D2AAC045055464E500DB518D /* Atomix */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1DEB91EB08733DB70010E9CD /* Build configuration list for PBXNativeTarget "Atomix" */;
@@ -839,6 +893,7 @@
 				CA0C99E80D15D0AA00E23496 /* StringsTest */,
 				CA0C99FC0D15D0E900E23496 /* MiscTest */,
 				CA0C9A110D15D12100E23496 /* LoggingTest */,
+				CAA3D5A00F97CD6500BAE44C /* FilesTest */,
 				CA0C9A250D15D16C00E23496 /* NetPump */,
 				CA0C9A370D15D1A700E23496 /* Tests */,
 				CA0C9A490D15D1C600E23496 /* Apps */,
@@ -909,6 +964,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				CA0C9A2F0D15D17D00E23496 /* NetPump.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CAA3D59E0F97CD6500BAE44C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CAA3D5AC0F97CD9300BAE44C /* FilesTest.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1023,6 +1086,16 @@
 			isa = PBXTargetDependency;
 			target = CA0C9A250D15D16C00E23496 /* NetPump */;
 			targetProxy = CA0C9A4D0D15D1CC00E23496 /* PBXContainerItemProxy */;
+		};
+		CAA3D5A60F97CD6A00BAE44C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D2AAC045055464E500DB518D /* Atomix */;
+			targetProxy = CAA3D5A50F97CD6A00BAE44C /* PBXContainerItemProxy */;
+		};
+		CAA3D5A90F97CD7E00BAE44C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CAA3D5A00F97CD6500BAE44C /* FilesTest */;
+			targetProxy = CAA3D5A80F97CD7E00BAE44C /* PBXContainerItemProxy */;
 		};
 		CAAA4C6A0E35184200783AE4 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1375,6 +1448,36 @@
 			};
 			name = Release;
 		};
+		CAA3D5A30F97CD6600BAE44C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = FilesTest;
+			};
+			name = Debug;
+		};
+		CAA3D5A40F97CD6600BAE44C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = FilesTest;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 		CAAA4C670E35183C00783AE4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1503,6 +1606,15 @@
 			buildConfigurations = (
 				CA0C9A4A0D15D1C600E23496 /* Debug */,
 				CA0C9A4B0D15D1C600E23496 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CAA3D5AD0F97CD9300BAE44C /* Build configuration list for PBXNativeTarget "FilesTest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CAA3D5A30F97CD6600BAE44C /* Debug */,
+				CAA3D5A40F97CD6600BAE44C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
