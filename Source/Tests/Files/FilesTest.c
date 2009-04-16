@@ -20,7 +20,7 @@
 #define SHOULD_SUCCEED(r)                                   \
     do {                                                    \
         if (ATX_FAILED(r)) {                                \
-            ATX_Debug("failed line %d (%d)\n", __LINE__, r);\
+            ATX_ConsoleOutputF("failed line %d (%d)\n", __LINE__, r);\
             exit(1);                                        \
         }                                                   \
     } while(0)                                         
@@ -28,7 +28,7 @@
 #define SHOULD_FAIL(r)                                                  \
     do {                                                                \
         if (ATX_SUCCEEDED(r)) {                                         \
-            ATX_Debug("should have failed line %d (%d)\n", __LINE__, r);\
+            ATX_ConsoleOutputF("should have failed line %d (%d)\n", __LINE__, r);\
             exit(1);                                                    \
         }                                                               \
     } while(0)                                  
@@ -36,7 +36,7 @@
 #define SHOULD_EQUAL_I(a, b)                                           \
     do {                                                               \
         if ((a) != (b)) {                                              \
-            ATX_Debug("got %d, expected %d line %d\n", (int)a, (int)b, __LINE__);\
+            ATX_ConsoleOutputF("got %d, expected %d line %d\n", a, b, __LINE__);\
             exit(1);                                                   \
         }                                                              \
     } while(0)                                  
@@ -44,7 +44,7 @@
 #define SHOULD_EQUAL_F(a, b)                                           \
     do {                                                               \
         if ((a) != (b)) {                                              \
-            ATX_Debug("got %f, expected %f line %d\n", a, b, __LINE__);\
+            ATX_ConsoleOutputF("got %f, expected %f line %d\n", a, b, __LINE__);\
             exit(1);                                                   \
         }                                                              \
     } while(0)                                  
@@ -52,7 +52,7 @@
 #define SHOULD_EQUAL_S(a, b)                                           \
     do {                                                               \
         if (!ATX_StringsEqual(a,b)) {                                  \
-            ATX_Debug("got %s, expected %s line %d\n", a, b, __LINE__);\
+            ATX_ConsoleOutputF("got %s, expected %s line %d\n", a, b, __LINE__);\
             exit(1);                                                   \
         }                                                              \
     } while(0)                                  
