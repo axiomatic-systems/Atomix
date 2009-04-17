@@ -36,26 +36,10 @@
 #define SHOULD_EQUAL_I(a, b)                                           \
     do {                                                               \
         if ((a) != (b)) {                                              \
-            ATX_ConsoleOutputF("got %d, expected %d line %d\n", a, b, __LINE__);\
+            ATX_ConsoleOutputF("got %d, expected %d line %d\n", (int)a, (int)b, __LINE__);\
             exit(1);                                                   \
         }                                                              \
-    } while(0)                                  
-
-#define SHOULD_EQUAL_F(a, b)                                           \
-    do {                                                               \
-        if ((a) != (b)) {                                              \
-            ATX_ConsoleOutputF("got %f, expected %f line %d\n", a, b, __LINE__);\
-            exit(1);                                                   \
-        }                                                              \
-    } while(0)                                  
-
-#define SHOULD_EQUAL_S(a, b)                                           \
-    do {                                                               \
-        if (!ATX_StringsEqual(a,b)) {                                  \
-            ATX_ConsoleOutputF("got %s, expected %s line %d\n", a, b, __LINE__);\
-            exit(1);                                                   \
-        }                                                              \
-    } while(0)                                  
+    } while(0)                                                            
 
 /*----------------------------------------------------------------------
 |       main
@@ -73,6 +57,7 @@ main(int argc, char** argv)
     unsigned char     buffer[16] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f};  
     const char*       filename = "pi.\xCF\x80.test";
     unsigned int      i;
+    ATX_TimeInterval  wait = {2,0};
 
     if (argc > 1) {
         filename = argv[1];
@@ -90,6 +75,7 @@ main(int argc, char** argv)
     SHOULD_EQUAL_I(position, 0);
     SHOULD_SUCCEED(ATX_OutputStream_WriteFully(output, buffer, 16));
     ATX_OutputStream_Flush(output);
+    ATX_System_Sleep(&wait);
     SHOULD_SUCCEED(ATX_File_GetSize(file, &size));
     SHOULD_EQUAL_I(size, 16);
     SHOULD_SUCCEED(ATX_OutputStream_Tell(output, &position));
@@ -117,6 +103,7 @@ main(int argc, char** argv)
 
     SHOULD_SUCCEED(ATX_OutputStream_WriteFully(output, buffer, 16));
     ATX_OutputStream_Flush(output);
+    ATX_System_Sleep(&wait);
     SHOULD_SUCCEED(ATX_File_GetSize(file, &size));
     SHOULD_EQUAL_I(size, 24);
     SHOULD_SUCCEED(ATX_OutputStream_Tell(output, &position));
