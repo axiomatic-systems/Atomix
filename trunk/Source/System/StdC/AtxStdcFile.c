@@ -23,7 +23,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 #if defined(ATX_CONFIG_HAVE_UNISTD_H)
-//#include <unistd.h>
+#include <unistd.h>
 #endif
 
 #include "AtxUtils.h"
