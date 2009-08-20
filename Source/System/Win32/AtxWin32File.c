@@ -25,7 +25,7 @@
 /*----------------------------------------------------------------------
 |   logging
 +---------------------------------------------------------------------*/
-ATX_SET_LOCAL_LOGGER("atomix.system.win32.file")
+/*ATX_SET_LOCAL_LOGGER("atomix.system.win32.file")*/
 
 /*----------------------------------------------------------------------
 |   types
@@ -594,7 +594,6 @@ Win32File_Open(ATX_File* _self, ATX_Flags mode)
     }
     if (handle == INVALID_HANDLE_VALUE) {
         DWORD error = GetLastError();
-        ATX_LOG_FINE_1("CreateFile() error %x", error);
         return MapError(error);
     }
 
