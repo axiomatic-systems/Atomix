@@ -427,19 +427,19 @@ static void
 ATX_JsonParser_AppendUTF8(ATX_String* dest, unsigned int c)
 {
     if (c <= 0x7F) {
-        // 000000-00007F -> 1 char = 0xxxxxxx
+        /* 000000-00007F -> 1 char = 0xxxxxxx */
         ATX_String_AppendChar(dest,(char)c);
     } else if (c <= 0x7FF) {
-        // 000080-0007FF -> 2 chars = 110zzzzx 10xxxxxx
+        /* 000080-0007FF -> 2 chars = 110zzzzx 10xxxxxx */
         ATX_String_AppendChar(dest, 0xC0|(c>>6));
         ATX_String_AppendChar(dest, 0x80|(c&0x3F));
     } else if (c <= 0xFFFF) {
-        // 000800-00FFFF -> 3 chars = 1110zzzz 10zxxxxx 10xxxxxx
+        /* 000800-00FFFF -> 3 chars = 1110zzzz 10zxxxxx 10xxxxxx */
         ATX_String_AppendChar(dest, 0xE0| (c>>12      ));
         ATX_String_AppendChar(dest, 0x80|((c&0xFC0)>>6));
         ATX_String_AppendChar(dest, 0x80| (c&0x3F     ));
     } else if (c <= 0x10FFFF) {
-        // 010000-10FFFF -> 4 chars = 11110zzz 10zzxxxx 10xxxxxx 10xxxxxx
+        /* 010000-10FFFF -> 4 chars = 11110zzz 10zzxxxx 10xxxxxx 10xxxxxx */
         ATX_String_AppendChar(dest, 0xF0| (c>>18         ));
         ATX_String_AppendChar(dest, 0x80|((c&0x3F000)>>12));
         ATX_String_AppendChar(dest, 0x80|((c&0xFC0  )>> 6));
