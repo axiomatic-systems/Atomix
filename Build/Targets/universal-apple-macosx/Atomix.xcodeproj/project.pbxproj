@@ -13,6 +13,7 @@
 			buildPhases = (
 			);
 			dependencies = (
+				CAE3A9301064D21400EBAD97 /* PBXTargetDependency */,
 				CAA3D5A90F97CD7E00BAE44C /* PBXTargetDependency */,
 				CA0C9A3C0D15D1B100E23496 /* PBXTargetDependency */,
 				CA0C9A3E0D15D1B100E23496 /* PBXTargetDependency */,
@@ -118,6 +119,10 @@
 		CA0C9A300D15D18300E23496 /* libAtomix.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D2AAC046055464E500DB518D /* libAtomix.a */; };
 		CAA3D5A70F97CD6F00BAE44C /* libAtomix.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D2AAC046055464E500DB518D /* libAtomix.a */; };
 		CAA3D5AC0F97CD9300BAE44C /* FilesTest.c in Sources */ = {isa = PBXBuildFile; fileRef = CAA3D5AB0F97CD9300BAE44C /* FilesTest.c */; };
+		CAE3A9231064D1CD00EBAD97 /* AtxJson.c in Sources */ = {isa = PBXBuildFile; fileRef = CAE3A9211064D1CD00EBAD97 /* AtxJson.c */; };
+		CAE3A9241064D1CD00EBAD97 /* AtxJson.h in Headers */ = {isa = PBXBuildFile; fileRef = CAE3A9221064D1CD00EBAD97 /* AtxJson.h */; };
+		CAE3A92E1064D20400EBAD97 /* libAtomix.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D2AAC046055464E500DB518D /* libAtomix.a */; };
+		CAE3A9331064D22F00EBAD97 /* JsonTest.c in Sources */ = {isa = PBXBuildFile; fileRef = CAE3A9321064D22F00EBAD97 /* JsonTest.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -261,6 +266,20 @@
 			remoteGlobalIDString = CA0C9A370D15D1A700E23496;
 			remoteInfo = Tests;
 		};
+		CAE3A92C1064D1FF00EBAD97 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
+			remoteInfo = Atomix;
+		};
+		CAE3A92F1064D21400EBAD97 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CAE3A9271064D1F900EBAD97;
+			remoteInfo = JsonTest;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -332,6 +351,10 @@
 		CA0C9A260D15D16C00E23496 /* NetPump */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NetPump; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAA3D5A10F97CD6500BAE44C /* FilesTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FilesTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAA3D5AB0F97CD9300BAE44C /* FilesTest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = FilesTest.c; sourceTree = "<group>"; };
+		CAE3A9211064D1CD00EBAD97 /* AtxJson.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = AtxJson.c; sourceTree = "<group>"; };
+		CAE3A9221064D1CD00EBAD97 /* AtxJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AtxJson.h; sourceTree = "<group>"; };
+		CAE3A9281064D1F900EBAD97 /* JsonTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = JsonTest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CAE3A9321064D22F00EBAD97 /* JsonTest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = JsonTest.c; sourceTree = "<group>"; };
 		D2AAC046055464E500DB518D /* libAtomix.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libAtomix.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -408,6 +431,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CAE3A9261064D1F900EBAD97 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CAE3A92E1064D20400EBAD97 /* libAtomix.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D289987405E68DCB004EDB86 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -441,6 +472,7 @@
 				CA0C9A120D15D12100E23496 /* LoggingTest */,
 				CA0C9A260D15D16C00E23496 /* NetPump */,
 				CAA3D5A10F97CD6500BAE44C /* FilesTest */,
+				CAE3A9281064D1F900EBAD97 /* JsonTest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -484,6 +516,8 @@
 		CA0C98BF0D15C2C300E23496 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				CAE3A9211064D1CD00EBAD97 /* AtxJson.c */,
+				CAE3A9221064D1CD00EBAD97 /* AtxJson.h */,
 				CA0C98C00D15C2C300E23496 /* Atomix.h */,
 				CA0C98C10D15C2C300E23496 /* AtxConfig.h */,
 				CA0C98C20D15C2C300E23496 /* AtxConsole.c */,
@@ -587,6 +621,7 @@
 		CA0C990A0D15C2C400E23496 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				CAE3A9311064D22F00EBAD97 /* Json */,
 				CAA3D5AA0F97CD9300BAE44C /* Files */,
 				CA0C990B0D15C2C400E23496 /* Containers */,
 				CA0C990D0D15C2C400E23496 /* Http */,
@@ -663,6 +698,14 @@
 			path = Files;
 			sourceTree = "<group>";
 		};
+		CAE3A9311064D22F00EBAD97 /* Json */ = {
+			isa = PBXGroup;
+			children = (
+				CAE3A9321064D22F00EBAD97 /* JsonTest.c */,
+			);
+			path = Json;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -697,6 +740,7 @@
 				CA0C99500D15C33700E23496 /* AtxVersion.h in Headers */,
 				CA0C99510D15C33800E23496 /* AtxTypes.h in Headers */,
 				CA0C99520D15C33900E23496 /* AtxMap.h in Headers */,
+				CAE3A9241064D1CD00EBAD97 /* AtxJson.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -856,6 +900,23 @@
 			productReference = CAA3D5A10F97CD6500BAE44C /* FilesTest */;
 			productType = "com.apple.product-type.tool";
 		};
+		CAE3A9271064D1F900EBAD97 /* JsonTest */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CAE3A9341064D23000EBAD97 /* Build configuration list for PBXNativeTarget "JsonTest" */;
+			buildPhases = (
+				CAE3A9251064D1F900EBAD97 /* Sources */,
+				CAE3A9261064D1F900EBAD97 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CAE3A92D1064D1FF00EBAD97 /* PBXTargetDependency */,
+			);
+			name = JsonTest;
+			productName = JsonTest;
+			productReference = CAE3A9281064D1F900EBAD97 /* JsonTest */;
+			productType = "com.apple.product-type.tool";
+		};
 		D2AAC045055464E500DB518D /* Atomix */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1DEB91EB08733DB70010E9CD /* Build configuration list for PBXNativeTarget "Atomix" */;
@@ -894,6 +955,7 @@
 				CA0C99FC0D15D0E900E23496 /* MiscTest */,
 				CA0C9A110D15D12100E23496 /* LoggingTest */,
 				CAA3D5A00F97CD6500BAE44C /* FilesTest */,
+				CAE3A9271064D1F900EBAD97 /* JsonTest */,
 				CA0C9A250D15D16C00E23496 /* NetPump */,
 				CA0C9A370D15D1A700E23496 /* Tests */,
 				CA0C9A490D15D1C600E23496 /* Apps */,
@@ -975,6 +1037,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CAE3A9251064D1F900EBAD97 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CAE3A9331064D22F00EBAD97 /* JsonTest.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D2AAC044055464E500DB518D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1001,6 +1071,7 @@
 				CA0C99570D15C35000E23496 /* AtxStdcDebug.c in Sources */,
 				CA0C99580D15C35100E23496 /* AtxPosixSystem.c in Sources */,
 				CA0C99590D15C35200E23496 /* AtxStdcFile.c in Sources */,
+				CAE3A9231064D1CD00EBAD97 /* AtxJson.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1107,6 +1178,16 @@
 			target = CA0C9A370D15D1A700E23496 /* Tests */;
 			targetProxy = CAAA4C6B0E35184400783AE4 /* PBXContainerItemProxy */;
 		};
+		CAE3A92D1064D1FF00EBAD97 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D2AAC045055464E500DB518D /* Atomix */;
+			targetProxy = CAE3A92C1064D1FF00EBAD97 /* PBXContainerItemProxy */;
+		};
+		CAE3A9301064D21400EBAD97 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CAE3A9271064D1F900EBAD97 /* JsonTest */;
+			targetProxy = CAE3A92F1064D21400EBAD97 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -1146,6 +1227,7 @@
 					ATX_CONFIG_ENABLE_LOGGING,
 				);
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				GCC_VERSION = 4.0;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -1162,6 +1244,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				GCC_VERSION = 4.0;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -1499,6 +1582,36 @@
 			};
 			name = Release;
 		};
+		CAE3A92A1064D1FA00EBAD97 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = JsonTest;
+			};
+			name = Debug;
+		};
+		CAE3A92B1064D1FA00EBAD97 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = JsonTest;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1624,6 +1737,15 @@
 			buildConfigurations = (
 				CAAA4C670E35183C00783AE4 /* Debug */,
 				CAAA4C680E35183C00783AE4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CAE3A9341064D23000EBAD97 /* Build configuration list for PBXNativeTarget "JsonTest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CAE3A92A1064D1FA00EBAD97 /* Debug */,
+				CAE3A92B1064D1FA00EBAD97 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -67,6 +67,7 @@ main(int argc, char** argv)
     int        i;
     ATX_Int32  i32;
     ATX_UInt32 ui32;
+    ATX_UInt64 ui64;
     char       buff[64];
 
     ATX_COMPILER_UNUSED(argc);
@@ -114,6 +115,8 @@ main(int argc, char** argv)
     SHOULD_FAIL(ATX_ParseInteger32U("4294967296", &ui32, ATX_FALSE));
     SHOULD_FAIL(ATX_ParseInteger32U("-1", &ui32, ATX_FALSE));
 
+    SHOULD_SUCCEED(ATX_ParseInteger64U("32410071309164530", &ui64, ATX_FALSE));
+
     SHOULD_SUCCEED(ATX_IntegerToString(-123, buff, sizeof(buff)));
     SHOULD_EQUAL_S(buff, "-123");
     SHOULD_FAIL(ATX_IntegerToString(-1234567, buff, 8));
@@ -125,7 +128,6 @@ main(int argc, char** argv)
     SHOULD_FAIL(ATX_IntegerToStringU(1234567, buff, 7));
     SHOULD_SUCCEED(ATX_IntegerToStringU(1234567, buff, 8));
     SHOULD_EQUAL_S(buff, "1234567");
-
 
     SHOULD_FAIL(ATX_ParseFloat("ssdfsdf", &f, ATX_FALSE));
     SHOULD_FAIL(ATX_ParseFloat("", &f, ATX_FALSE));

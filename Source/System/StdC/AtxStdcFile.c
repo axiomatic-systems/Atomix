@@ -275,6 +275,7 @@ StdcFileInputStream_Read(ATX_InputStream* _self,
     
     /* if we predict an EOF condition, clear the EOF flag, in case the file has grown */
     if (self->file->position+bytes_to_read > self->file->size) {
+        StdcFileWrapper_UpdateSize(self->file);
         clearerr(self->file->file);
     }
     

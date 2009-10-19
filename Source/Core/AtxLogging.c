@@ -2,7 +2,7 @@
 |
 |   Atomix - Logging Support
 |
-|   (c) 2002-2006 Gilles Boccon-Gibod
+|   (c) 2002-2009 Gilles Boccon-Gibod
 |   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
 ****************************************************************/
@@ -77,18 +77,20 @@ typedef struct {
 #define ATX_LOG_STACK_BUFFER_MAX_SIZE 512
 #define ATX_LOG_HEAP_BUFFER_MAX_SIZE  65536
 
-#if !defined(ATOMIX_LOG_CONFIG)
-#define ATX_LOG_CONFIG_ENV "ATOMIX_LOG_CONFIG"
+#if !defined(ATX_CONFIG_LOG_CONFIG_ENV)
+#define ATX_CONFIG_LOG_CONFIG_ENV "ATOMIX_LOG_CONFIG"
 #endif
 
-#if !defined(ATX_LOG_DEFAULT_CONFIG_SOURCE)
-#define ATX_LOG_DEFAULT_CONFIG_SOURCE "file:atomix-logging.properties"
+#if !defined(ATX_CONFIG_DEFAULT_LOG_CONFIG_SOURCE)
+#define ATX_CONFIG_DEFAULT_LOG_CONFIG_SOURCE "file:atomix-logging.properties"
 #endif
 
-#define ATX_LOG_ROOT_DEFAULT_LOG_LEVEL ATX_LOG_LEVEL_INFO
+#if !defined(ATX_CONFIG_DEFAULT_LOG_LEVEL)
+#define ATX_CONFIG_DEFAULT_LOG_LEVEL ATX_LOG_LEVEL_OFF
+#endif
 #define ATX_LOG_ROOT_DEFAULT_HANDLER   "ConsoleHandler"
-#if !defined(ATX_LOG_ROOT_DEFAULT_FILE_HANDLER_FILENAME)
-#define ATX_LOG_ROOT_DEFAULT_FILE_HANDLER_FILENAME "_atomix.log"
+#if !defined(ATX_CONFIG_DEFAULT_LOG_FILE_HANDLER_FILENAME)
+#define ATX_CONFIG_DEFAULT_LOG_FILE_HANDLER_FILENAME "_atomix.log"
 #endif
 
 #define ATX_LOG_TCP_HANDLER_DEFAULT_PORT            7723
@@ -582,7 +584,7 @@ ATX_Result
 ATX_LogManager_Initialize(void) 
 {
     ATX_String  config_sources_env = ATX_EMPTY_STRING;
-    const char* config_sources = ATX_LOG_DEFAULT_CONFIG_SOURCE;
+    const char* config_sources = ATX_CONFIG_DEFAULT_LOG_CONFIG_SOURCE;
 
     if (LogManager.initialized) {
         return ATX_SUCCESS;
@@ -598,7 +600,7 @@ ATX_LogManager_Initialize(void)
     ATX_LogManager_SetConfigValue(".handlers", ATX_LOG_ROOT_DEFAULT_HANDLER);
 
     /* see if the config sources have been set to non-default values */
-    if (ATX_SUCCEEDED(ATX_GetEnvironment(ATX_LOG_CONFIG_ENV, &config_sources_env))) {
+    if (ATX_SUCCEEDED(ATX_GetEnvironment(ATX_CONFIG_LOG_CONFIG_ENV, &config_sources_env))) {
         config_sources = ATX_CSTR(config_sources_env);
     }
 
@@ -625,7 +627,7 @@ ATX_LogManager_Initialize(void)
     /* create the root logger */
     LogManager.root = ATX_Logger_Create("");
     if (LogManager.root) {
-        LogManager.root->level = ATX_LOG_ROOT_DEFAULT_LOG_LEVEL;
+        LogManager.root->level = ATX_CONFIG_DEFAULT_LOG_LEVEL;
         LogManager.root->level_is_inherited = ATX_FALSE;
         ATX_LogManager_ConfigureLogger(LogManager.root);
     }
@@ -1046,7 +1048,6 @@ ATX_LogConsoleHandler_Create(const char*     logger_name,
                              ATX_LogHandler* handler)
 {
     ATX_LogConsoleHandler* instance;
-    const char*            filename;
     ATX_Result             result = ATX_SUCCESS;
 
     /* compute a prefix for the configuration of this handler */
@@ -1059,7 +1060,6 @@ ATX_LogConsoleHandler_Create(const char*     logger_name,
     /* configure the object */
     {
         ATX_String* colors;
-        filename = ATX_FILE_STANDARD_OUTPUT;
         instance->use_colors = ATX_LOG_CONSOLE_HANDLER_DEFAULT_COLOR_MODE;
         colors = ATX_LogManager_GetConfigValue(ATX_CSTR(logger_prefix),".colors");
         if (colors) {
@@ -1174,7 +1174,7 @@ ATX_LogFileHandler_Create(const char*     logger_name,
             filename = ATX_CSTR(filename_synth);
         } else {
             /* default name for the root logger */
-            filename = ATX_LOG_ROOT_DEFAULT_FILE_HANDLER_FILENAME;
+            filename = ATX_CONFIG_DEFAULT_LOG_FILE_HANDLER_FILENAME;
         }
     }
     {
