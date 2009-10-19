@@ -602,7 +602,8 @@ ATX_JsonParser_Parse(ATX_JsonParser* self, const char* serialized, ATX_Size size
             if (ATX_JSON_CHAR_IS_NUMBER(c)) {
                 ATX_String_AppendChar(&self->value, c);
             } else {
-                double number = 0.0;
+                double     number = 0.0;
+                ATX_Result result;
                 
                 /* integers can't start with a zero */
                 if (ATX_String_GetLength(&self->value) >= 2) {
@@ -614,7 +615,7 @@ ATX_JsonParser_Parse(ATX_JsonParser* self, const char* serialized, ATX_Size size
                 }
                 
                 /* parse the number */
-                ATX_Result result = ATX_ParseDouble(ATX_CSTR(self->value), &number, ATX_FALSE);
+                result = ATX_ParseDouble(ATX_CSTR(self->value), &number, ATX_FALSE);
                 if (ATX_FAILED(result)) return ATX_ERROR_INVALID_SYNTAX;
                 ATX_JsonParser_OnNewValue(self, ATX_Json_CreateNumber(number));
                 self->state = ATX_JSON_PARSER_STATE_DELIMITER;
