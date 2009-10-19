@@ -137,6 +137,7 @@ ATX_METHOD _class##_AddReference(ATX_Referenceable* _self)                \
 ATX_METHOD _class##_Release(ATX_Referenceable* _self)                     \
 {                                                                         \
     _class* self = ATX_SELF_EX(_class, _base, ATX_Referenceable);         \
+    ATX_ASSERT(ATX_BASE(self, _base)._counter != 0);                      \
     if (--ATX_BASE(self, _base)._counter == 0) {                          \
         _class##_Destroy(self);                                           \
     }                                                                     \
