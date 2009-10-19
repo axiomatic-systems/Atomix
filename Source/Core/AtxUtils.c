@@ -236,7 +236,7 @@ ATX_ParseFloat(const char* str, float* result, ATX_Boolean relaxed)
         *result = 0.0f;
         return xr;
     }
-    *result = value;
+    *result = (float)value;
     
     return ATX_SUCCESS;
 }
@@ -529,7 +529,7 @@ ATX_IntegerToString(ATX_Int64 value, char* buffer, ATX_Size buffer_size)
 
     /* process the digits */
     do {
-        int digit = value%10;
+        int digit = (int)(value%10);
         *c-- = '0'+digit;
         value /= 10;
     } while(value);
@@ -565,7 +565,7 @@ ATX_IntegerToStringU(ATX_UInt64 value, char* buffer, ATX_Size buffer_size)
 
     /* process the digits */
     do {
-        unsigned int digit = value%10;
+        unsigned int digit = (unsigned int)(value%10);
         *c-- = '0'+digit;
         value /= 10;
     } while(value);
