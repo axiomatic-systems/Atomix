@@ -84,6 +84,9 @@ extern ATX_Result
 ATX_ParseFloat(const char* str, float* result, ATX_Boolean relaxed);
 
 extern ATX_Result 
+ATX_ParseDouble(const char* str, double* result, ATX_Boolean relaxed);
+
+extern ATX_Result 
 ATX_ParseInteger(const char* str, int* result, ATX_Boolean relaxed);
 
 extern ATX_Result 
@@ -105,10 +108,13 @@ extern ATX_Result
 ATX_FloatToString(float value, char* buffer, ATX_Size buffer_size);
 
 extern ATX_Result
-ATX_IntegerToString(ATX_Int3264 value, char* buffer, ATX_Size buffer_size);
+ATX_DoubleToString(double value, char* buffer, ATX_Size buffer_size);
 
 extern ATX_Result
-ATX_IntegerToStringU(ATX_UInt3264 value, char* buffer, ATX_Size buffer_size);
+ATX_IntegerToString(ATX_Int64 value, char* buffer, ATX_Size buffer_size);
+
+extern ATX_Result
+ATX_IntegerToStringU(ATX_UInt64 value, char* buffer, ATX_Size buffer_size);
 
 /*----------------------------------------------------------------------
 |    byte IO
@@ -132,6 +138,8 @@ ATX_FormatOutput(void        (*function)(void* parameter, const char* message),
                  void*       function_parameter,
                  const char* format, 
                  va_list     args);
+
+extern int ATX_HexToNibble(char hex);
 
 /*----------------------------------------------------------------------
 |    environment variables
@@ -197,6 +205,12 @@ extern void ATX_MoveMemory(void* dest, const void* src, ATX_Size size);
 extern void ATX_SetMemory(void* dest, int c, ATX_Size size);
 #endif
 
+#if defined(ATX_CONFIG_HAVE_MEMCMP)
+#define ATX_CompareMemory memcmp
+#else 
+extern int ATX_CompareMemory(void* mem1, const void* mem2, ATX_Size size);
+#endif
+    
 #if defined(ATX_CONFIG_HAVE_STRCPY)
 #define ATX_CopyString(dst, src) ((void)strcpy((dst), (src)))
 #else

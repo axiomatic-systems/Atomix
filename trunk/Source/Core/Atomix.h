@@ -41,5 +41,6 @@
 #include "AtxSystem.h"
 #include "AtxDataBuffer.h"
 #include "AtxConsole.h"
+#include "AtxJson.h"
 
 #endif /* _ATOMIX_H_ */

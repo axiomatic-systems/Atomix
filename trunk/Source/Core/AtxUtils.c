@@ -137,16 +137,16 @@ ATX_BytesToInt16Le(const unsigned char* buffer)
 }
 
 /*----------------------------------------------------------------------
-|    ATX_ParseFloat
+|    ATX_ParseDouble
 +---------------------------------------------------------------------*/
 ATX_Result 
-ATX_ParseFloat(const char* str, float* result, ATX_Boolean relaxed)
+ATX_ParseDouble(const char* str, double* result, ATX_Boolean relaxed)
 {
     ATX_Boolean  after_radix = ATX_FALSE;
-    ATX_Boolean  negative = ATX_FALSE;
-    ATX_Boolean  empty = ATX_TRUE;
-    float        value = 0.0f;
-    float        decimal = 10.0f;
+    ATX_Boolean  negative    = ATX_FALSE;
+    ATX_Boolean  empty       = ATX_TRUE;
+    double       value       = 0.0;
+    double       decimal     = 10.0;
     char         c;
 
     /* safe default value */
@@ -187,17 +187,17 @@ ATX_ParseFloat(const char* str, float* result, ATX_Boolean relaxed)
         } else if (c >= '0' && c <= '9') {
             empty = ATX_FALSE;
             if (after_radix) {
-                value += (float)(c-'0')/decimal;
+                value += (double)(c-'0')/decimal;
                 decimal *= 10.0f;
             } else {
-                value = 10.0f*value + (float)(c-'0');
+                value = 10.0f*value + (double)(c-'0');
             }
         } else if (c == 'e' || c == 'E') {
             /* exponent */
             if (*str == '+' || *str == '-' || (*str >= '0' && *str <= '9')) {
                 int exponent = 0;
                 if (ATX_SUCCEEDED(ATX_ParseInteger(str, &exponent, relaxed))) {
-                    value *= (float)pow(10.0f, (float)exponent);
+                    value *= (double)pow(10.0f, (double)exponent);
                     break;
                 } else {
                     return ATX_ERROR_INVALID_PARAMETERS;
@@ -221,6 +221,23 @@ ATX_ParseFloat(const char* str, float* result, ATX_Boolean relaxed)
 
     /* return the result */
     *result = negative ? -value : value;
+    return ATX_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|    ATX_ParseFloat
++---------------------------------------------------------------------*/
+ATX_Result 
+ATX_ParseFloat(const char* str, float* result, ATX_Boolean relaxed)
+{
+    double value;
+    ATX_Result xr = ATX_ParseDouble(str, &value, relaxed);
+    if (ATX_FAILED(xr)) {
+        *result = 0.0f;
+        return xr;
+    }
+    *result = value;
+    
     return ATX_SUCCESS;
 }
 
@@ -416,10 +433,10 @@ ATX_ParseIntegerU(const char* str, unsigned int* value, ATX_Boolean relaxed)
 }
 
 /*----------------------------------------------------------------------
-|   ATX_FloatToString
+|   ATX_DoubleToString
 +---------------------------------------------------------------------*/
 ATX_Result
-ATX_FloatToString(float value, char* buffer, ATX_Size buffer_size)
+ATX_DoubleToString(double value, char* buffer, ATX_Size buffer_size)
 {
     char  s[256];
     char* c = s;
@@ -436,7 +453,7 @@ ATX_FloatToString(float value, char* buffer, ATX_Size buffer_size)
     if (value == 0.0f) {
         *c++ = '0';
     } else {
-        float limit;
+        double limit;
         do {
             ATX_Int32 integer_part;
             limit = 1.0f;
@@ -447,7 +464,7 @@ ATX_FloatToString(float value, char* buffer, ATX_Size buffer_size)
             integer_part = (ATX_Int32)(value/limit);
             ATX_IntegerToString(integer_part, c, (ATX_Size)(sizeof(s)-(c-&s[0])));
             while (*c != '\0') { ++c; }
-            value -= limit*(float)integer_part;
+            value -= limit*(double)integer_part;
         } while (limit > 1.0f);
     }
 
@@ -459,7 +476,7 @@ ATX_FloatToString(float value, char* buffer, ATX_Size buffer_size)
     *c++ = '.';
     if (value <= 1E-6) {
         *c++ = '0';
-        *c++ = '\0';
+        *c   = '\0';
     } else {
         ATX_Int32 factional_part = (ATX_Int32)(value*1E6);
         do {
@@ -467,7 +484,7 @@ ATX_FloatToString(float value, char* buffer, ATX_Size buffer_size)
             factional_part = 10*(factional_part-(digit*100000));
             *c++ = '0'+digit;
         } while (factional_part);
-        *c++ = '\0';
+        *c = '\0';
     }
 
     /* copy the string */
@@ -480,10 +497,19 @@ ATX_FloatToString(float value, char* buffer, ATX_Size buffer_size)
 }
 
 /*----------------------------------------------------------------------
+|   ATX_FloatToString
++---------------------------------------------------------------------*/
+ATX_Result
+ATX_FloatToString(float value, char* buffer, ATX_Size buffer_size)
+{
+    return ATX_DoubleToString(value, buffer, buffer_size);
+}
+
+/*----------------------------------------------------------------------
 |   ATX_IntegerToString
 +---------------------------------------------------------------------*/
 ATX_Result
-ATX_IntegerToString(ATX_Int3264 value, char* buffer, ATX_Size buffer_size)
+ATX_IntegerToString(ATX_Int64 value, char* buffer, ATX_Size buffer_size)
 {
     char s[32];
     char* c = &s[31];
@@ -527,7 +553,7 @@ ATX_IntegerToString(ATX_Int3264 value, char* buffer, ATX_Size buffer_size)
 |   ATX_IntegerToStringU
 +---------------------------------------------------------------------*/
 ATX_Result
-ATX_IntegerToStringU(ATX_UInt3264 value, char* buffer, ATX_Size buffer_size)
+ATX_IntegerToStringU(ATX_UInt64 value, char* buffer, ATX_Size buffer_size)
 {
     char s[32];
     char* c = &s[31];
@@ -614,3 +640,21 @@ ATX_ScrubMemory(void* buffer, ATX_Size size)
         }
     }
 }
+
+/*----------------------------------------------------------------------
+|   ATX_HexToNibble
++---------------------------------------------------------------------*/
+int 
+ATX_HexToNibble(char hex)
+{
+    if (hex >= 'a' && hex <= 'f') {
+        return ((hex - 'a') + 10);
+    } else if (hex >= 'A' && hex <= 'F') {
+        return ((hex - 'A') + 10);
+    } else if (hex >= '0' && hex <= '9') {
+        return (hex - '0');
+    } else {
+        return -1;
+    }
+}
+
