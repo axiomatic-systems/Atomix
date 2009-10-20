@@ -81,6 +81,11 @@
 #define ATX_CONFIG_HAVE_ULONG_MAX
 #endif
 
+#if defined(ATX_CONFIG_HAVE_STDINT_H)
+#define ATX_CONFIG_INT_PTR_TYPE intptr_t
+#define ATX_CONFIG_UINT_PTR_TYPE uintptr_t
+#endif
+
 /*----------------------------------------------------------------------
 |    compiler specifics
 +---------------------------------------------------------------------*/
@@ -88,6 +93,7 @@
 #if defined(__GNUC__)
 #define ATX_LocalFunctionName __FUNCTION__
 #define ATX_COMPILER_UNUSED(p) (void)p
+#define ATX_CONFIG_HAVE_STDINT_H
 #else
 #define ATX_COMPILER_UNUSED(p) 
 #endif
@@ -104,6 +110,8 @@
 #define ATX_fseek  _fseeki64
 #define ATX_ftell  _ftelli64
 #define ATX_INT64_PRINTF_FORMAT "I64"
+#define ATX_CONFIG_INT_PTR_TYPE intptr_t
+#define ATX_CONFIG_UINT_PTR_TYPE uintptr_t
 #if (_MSC_VER >= 1400) && !defined(_WIN32_WCE)
 #define ATX_vsnprintf(s,c,f,a)  _vsnprintf_s(s,c,_TRUNCATE,f,a)
 #define ATX_snprintf(s,c,f,...) _snprintf_s(s,c,_TRUNCATE,f,__VA_ARGS__)
@@ -117,13 +125,10 @@
 #endif
 #if (_MSC_VER >= 1300)
 #if defined (_WIN64)
-typedef __int64 ATX_PointerLong;
 #define ATX_CONFIG_INT_32_64_TYPE __int64
 #else
-typedef __w64 long ATX_PointerLong;
 #define ATX_CONFIG_INT_32_64_TYPE long
 #endif
-#define ATX_POINTER_TO_LONG(_p) ((ATX_PointerLong) (_p) )
 #undef ATX_CONFIG_HAVE_STRCPY
 #endif
 #if defined(_DEBUG)
@@ -151,7 +156,7 @@ typedef __w64 long ATX_PointerLong;
 |   defaults
 +---------------------------------------------------------------------*/
 #ifndef ATX_POINTER_TO_LONG
-#define ATX_POINTER_TO_LONG(_p) ((long)(_p))
+#define ATX_POINTER_TO_LONG(_p) ((ATX_IntPtr)(_p))
 #endif
 
 #if !defined(ATX_CONFIG_INT_32_64_TYPE)
@@ -164,6 +169,13 @@ typedef __w64 long ATX_PointerLong;
 
 #if !defined(ATX_INT64_PRINTF_FORMAT)
 #define ATX_INT64_PRINTF_FORMAT "ll"
+#endif
+
+#if !defined(ATX_CONFIG_INT_PTR_TYPE)
+#define ATX_CONFIG_INT_PTR_TYPE long
+#endif
+#if !defined(ATX_CONFIG_UINT_PTR_TYPE)
+#define ATX_CONFIG_UINT_PTR_TYPE unsigned long
 #endif
 
 /*----------------------------------------------------------------------

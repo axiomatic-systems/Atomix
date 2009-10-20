@@ -2,7 +2,7 @@
 |
 |   Atomix - General Types
 |
-|   (c) 2002-2006 Gilles Boccon-Gibod
+|   (c) 2002-2009 Gilles Boccon-Gibod
 |   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
@@ -15,6 +15,13 @@
 +---------------------------------------------------------------------*/
 #include "AtxConfig.h"
 #include "AtxDefs.h"
+
+#if defined(ATX_CONFIG_HAVE_STDINT_H)
+#include <stdint.h>
+#endif
+#if defined(ATX_CONFIG_HAVE_STDDEF_H)
+#include <stddef.h>
+#endif
 
 /*----------------------------------------------------------------------
 |   generic types
@@ -158,6 +165,12 @@ typedef ATX_UInt64 ATX_Position;
  */
 typedef ATX_CONFIG_INT_32_64_TYPE ATX_Int3264;
 typedef unsigned ATX_CONFIG_INT_32_64_TYPE ATX_UInt3264;
+
+/** 
+ * Integer that can hold a pointer
+ */
+typedef ATX_CONFIG_INT_PTR_TYPE ATX_IntPtr;
+typedef ATX_CONFIG_UINT_PTR_TYPE ATX_UIntPtr;
 
 #if !defined(ATX_INT_MIN)
 #if defined(ATX_CONFIG_HAVE_INT_MIN)
