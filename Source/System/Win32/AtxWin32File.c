@@ -2,7 +2,7 @@
 ||
 |   Atomix - File Streams: Win32 Implementation
 |
-|   (c) 2002-20069 Gilles Boccon-Gibod
+|   (c) 2002-2009 Gilles Boccon-Gibod
 |   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
