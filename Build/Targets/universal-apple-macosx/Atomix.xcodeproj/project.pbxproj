@@ -1208,6 +1208,7 @@
 		1DEB91F008733DB70010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1219,6 +1220,8 @@
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				SDKROOT = macosx10.5;
+				VALID_ARCHS = "i386 ppc x86_64 armv6 armv7";
 				WARNING_CFLAGS = (
 					"-Wall",
 					"-Wextra",
@@ -1229,6 +1232,7 @@
 		1DEB91F108733DB70010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
@@ -1236,6 +1240,8 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				SDKROOT = macosx10.5;
+				VALID_ARCHS = "i386 ppc x86_64 armv6 armv7";
 				WARNING_CFLAGS = (
 					"-Wall",
 					"-Wextra",
