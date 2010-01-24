@@ -74,12 +74,12 @@ typedef ATX_UInt32 ATX_Mask;
  * An unsigned integer used to represent a measurable quantity (eg. the 
  * size of a file)
  */
-typedef unsigned long ATX_Size;
+typedef ATX_UInt32 ATX_Size;
 
 /**
  * A signed integer used to represent an offset from a base value.
  */
-typedef signed long ATX_Offset;
+typedef ATX_Int32 ATX_Offset;
 
 /**
  * An address as a generic pointer, that can be dereferenced as a byte address.
@@ -138,7 +138,7 @@ typedef ATX_UInt8* ATX_ByteBuffer;
 /**
  * Timeout in milliseconds
  */
-typedef long       ATX_Timeout;
+typedef int        ATX_Timeout;
 
 /**
  * 64 bit integers
