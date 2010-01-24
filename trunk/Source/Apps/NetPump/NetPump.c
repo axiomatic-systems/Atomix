@@ -523,11 +523,11 @@ main(int argc, char** argv)
 
             /* send */
             result = ATX_InputStream_Read(in, buffer, packet_size, &bytes_read);
-            fprintf(stderr, "[%d] read %ld bytes\n", result, bytes_read);
+            fprintf(stderr, "[%d] read %d bytes\n", result, bytes_read);
             if (result == ATX_SUCCESS && bytes_read) {
                 result = ATX_OutputStream_Write(out, buffer, bytes_read,
                                                 &bytes_written);
-                fprintf(stderr, "[%d] wrote %ld bytes\n", 
+                fprintf(stderr, "[%d] wrote %d bytes\n", 
                         result, bytes_written);
                 offset += bytes_written;
             } else {
