@@ -275,6 +275,12 @@ ATX_BaseProperties_RemoveListener(ATX_Properties*            self,
                                   ATX_PropertyListenerHandle handle);
 
 ATX_Result ATX_Properties_Create(ATX_Properties** properties);
+ATX_Result ATX_PropertyValue_Clone(const ATX_PropertyValue* self, 
+                                   ATX_PropertyValue*       clone);
+ATX_Result ATX_PropertyValue_Destruct(ATX_PropertyValue* self);
+ATX_Result ATX_Property_Clone(const ATX_Property* self, 
+                              ATX_Property*       clone);
+ATX_Result ATX_Property_Destruct(ATX_Property* self);
 
 #ifdef __cplusplus
 }

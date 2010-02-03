@@ -159,56 +159,7 @@ static ATX_Result
 PropertyNode_SetValue(PropertyNode*            node,
                       const ATX_PropertyValue* value)
 {
-    node->property.value.type = value->type;
-    switch (value->type) {
-      case ATX_PROPERTY_VALUE_TYPE_INTEGER:
-      case ATX_PROPERTY_VALUE_TYPE_FLOAT:
-      case ATX_PROPERTY_VALUE_TYPE_BOOLEAN:
-      case ATX_PROPERTY_VALUE_TYPE_POINTER:
-        node->property.value.data = value->data;
-        break;
-
-      case ATX_PROPERTY_VALUE_TYPE_STRING:
-        node->property.value.data.string = ATX_DuplicateString(value->data.string);
-        break;
-
-      case ATX_PROPERTY_VALUE_TYPE_RAW_DATA:
-        node->property.value.data.raw_data.size = value->data.raw_data.size;
-        node->property.value.data.raw_data.data = 
-            ATX_AllocateMemory(node->property.value.data.raw_data.size);
-        if (node->property.value.data.raw_data.data == NULL) {
-            return ATX_ERROR_OUT_OF_MEMORY;
-        }
-        ATX_CopyMemory(node->property.value.data.raw_data.data,
-                       value->data.raw_data.data,
-                       value->data.raw_data.size);
-        break;
-    }
-
-    return ATX_SUCCESS;
-}
-
-/*----------------------------------------------------------------------
-|   PropertyNode_DestroyValue
-+---------------------------------------------------------------------*/
-static void
-PropertyNode_DestroyValue(PropertyNode* node)
-{
-    /* destruct the node */
-    switch (node->property.value.type) {
-      case ATX_PROPERTY_VALUE_TYPE_STRING:
-        ATX_FreeMemory((void*)node->property.value.data.string);
-        break;
-
-      case ATX_PROPERTY_VALUE_TYPE_RAW_DATA:
-        if (node->property.value.data.raw_data.data) {
-            ATX_FreeMemory((void*)node->property.value.data.raw_data.data);
-        }
-        break;
-
-      default:
-        break;
-    }
+    return ATX_PropertyValue_Clone(value, &node->property.value);
 }
 
 /*----------------------------------------------------------------------
@@ -242,9 +193,8 @@ PropertyNode_Create(ATX_CString              name,
 static void
 PropertyNode_Destroy(PropertyNode* node)
 {
-    /* destruct the node */
-    ATX_FreeMemory((void*)node->property.name);
-    PropertyNode_DestroyValue(node);
+    /* destruct the node property */
+    ATX_Property_Destruct(&node->property);
 
     /* free the node */
     ATX_FreeMemory((void*)node);
@@ -428,7 +378,7 @@ Properties_SetProperty(ATX_Properties*          _self,
     /* find the property with that name */
     node = Properties_FindProperty(self, name);
     if (node) {
-        PropertyNode_DestroyValue(node);
+        ATX_PropertyValue_Destruct(&node->property.value);
         PropertyNode_SetValue(node, value);
     } else {
         /* no property with that name, create one */
@@ -548,8 +498,92 @@ Properties_RemoveListener(ATX_Properties*            _self,
     return ATX_ERROR_NO_SUCH_LISTENER;
 }
 
+
 /*----------------------------------------------------------------------
-|   Properties_Create
+|   ATX_PropertyValue_Clone
++---------------------------------------------------------------------*/
+ATX_Result 
+ATX_PropertyValue_Clone(const ATX_PropertyValue* self, ATX_PropertyValue* clone)
+{
+    clone->type = self->type;
+    switch (self->type) {
+      case ATX_PROPERTY_VALUE_TYPE_INTEGER:
+      case ATX_PROPERTY_VALUE_TYPE_FLOAT:
+      case ATX_PROPERTY_VALUE_TYPE_BOOLEAN:
+      case ATX_PROPERTY_VALUE_TYPE_POINTER:
+        clone->data = self->data;
+        break;
+
+      case ATX_PROPERTY_VALUE_TYPE_STRING:
+        clone->data.string = ATX_DuplicateString(self->data.string);
+        break;
+
+      case ATX_PROPERTY_VALUE_TYPE_RAW_DATA:
+        clone->data.raw_data.size = self->data.raw_data.size;
+        clone->data.raw_data.data = ATX_AllocateMemory(self->data.raw_data.size);
+        if (clone->data.raw_data.data == NULL) {
+            return ATX_ERROR_OUT_OF_MEMORY;
+        }
+        ATX_CopyMemory(clone->data.raw_data.data,
+                       self->data.raw_data.data,
+                       self->data.raw_data.size);
+        break;
+    }
+    
+    return ATX_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   ATX_PropertyValue_Destruct
++---------------------------------------------------------------------*/
+ATX_Result
+ATX_PropertyValue_Destruct(ATX_PropertyValue* self)
+{
+    switch (self->type) {
+      case ATX_PROPERTY_VALUE_TYPE_STRING:
+        ATX_FreeMemory((void*)self->data.string);
+        break;
+
+      case ATX_PROPERTY_VALUE_TYPE_RAW_DATA:
+        if (self->data.raw_data.data) {
+            ATX_FreeMemory(self->data.raw_data.data);
+        }
+        break;
+
+      default:
+        break;
+    }
+    
+    return ATX_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   ATX_Property_Clone
++---------------------------------------------------------------------*/
+ATX_Result
+ATX_Property_Clone(const ATX_Property* self, ATX_Property* clone)
+{
+    if (self->name) {
+        clone->name = ATX_DuplicateString(self->name);
+    } else {
+        clone->name = NULL;
+    }
+    return ATX_PropertyValue_Clone(&self->value, &clone->value);
+}
+
+/*----------------------------------------------------------------------
+|   ATX_Property_Destruct
++---------------------------------------------------------------------*/
+ATX_Result
+ATX_Property_Destruct(ATX_Property* self)
+{
+    if (self->name) ATX_FreeMemory((void*)self->name);
+    self->name = NULL;
+    return ATX_PropertyValue_Destruct(&self->value);
+}
+
+/*----------------------------------------------------------------------
+|   ATX_Properties_Create
 +---------------------------------------------------------------------*/
 ATX_Result 
 ATX_Properties_Create(ATX_Properties** object)
