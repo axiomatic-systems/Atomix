@@ -280,9 +280,9 @@ ATX_LogManager_GetConfigValue(const char* prefix, const char* suffix)
         if (ATX_String_GetLength(&entry->key) == key_length &&
             (prefix == NULL || ATX_String_StartsWith(&entry->key, prefix)) &&
             (suffix == NULL || ATX_String_EndsWith(&entry->key, suffix  )) ) {
-                return &entry->value;
-            }
-            item = ATX_ListItem_GetNext(item);
+            return &entry->value;
+        }
+        item = ATX_ListItem_GetNext(item);
     }
 
     /* not found */

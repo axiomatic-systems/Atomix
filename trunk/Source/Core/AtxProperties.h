@@ -52,7 +52,7 @@ typedef struct {
  * an ATX_PropertyValue struct.
  */
 typedef union {
-    void*               pointer;  /**< A pointer                 */
+    const void*         pointer;  /**< A pointer                 */
     ATX_CString         string;   /**< A character string        */
     ATX_Int32           integer;  /**< An integer number         */
     ATX_Float           fp;       /**< A floating point number   */
