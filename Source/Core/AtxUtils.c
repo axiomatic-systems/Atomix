@@ -28,6 +28,22 @@
 #define ATX_FORMAT_BUFFER_MAX_SIZE   65536
 
 /*----------------------------------------------------------------------
+|    ATX_BytesFromInt64Be
++---------------------------------------------------------------------*/
+void 
+ATX_BytesFromInt64Be(unsigned char* buffer, ATX_UInt64 value)
+{
+    buffer[0] = (unsigned char)(value>>56) & 0xFF;
+    buffer[1] = (unsigned char)(value>>48) & 0xFF;
+    buffer[2] = (unsigned char)(value>>40) & 0xFF;
+    buffer[3] = (unsigned char)(value>>32) & 0xFF;
+    buffer[4] = (unsigned char)(value>>24) & 0xFF;
+    buffer[5] = (unsigned char)(value>>16) & 0xFF;
+    buffer[6] = (unsigned char)(value>> 8) & 0xFF;
+    buffer[7] = (unsigned char)(value    ) & 0xFF;
+}
+
+/*----------------------------------------------------------------------
 |    ATX_BytesFromInt32Be
 +---------------------------------------------------------------------*/
 void 
@@ -642,6 +658,62 @@ ATX_ScrubMemory(void* buffer, ATX_Size size)
 }
 
 /*----------------------------------------------------------------------
+|   ATX_NibbleToHex
++---------------------------------------------------------------------*/
+char
+ATX_NibbleToHex(unsigned int nibble, ATX_Boolean uppercase)
+{
+    ATX_ASSERT(nibble < 16);
+    if (uppercase) {
+        return (nibble < 10) ? ('0' + nibble) : ('A' + (nibble-10));
+    } else {
+        return (nibble < 10) ? ('0' + nibble) : ('a' + (nibble-10));
+    }
+    return (nibble < 10) ? ('0' + nibble) : ('A' + (nibble-10));
+}
+
+/*----------------------------------------------------------------------
+|   ATX_ByteToHex
++---------------------------------------------------------------------*/
+void
+ATX_ByteToHex(ATX_Byte b, char* buffer, ATX_Boolean uppercase)
+{
+    buffer[0] = ATX_NibbleToHex((b>>4) & 0x0F, uppercase);
+    buffer[1] = ATX_NibbleToHex(b      & 0x0F, uppercase);
+}
+
+/*----------------------------------------------------------------------
+|   ATX_HexString
++---------------------------------------------------------------------*/
+ATX_String
+ATX_HexString(const unsigned char* data,
+              ATX_Size             data_size,
+              ATX_Boolean          uppercase)
+{
+    ATX_String           result;
+    const unsigned char* src = data;
+    char*                dst;
+    ATX_INIT_STRING(result);
+    
+    /* quick check */
+    if (data == NULL || data_size == 0) return result;
+    
+    /* set the result size */
+    ATX_String_Reserve(&result, 2*data_size);
+    
+    /* build the string */
+    dst = ATX_String_UseChars(&result);
+    dst[2*data_size] = '\0'; /* NULL terminate */
+    while (data_size--) {
+        ATX_ByteToHex(*src++, dst, uppercase);
+        dst += 2;
+    }
+    
+    
+    return result;
+}
+
+/*----------------------------------------------------------------------
 |   ATX_HexToNibble
 +---------------------------------------------------------------------*/
 int 
@@ -658,3 +730,45 @@ ATX_HexToNibble(char hex)
     }
 }
 
+/*----------------------------------------------------------------------
+|   ATX_HexToByte
++---------------------------------------------------------------------*/
+ATX_Result
+ATX_HexToByte(const char* buffer, ATX_Byte* b)
+{
+    int nibble_0 = ATX_HexToNibble(buffer[0]);
+    int nibble_1 = ATX_HexToNibble(buffer[1]);
+    
+    if (nibble_0 < 0 || nibble_1 < 0) {
+        return ATX_ERROR_INVALID_SYNTAX;
+    }
+    
+    *b = (nibble_0 << 4) | nibble_1;
+    return ATX_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   ATX_HexToBytes
++---------------------------------------------------------------------*/
+ATX_Result
+ATX_HexToBytes(const char*     hex,
+               ATX_DataBuffer* bytes)
+{
+    ATX_Size     byte_count;
+    unsigned int i;
+    ATX_Result   result;
+    
+    /* check the size */
+    ATX_Size len = ATX_StringLength(hex);
+    if ((len%2) != 0) return ATX_ERROR_INVALID_PARAMETERS;
+    byte_count = len / 2;
+    result = ATX_DataBuffer_SetDataSize(bytes, byte_count);
+    if (ATX_FAILED(result)) return result;
+    
+    /* decode */
+    for (i=0; i<byte_count; i++) {
+        result = ATX_HexToByte(hex+(i*2), ATX_DataBuffer_UseData(bytes)+i);
+        if (ATX_FAILED(result)) return result;
+    }
+    return ATX_SUCCESS;
+}
