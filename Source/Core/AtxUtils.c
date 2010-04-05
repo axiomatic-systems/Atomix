@@ -13,6 +13,7 @@
 #include "AtxConfig.h"
 #include "AtxUtils.h"
 #include "AtxResults.h"
+#include "AtxDebug.h"
 #if defined(ATX_CONFIG_HAVE_MATH_H)
 #include <math.h>
 #endif
