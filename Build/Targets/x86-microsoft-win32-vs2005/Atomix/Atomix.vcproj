@@ -212,6 +212,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\Source\Core\AtxJson.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\Source\Core\AtxList.c"
 				>
 			</File>
@@ -331,6 +335,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\AtxIterator.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\Source\Core\AtxJson.h"
 				>
 			</File>
 			<File
