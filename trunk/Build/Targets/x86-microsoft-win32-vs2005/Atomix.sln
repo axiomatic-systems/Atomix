@@ -52,6 +52,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FilesTest", "FilesTest\File
 		{AB4D6E4D-790B-4851-8E5F-129AA6D7E56F} = {AB4D6E4D-790B-4851-8E5F-129AA6D7E56F}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JsonTest", "JsonTest\JsonTest.vcproj", "{98BD7071-5D4C-4274-886A-76D0526C1F16}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AB4D6E4D-790B-4851-8E5F-129AA6D7E56F} = {AB4D6E4D-790B-4851-8E5F-129AA6D7E56F}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -102,6 +107,10 @@ Global
 		{047A6643-61DF-4220-9E7F-3CB609A14FBB}.Debug|Win32.Build.0 = Debug|Win32
 		{047A6643-61DF-4220-9E7F-3CB609A14FBB}.Release|Win32.ActiveCfg = Release|Win32
 		{047A6643-61DF-4220-9E7F-3CB609A14FBB}.Release|Win32.Build.0 = Release|Win32
+		{98BD7071-5D4C-4274-886A-76D0526C1F16}.Debug|Win32.ActiveCfg = Debug|Win32
+		{98BD7071-5D4C-4274-886A-76D0526C1F16}.Debug|Win32.Build.0 = Debug|Win32
+		{98BD7071-5D4C-4274-886A-76D0526C1F16}.Release|Win32.ActiveCfg = Release|Win32
+		{98BD7071-5D4C-4274-886A-76D0526C1F16}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
