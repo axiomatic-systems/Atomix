@@ -16,6 +16,7 @@
 #include "AtxConfig.h"
 #include "AtxString.h"
 #include "AtxTypes.h"
+#include "AtxDataBuffer.h"
 
 #if defined(ATX_CONFIG_HAVE_STDLIB_H)
 #include <stdlib.h>
@@ -119,6 +120,7 @@ ATX_IntegerToStringU(ATX_UInt64 value, char* buffer, ATX_Size buffer_size);
 /*----------------------------------------------------------------------
 |    byte IO
 +---------------------------------------------------------------------*/
+extern void ATX_BytesFromInt64Be(unsigned char* buffer, ATX_UInt64 value);
 extern void ATX_BytesFromInt32Be(unsigned char* buffer, ATX_UInt32 value);
 extern void ATX_BytesFromInt16Be(unsigned char* buffer, ATX_UInt16 value);
 extern ATX_UInt32 ATX_BytesToInt32Be(const unsigned char* buffer);
@@ -140,6 +142,13 @@ ATX_FormatOutput(void        (*function)(void* parameter, const char* message),
                  va_list     args);
 
 extern int ATX_HexToNibble(char hex);
+extern ATX_Result ATX_HexToByte(const char* buffer, ATX_Byte* b);
+extern ATX_Result ATX_HexToBytes(const char* buffer, ATX_DataBuffer* bytes);    
+ATX_String ATX_HexString(const unsigned char* data,
+                         ATX_Size             data_size,
+                         ATX_Boolean          uppercase);
+void ATX_ByteToHex(ATX_Byte b, char* buffer, ATX_Boolean uppercase);
+char ATX_NibbleToHex(unsigned int nibble, ATX_Boolean uppercase);
 
 /*----------------------------------------------------------------------
 |    environment variables

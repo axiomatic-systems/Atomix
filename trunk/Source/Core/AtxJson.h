@@ -55,6 +55,7 @@ ATX_Json*         ATX_Json_GetChildAt(ATX_Json* self, ATX_Ordinal indx);
 ATX_Cardinal      ATX_Json_GetChildCount(ATX_Json* self);
 ATX_Json*         ATX_Json_GetParent(ATX_Json* self);
 ATX_Result        ATX_Json_AddChild(ATX_Json* self, ATX_Json* child);
+const ATX_String* ATX_Json_GetName(ATX_Json* self);
 ATX_JsonType      ATX_Json_GetType(ATX_Json* self);
 ATX_Int32         ATX_Json_AsInteger(ATX_Json* self);
 double            ATX_Json_AsDouble(ATX_Json* self);

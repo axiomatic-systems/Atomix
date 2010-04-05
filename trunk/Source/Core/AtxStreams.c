@@ -132,6 +132,28 @@ ATX_InputStream_ReadLineString(ATX_InputStream* self,
 }
 
 /*----------------------------------------------------------------------
+|   ATX_InputStream_ReadUI16
++---------------------------------------------------------------------*/
+ATX_Result
+ATX_InputStream_ReadUI16(ATX_InputStream* self, ATX_UInt16* value)
+{
+    unsigned char buffer[2];
+    
+    /* read bytes from the stream */
+    ATX_Result result;
+    result = ATX_InputStream_ReadFully(self, (void*)buffer, 2);
+    if (ATX_FAILED(result)) {
+        *value = 0;
+        return result;
+    }
+    
+    /* convert bytes to value */
+    *value = ATX_BytesToInt16Be(buffer);
+    
+    return ATX_SUCCESS;   
+}
+
+/*----------------------------------------------------------------------
 |   ATX_InputStream_ReadUI32
 +---------------------------------------------------------------------*/
 ATX_Result
@@ -626,6 +648,17 @@ ATX_DECLARE_INTERFACE_MAP(ATX_MemoryStream, ATX_Referenceable)
 ATX_Result
 ATX_MemoryStream_Create(ATX_Size size, ATX_MemoryStream** stream)
 { 
+    return ATX_MemoryStream_CreateFromBuffer(NULL, size, stream);
+}
+
+/*----------------------------------------------------------------------
+|   ATX_MemoryStream_CreateFromBuffer
++---------------------------------------------------------------------*/
+ATX_Result
+ATX_MemoryStream_CreateFromBuffer(ATX_Byte*          buffer, 
+                                  ATX_Size           size, 
+                                  ATX_MemoryStream** stream)
+{ 
     ATX_Result result;
 
     /* allocate the object */
@@ -633,11 +666,31 @@ ATX_MemoryStream_Create(ATX_Size size, ATX_MemoryStream** stream)
     if (*stream == NULL) return ATX_ERROR_OUT_OF_MEMORY;
 
     /* construct the object */
-    result = ATX_DataBuffer_Create(size, &(*stream)->buffer);
+    if (buffer == NULL) {
+        result = ATX_DataBuffer_Create(size, &(*stream)->buffer);
+    } else {
+        result = ATX_DataBuffer_Create(0, &(*stream)->buffer);
+    }
     if (ATX_FAILED(result)) {
         ATX_FreeMemory((void*)(*stream));
         return result;
     }
+    
+    /* set the buffer if needed */
+    if (buffer != NULL) {
+        result = ATX_DataBuffer_SetBuffer((*stream)->buffer, 
+                                          buffer,
+                                          size);
+        if (ATX_SUCCEEDED(result)) {
+            result = ATX_DataBuffer_SetDataSize((*stream)->buffer, size);
+        }
+        if (ATX_FAILED(result)) {
+            ATX_DataBuffer_Destroy((*stream)->buffer);
+            ATX_FreeMemory((void*)(*stream));
+            return result;
+        }
+    }
+    
     (*stream)->reference_count = 1;
     (*stream)->read_offset = 0;
     (*stream)->write_offset = 0;

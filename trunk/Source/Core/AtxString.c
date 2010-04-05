@@ -539,6 +539,32 @@ ATX_String_ReverseFindChar(const ATX_String* self, char c)
 }
 
 /*----------------------------------------------------------------------
+|   ATX_String_ReverseFindString
++---------------------------------------------------------------------*/
+int
+ATX_String_ReverseFindString(const ATX_String* self, const char* s)
+{
+    const char* src = ATX_String_GetChars(self);
+    
+    /* check args */
+    ATX_Size my_length = ATX_String_GetLength(self);
+    ATX_Size s_length  = ATX_StringLength(s);
+    int i = my_length - s_length;
+    if (i < 0) return -1;
+    
+    /* look for the string */
+    for (;i>=0;i--) {
+        int cmp = ATX_StringStartsWith(src+i, s);
+        if (cmp == 1) {
+            /* match */
+            return i;
+        }
+    }
+    
+    return -1;
+}
+
+/*----------------------------------------------------------------------
 |   ATX_String_MakeLowercase
 +---------------------------------------------------------------------*/
 void

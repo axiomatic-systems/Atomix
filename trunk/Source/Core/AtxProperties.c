@@ -498,7 +498,6 @@ Properties_RemoveListener(ATX_Properties*            _self,
     return ATX_ERROR_NO_SUCH_LISTENER;
 }
 
-
 /*----------------------------------------------------------------------
 |   ATX_PropertyValue_Clone
 +---------------------------------------------------------------------*/

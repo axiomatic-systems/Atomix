@@ -92,6 +92,9 @@ ATX_Result ATX_InputStream_ReadUI64(ATX_InputStream* stream,
 ATX_Result ATX_InputStream_ReadUI32(ATX_InputStream* stream,
                                     ATX_UInt32*      value);
 
+ATX_Result ATX_InputStream_ReadUI16(ATX_InputStream* stream,
+                                    ATX_UInt16*      value);
+
 ATX_Result ATX_InputStream_ReadFully(ATX_InputStream* stream,
                                      ATX_Any          buffer,
                                      ATX_Size         bytes_to_read);
@@ -166,6 +169,11 @@ extern "C" {
 
 ATX_Result 
 ATX_MemoryStream_Create(ATX_Size size, ATX_MemoryStream** stream);
+
+ATX_Result 
+ATX_MemoryStream_CreateFromBuffer(ATX_Byte*          buffer,
+                                  ATX_Size           size,
+                                  ATX_MemoryStream** stream);
 
 ATX_Result 
 ATX_MemoryStream_Destroy(ATX_MemoryStream* self);
