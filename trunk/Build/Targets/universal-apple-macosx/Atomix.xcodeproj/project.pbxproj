@@ -123,6 +123,7 @@
 		CAE3A9241064D1CD00EBAD97 /* AtxJson.h in Headers */ = {isa = PBXBuildFile; fileRef = CAE3A9221064D1CD00EBAD97 /* AtxJson.h */; };
 		CAE3A92E1064D20400EBAD97 /* libAtomix.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D2AAC046055464E500DB518D /* libAtomix.a */; };
 		CAE3A9331064D22F00EBAD97 /* JsonTest.c in Sources */ = {isa = PBXBuildFile; fileRef = CAE3A9321064D22F00EBAD97 /* JsonTest.c */; };
+		CAF9556C1268EA390063F480 /* AtxThreads.h in Headers */ = {isa = PBXBuildFile; fileRef = CAF9556B1268EA390063F480 /* AtxThreads.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -355,6 +356,7 @@
 		CAE3A9221064D1CD00EBAD97 /* AtxJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AtxJson.h; sourceTree = "<group>"; };
 		CAE3A9281064D1F900EBAD97 /* JsonTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = JsonTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAE3A9321064D22F00EBAD97 /* JsonTest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = JsonTest.c; sourceTree = "<group>"; };
+		CAF9556B1268EA390063F480 /* AtxThreads.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AtxThreads.h; sourceTree = "<group>"; };
 		D2AAC046055464E500DB518D /* libAtomix.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libAtomix.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -516,6 +518,7 @@
 		CA0C98BF0D15C2C300E23496 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				CAF9556B1268EA390063F480 /* AtxThreads.h */,
 				CAE3A9211064D1CD00EBAD97 /* AtxJson.c */,
 				CAE3A9221064D1CD00EBAD97 /* AtxJson.h */,
 				CA0C98C00D15C2C300E23496 /* Atomix.h */,
@@ -741,6 +744,7 @@
 				CA0C99510D15C33800E23496 /* AtxTypes.h in Headers */,
 				CA0C99520D15C33900E23496 /* AtxMap.h in Headers */,
 				CAE3A9241064D1CD00EBAD97 /* AtxJson.h in Headers */,
+				CAF9556C1268EA390063F480 /* AtxThreads.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
