@@ -401,15 +401,15 @@ ATX_List_GetLastItem(ATX_List* list)
 |    ATX_List_GetItem
 +---------------------------------------------------------------------*/
 ATX_ListItem*
-ATX_List_GetItem(ATX_List* list, ATX_Ordinal index)
+ATX_List_GetItem(ATX_List* list, ATX_Ordinal indx)
 {
     ATX_ListItem* item = list->head;
     
     /* check the range */
-    if (index >= list->item_count) return NULL;
+    if (indx >= list->item_count) return NULL;
 
     /* advance to the requested item */
-    while (index--) item = item->next;
+    while (indx--) item = item->next;
 
     return item;
 }
