@@ -287,6 +287,10 @@
 				RelativePath="..\..\..\..\Source\System\Win32\AtxWin32System.c"
 				>
 			</File>
+			<File
+				RelativePath="..\..\..\..\Source\System\Win32\AtxWin32Threads.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -383,6 +387,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\AtxString.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\Source\Core\AtxThreads.h"
 				>
 			</File>
 			<File
