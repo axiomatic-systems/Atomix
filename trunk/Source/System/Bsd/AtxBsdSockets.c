@@ -181,7 +181,7 @@ typedef int          SocketFd;
 
 #define GetSocketError()                 errno
 #define ATX_BSD_SOCKET_IS_INVALID(_s)    ((_s)  < 0)
-#define ATX_BSD_SOCKET_CALL_FAILED(_e)   ((_e) != 0)
+#define ATX_BSD_SOCKET_CALL_FAILED(_e)   ((_e)  < 0)
 #define ATX_BSD_SOCKET_SELECT_FAILED(_e) ((_e)  < 0)
 
 #endif
