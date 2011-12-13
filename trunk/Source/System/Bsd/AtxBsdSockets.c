@@ -365,11 +365,10 @@ ATX_IpAddress_ResolveName(ATX_IpAddress* address,
                           const char*    name, 
                           ATX_Timeout    timeout)
 {
+    ATX_COMPILER_UNUSED(timeout);
+    
     /* make sure the TCP/IP stack is initialized */
     ATX_CHECK(BsdSockets_Init());
-
-    /* get rid of compiler warnings */
-    timeout = timeout;
 
     /* check parameters */
     if (name == NULL || name[0] == '\0') return ATX_ERROR_HOST_UNKNOWN;
@@ -1081,9 +1080,8 @@ BsdUdpSocket_Connect(ATX_Socket*              _self,
     struct sockaddr_in inet_address;
     int                io_result;
     
-    /* avoid compiler warnings */
-    timeout = timeout;
-
+    ATX_COMPILER_UNUSED(timeout);
+    
     /* setup an address structure */
     SocketAddressToInetAddress(address, &inet_address);
 
