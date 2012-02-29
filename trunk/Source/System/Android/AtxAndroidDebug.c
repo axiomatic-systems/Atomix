@@ -1,6 +1,6 @@
 /*****************************************************************
 |
-|      File: AtxStdcDebug.c
+|      File: AtxAndroidDebug.c
 |
 |      Atomix - Debug Support: Android Implementation
 |

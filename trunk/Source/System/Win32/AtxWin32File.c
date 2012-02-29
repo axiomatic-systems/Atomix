@@ -525,14 +525,6 @@ ATX_File_Create(const char* filename, ATX_File** object)
     /* construct the object */
     ATX_SET_CSTRING(file->name, filename);
 
-    /* get the size */
-#if !defined(_WIN32_WCE)
-    if (ATX_StringsEqual(filename, ATX_FILE_STANDARD_INPUT)  ||
-        ATX_StringsEqual(filename, ATX_FILE_STANDARD_OUTPUT) ||
-        ATX_StringsEqual(filename, ATX_FILE_STANDARD_ERROR)) {
-    } else 
-#endif
-
     /* setup the interfaces */
     ATX_SET_INTERFACE(file, Win32File, ATX_File);
     ATX_SET_INTERFACE(file, Win32File, ATX_Destroyable);

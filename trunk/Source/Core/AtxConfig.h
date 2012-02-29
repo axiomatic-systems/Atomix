@@ -123,6 +123,7 @@
 /* Microsoft C Compiler */
 #if defined(_MSC_VER)
 #define ATX_LocalFunctionName __FUNCTION__
+#define ATX_CONFIG_HAVE_GETADDRINFO
 #define ATX_CONFIG_HAVE_INT64
 #define ATX_CONFIG_INT64_TYPE __int64
 #define ATX_INT64_MIN _I64_MIN
@@ -172,6 +173,18 @@
 #if defined(__SYMBIAN32__)
 #define ATX_fseek fseek  /* no fseeko ? */
 #define ATX_ftell ftell  /* no ftello ? */
+#endif
+
+#if defined(__linux__) 
+#define ATX_CONFIG_HAVE_GETADDRINFO
+#endif
+
+#if defined(__APPLE__)
+#define ATX_CONFIG_HAVE_GETADDRINFO
+#endif
+
+#if defined(ANDROID)
+#define ATX_CONFIG_HAVE_GETADDRINFO
 #endif
 
 /*----------------------------------------------------------------------

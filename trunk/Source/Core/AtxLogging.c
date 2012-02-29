@@ -156,6 +156,19 @@ static ATX_LogManager LogManager;
     }                                                                                   \
 } while (0)
 
+
+/*----------------------------------------------------------------------
+|   ATX_GetSystemLogConfig
++---------------------------------------------------------------------*/
+#if !defined(ATX_CONFIG_HAVE_SYSTEM_LOG_CONFIG)
+ATX_Result ATX_GetSystemLogConfig(ATX_String* config)
+{
+    ATX_COMPILER_UNUSED(config);
+    return ATX_ERROR_NOT_SUPPORTED;
+}
+#endif
+
+
 /*----------------------------------------------------------------------
 |   forward references
 +---------------------------------------------------------------------*/
@@ -605,6 +618,7 @@ ATX_LogManager_AtExitHandler(void)
 ATX_Result
 ATX_LogManager_Initialize(void) 
 {
+    ATX_String  config_sources_system = ATX_EMPTY_STRING;
     ATX_String  config_sources_env = ATX_EMPTY_STRING;
     const char* config_sources = ATX_CONFIG_DEFAULT_LOG_CONFIG_SOURCE;
 
@@ -620,6 +634,12 @@ ATX_LogManager_Initialize(void)
 
     /* set some default config values */
     ATX_LogManager_SetConfigValue(".handlers", ATX_LOG_ROOT_DEFAULT_HANDLER);
+
+    /* check system specific log configuration */
+
+    if (ATX_SUCCEEDED(ATX_GetSystemLogConfig(&config_sources_system))) {
+        config_sources = ATX_CSTR(config_sources_system);
+    }
 
     /* see if the config sources have been set to non-default values */
     if (ATX_SUCCEEDED(ATX_GetEnvironment(ATX_CONFIG_LOG_CONFIG_ENV, &config_sources_env))) {
@@ -644,6 +664,7 @@ ATX_LogManager_Initialize(void)
         }
         ATX_String_Destruct(&config_source);
         ATX_String_Destruct(&config_sources_env);
+        ATX_String_Destruct(&config_sources_system);
     }
 
     /* create the root logger */
