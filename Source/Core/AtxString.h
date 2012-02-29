@@ -81,7 +81,7 @@ typedef struct {
 #define ATX_String_GetChar(str, index) ((str)->chars[(index)])
 #define ATX_String_SetChar(str, index, c) do {          \
     (str)->chars[(index)] = (c);                        \
-}
+} while(0)
 #define ATX_String_GetLength(str) ((str)->chars?(ATX_String_GetBuffer(str)->length):0)
 #define ATX_String_GetChars(str) ((str)->chars?(const char*)((str)->chars):ATX_String_EmptyString)
 #define ATX_String_UseChars(str) ((str)->chars?(str)->chars:(char*)ATX_String_EmptyString)

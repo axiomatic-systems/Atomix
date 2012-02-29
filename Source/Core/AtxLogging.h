@@ -103,6 +103,8 @@ typedef struct {
     const char* name;
 } ATX_LoggerReference;
 
+ATX_Result ATX_GetSystemLogConfig(ATX_String* config);
+
 /*----------------------------------------------------------------------
 |   constants
 +---------------------------------------------------------------------*/
