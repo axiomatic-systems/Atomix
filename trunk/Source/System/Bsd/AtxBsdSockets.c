@@ -335,13 +335,8 @@ MapErrorCode(int error)
 static ATX_Result
 MapGetAddrInfoErrorCode(int error_code)
 {
-    switch (error_code) {
-        case EAI_AGAIN:
-            return ATX_ERROR_TIMEOUT;
-            
-        default: 
-            return ATX_ERROR_HOST_UNKNOWN;
-    }
+    ATX_COMPILER_UNUSED(error_code);
+    return ATX_ERROR_HOST_UNKNOWN;
 }
 #endif
 
