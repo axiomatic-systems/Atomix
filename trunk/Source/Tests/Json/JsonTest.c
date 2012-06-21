@@ -435,8 +435,10 @@ main(int argc, char** argv)
     CHECK(json != NULL);
     CHECK(ATX_Json_GetType(json) == ATX_JSON_TYPE_ARRAY);
     CHECK(ATX_Json_GetChildCount(json) == 2);
-    child = ATX_Json_GetChildAt(json, 0, NULL);
+    const char* name = NULL;
+    child = ATX_Json_GetChildAt(json, 0, &name);
     CHECK(child != NULL);
+    CHECK(name == NULL);
     CHECK(ATX_Json_GetType(child) == ATX_JSON_TYPE_NUMBER);
     CHECK(ATX_Json_AsInteger(child) == 1);
     child = ATX_Json_GetChildAt(json, 1, NULL);
@@ -445,6 +447,23 @@ main(int argc, char** argv)
     CHECK(ATX_String_Equals(ATX_Json_AsString(child), "a", ATX_FALSE));
     ATX_Json_Destroy(json);
 
+    SHOULD_SUCCEED(ATX_Json_Parse("{\"a\":1}", &json));
+    CHECK(json != NULL);
+    CHECK(ATX_Json_GetType(json) == ATX_JSON_TYPE_OBJECT);
+    CHECK(ATX_Json_GetChildCount(json) == 1);
+    child = ATX_Json_GetChildAt(json, 0, &name);
+    CHECK(ATX_StringsEqual(name, "a"));
+    ATX_Json_Destroy(json);
+
+    SHOULD_SUCCEED(ATX_Json_Parse("{\"\":1,\"\":2}", &json));
+    CHECK(json != NULL);
+    CHECK(ATX_Json_GetType(json) == ATX_JSON_TYPE_OBJECT);
+    CHECK(ATX_Json_GetChildCount(json) == 2);
+    child = ATX_Json_GetChildAt(json, 0, &name);
+    CHECK(name != NULL);
+    CHECK(ATX_StringsEqual(name, ""));
+    ATX_Json_Destroy(json);
+    
     return 0;
 }
 
