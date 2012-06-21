@@ -329,47 +329,47 @@ main(int argc, char** argv)
     CHECK(ATX_Json_GetType(json) == ATX_JSON_TYPE_ARRAY);
     CHECK(ATX_Json_GetChildCount(json) == 20);
 
-    child = ATX_Json_GetChildAt(json, 0);
+    child = ATX_Json_GetChildAt(json, 0, NULL);
     CHECK(child != NULL);
     CHECK(ATX_Json_GetType(child) == ATX_JSON_TYPE_STRING);
     CHECK(ATX_String_Equals(ATX_Json_AsString(child), "JSON Test Pattern pass1", ATX_FALSE));
 
-    child = ATX_Json_GetChildAt(json, 1);
+    child = ATX_Json_GetChildAt(json, 1, NULL);
     CHECK(ATX_Json_GetType(child) == ATX_JSON_TYPE_OBJECT);
     CHECK(ATX_Json_GetChildCount(child) == 1);
     child = ATX_Json_GetChild(child, "object with 1 member");
     CHECK(child != NULL);
     CHECK(ATX_Json_GetType(child) == ATX_JSON_TYPE_ARRAY);
     CHECK(ATX_Json_GetChildCount(child) == 1);
-    child = ATX_Json_GetChildAt(child, 0);
+    child = ATX_Json_GetChildAt(child, 0, NULL);
     CHECK(ATX_Json_GetType(child) == ATX_JSON_TYPE_STRING);
     CHECK(ATX_String_Equals(ATX_Json_AsString(child), "array with 1 element", ATX_FALSE));
     child = ATX_Json_GetParent(child);
     
-    child = ATX_Json_GetChildAt(json, 2);
+    child = ATX_Json_GetChildAt(json, 2, NULL);
     CHECK(ATX_Json_GetType(child) == ATX_JSON_TYPE_OBJECT);
     CHECK(ATX_Json_GetChildCount(child) == 0);
 
-    child = ATX_Json_GetChildAt(json, 3);
+    child = ATX_Json_GetChildAt(json, 3, NULL);
     CHECK(ATX_Json_GetType(child) == ATX_JSON_TYPE_ARRAY);
     CHECK(ATX_Json_GetChildCount(child) == 0);
 
-    child = ATX_Json_GetChildAt(json, 4);
+    child = ATX_Json_GetChildAt(json, 4, NULL);
     CHECK(ATX_Json_GetType(child) == ATX_JSON_TYPE_NUMBER);
     CHECK(ATX_Json_AsInteger(child) == -42);
 
-    child = ATX_Json_GetChildAt(json, 5);
+    child = ATX_Json_GetChildAt(json, 5, NULL);
     CHECK(ATX_Json_GetType(child) == ATX_JSON_TYPE_BOOLEAN);
     CHECK(ATX_Json_AsBoolean(child) == ATX_TRUE);
 
-    child = ATX_Json_GetChildAt(json, 6);
+    child = ATX_Json_GetChildAt(json, 6, NULL);
     CHECK(ATX_Json_GetType(child) == ATX_JSON_TYPE_BOOLEAN);
     CHECK(ATX_Json_AsBoolean(child) == ATX_FALSE);
 
-    child = ATX_Json_GetChildAt(json, 7);
+    child = ATX_Json_GetChildAt(json, 7, NULL);
     CHECK(ATX_Json_GetType(child) == ATX_JSON_TYPE_NULL);
 
-    child = ATX_Json_GetChildAt(json, 8);
+    child = ATX_Json_GetChildAt(json, 8, NULL);
     CHECK(ATX_Json_GetType(child) == ATX_JSON_TYPE_OBJECT);
     CHECK(ATX_Json_GetChildCount(child) == 32);
     child = ATX_Json_GetChild(child, "integer");
@@ -435,11 +435,11 @@ main(int argc, char** argv)
     CHECK(json != NULL);
     CHECK(ATX_Json_GetType(json) == ATX_JSON_TYPE_ARRAY);
     CHECK(ATX_Json_GetChildCount(json) == 2);
-    child = ATX_Json_GetChildAt(json, 0);
+    child = ATX_Json_GetChildAt(json, 0, NULL);
     CHECK(child != NULL);
     CHECK(ATX_Json_GetType(child) == ATX_JSON_TYPE_NUMBER);
     CHECK(ATX_Json_AsInteger(child) == 1);
-    child = ATX_Json_GetChildAt(json, 1);
+    child = ATX_Json_GetChildAt(json, 1, NULL);
     CHECK(child != NULL);
     CHECK(ATX_Json_GetType(child) == ATX_JSON_TYPE_STRING);
     CHECK(ATX_String_Equals(ATX_Json_AsString(child), "a", ATX_FALSE));

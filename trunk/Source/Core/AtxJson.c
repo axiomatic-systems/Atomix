@@ -283,9 +283,10 @@ ATX_Json_GetChild(ATX_Json* self, const char* name)
 |    ATX_Json_GetChildAt
 +---------------------------------------------------------------------*/
 ATX_Json*    
-ATX_Json_GetChildAt(ATX_Json* self, ATX_Ordinal indx)
+ATX_Json_GetChildAt(ATX_Json* self, ATX_Ordinal indx, const char** name)
 {
     ATX_Json* child = self->child;
+    if (name) *name = NULL;
     
     /* start from the end of the list */
     if (indx >= self->child_count) return NULL;
@@ -295,6 +296,7 @@ ATX_Json_GetChildAt(ATX_Json* self, ATX_Ordinal indx)
         if (child == NULL) return NULL;
         --indx;
     }
+    if (name) *name = ATX_String_GetChars(&child->name);
     return child;
 }
 
@@ -320,8 +322,18 @@ ATX_Json_GetParent(ATX_Json* self)
 |    ATX_Json_AddChild
 +---------------------------------------------------------------------*/
 ATX_Result  
-ATX_Json_AddChild(ATX_Json* self, ATX_Json* child)
+ATX_Json_AddChild(ATX_Json* self, const char* name, ATX_Json* child)
 {
+    /* check that we can add a child to this object */
+    if (self->type == ATX_JSON_TYPE_ARRAY) {
+        if (!(name == NULL || name[0] == '\0')) {
+            return ATX_ERROR_INVALID_PARAMETERS;
+        }
+    } else if (self->type != ATX_JSON_TYPE_OBJECT) {
+        return ATX_ERROR_INVALID_PARAMETERS;
+    }
+    
+    ATX_String_Assign(&child->name, name);
     child->parent     = self;
     child->next       = self->child;
     child->prev       = NULL;
@@ -330,15 +342,6 @@ ATX_Json_AddChild(ATX_Json* self, ATX_Json* child)
     ++self->child_count;
     
     return ATX_SUCCESS; 
-}
-
-/*----------------------------------------------------------------------
-|    ATX_Json_GetName
-+---------------------------------------------------------------------*/
-const ATX_String*
-ATX_Json_GetName(ATX_Json* self)
-{
-    return &self->name;
 }
 
 /*----------------------------------------------------------------------
@@ -437,11 +440,12 @@ static void
 ATX_JsonParser_OnNewValue(ATX_JsonParser* self, ATX_Json* value)
 {
     if (self->context) {
+        const char* name = NULL;
         if (!ATX_String_IsEmpty(&self->name)) {
-            ATX_String_Assign(&value->name, ATX_CSTR(self->name));
-            ATX_String_SetLength(&self->name, 0);
+            name = ATX_String_GetChars(&self->name);
         }
-        ATX_Json_AddChild(self->context, value);
+        ATX_Json_AddChild(self->context, name, value);
+        if (name) ATX_String_SetLength(&self->name, 0);
     } else {
         ATX_ASSERT(self->root == NULL);
         self->root = value;
