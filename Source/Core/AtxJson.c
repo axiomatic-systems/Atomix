@@ -296,7 +296,12 @@ ATX_Json_GetChildAt(ATX_Json* self, ATX_Ordinal indx, const char** name)
         if (child == NULL) return NULL;
         --indx;
     }
-    if (name) *name = ATX_String_GetChars(&child->name);
+    if (name) {
+        if (self->type == ATX_JSON_TYPE_OBJECT) {
+            /* only children of Objects have names, even if they may be empty */
+            *name = ATX_String_GetChars(&child->name);
+        }
+    }
     return child;
 }
 
