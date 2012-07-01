@@ -119,12 +119,16 @@ ATX_DataBuffer_ReallocateBuffer(ATX_DataBuffer* self, ATX_Size size)
     if (self->data_size > size) return ATX_ERROR_INVALID_PARAMETERS;
 
     /* allocate a new buffer */
-    new_buffer = (ATX_Byte*)ATX_AllocateMemory(size);
-    if (new_buffer == NULL) return ATX_ERROR_OUT_OF_MEMORY;
+    if (size) {
+        new_buffer = (ATX_Byte*)ATX_AllocateMemory(size);
+        if (new_buffer == NULL) return ATX_ERROR_OUT_OF_MEMORY;
 
-    /* copy the contents of the previous buffer, if any */
-    if (self->buffer && self->data_size) {
-        ATX_CopyMemory(new_buffer, self->buffer, self->data_size);
+        /* copy the contents of the previous buffer, if any */
+        if (self->buffer && self->data_size) {
+            ATX_CopyMemory(new_buffer, self->buffer, self->data_size);
+        }
+    } else {
+        new_buffer = NULL;
     }
 
     /* destroy the previous buffer */
