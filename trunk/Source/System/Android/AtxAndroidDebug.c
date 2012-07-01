@@ -13,6 +13,7 @@
 |       includes
 +---------------------------------------------------------------------*/
 #include <android/log.h>
+#include <stdio.h>
 
 #include "AtxConfig.h"
 #include "AtxDefs.h"
@@ -26,4 +27,5 @@ void
 ATX_DebugOutput(const char* message)
 {
     __android_log_write(ANDROID_LOG_DEBUG, "Atomix", message);
+    printf("%s", message);
 }

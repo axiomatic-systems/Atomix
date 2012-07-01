@@ -13,6 +13,7 @@
 |       includes
 +---------------------------------------------------------------------*/
 #include <sys/system_properties.h>
+#include <android/log.h>
 
 #include "AtxResults.h"
 #include "AtxProperties.h"
@@ -30,8 +31,10 @@ ATX_GetSystemLogConfig(ATX_String* config)
                                          android_atx_config);
     if (prop_len > 0) {
         ATX_String_AssignN(config, android_atx_config, prop_len);
+        __android_log_print(ANDROID_LOG_DEBUG, "Atomix", "Atomix Log Config = %s\n", ATX_String_GetChars(config));
         return ATX_SUCCESS;
     } else {
+        __android_log_write(ANDROID_LOG_DEBUG, "Atomix", "Atomix Log Config = DEFAULT\n");
         return ATX_ERROR_NO_SUCH_PROPERTY;
     }
 }
