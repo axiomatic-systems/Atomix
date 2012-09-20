@@ -257,6 +257,7 @@ main(int argc, char** argv)
     ATX_Json* json = NULL;
     ATX_Json* child = NULL;
     ATX_String buffer = ATX_EMPTY_STRING;
+    const char* name = NULL;
     
     ATX_COMPILER_UNUSED(argc);
     ATX_COMPILER_UNUSED(argv);
@@ -435,7 +436,6 @@ main(int argc, char** argv)
     CHECK(json != NULL);
     CHECK(ATX_Json_GetType(json) == ATX_JSON_TYPE_ARRAY);
     CHECK(ATX_Json_GetChildCount(json) == 2);
-    const char* name = NULL;
     child = ATX_Json_GetChildAt(json, 0, &name);
     CHECK(child != NULL);
     CHECK(name == NULL);
