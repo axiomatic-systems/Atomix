@@ -51,3 +51,4 @@ const ATX_InterfaceId ATX_INTERFACE_ID__ATX_PropertyListener = {0x000B,0x0001};
 const ATX_InterfaceId ATX_INTERFACE_ID__ATX_Iterator         = {0x000C,0x0001};
 const ATX_InterfaceId ATX_INTERFACE_ID__ATX_File             = {0x000D,0x0001};
 const ATX_InterfaceId ATX_INTERFACE_ID__ATX_StreamTransformer= {0x000E,0x0001};
+const ATX_InterfaceId ATX_INTERFACE_ID__ATX_MulticastSocket  = {0x000F,0x0001};

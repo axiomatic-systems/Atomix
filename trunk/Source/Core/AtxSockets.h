@@ -180,6 +180,32 @@ ATX_INTERFACE(object)->Send(object, packet, address)
 ATX_INTERFACE(object)->Receive(object, packet, address)
 
 /*----------------------------------------------------------------------
+|   ATX_MulticastSocket
++---------------------------------------------------------------------*/
+ATX_DECLARE_INTERFACE(ATX_MulticastSocket)
+ATX_BEGIN_INTERFACE_DEFINITION(ATX_MulticastSocket)
+    ATX_Result (*JoinGroup)(ATX_MulticastSocket* self, const ATX_IpAddress* group, const ATX_IpAddress* iface);
+    ATX_Result (*LeaveGroup)(ATX_MulticastSocket* self, const ATX_IpAddress* group, const ATX_IpAddress* iface);
+    ATX_Result (*SetTimeToLive)(ATX_MulticastSocket* self, unsigned char ttl);
+    ATX_Result (*SetInterface)(ATX_MulticastSocket* self, const ATX_IpAddress* iface);
+ATX_END_INTERFACE_DEFINITION
+
+/*----------------------------------------------------------------------
+|   convenience macros
++---------------------------------------------------------------------*/
+#define ATX_MulticastSocket_JoinGroup(object, group, iface) \
+ATX_INTERFACE(object)->JoinGroup(object, group, iface)
+
+#define ATX_MulticastSocket_LeaveGroup(object, group, iface) \
+ATX_INTERFACE(object)->LeaveGroup(object, group, iface)
+
+#define ATX_MulticastSocket_SetTimeToLive(object, ttl) \
+ATX_INTERFACE(object)->SetTimeToLive(object, ttl)
+
+#define ATX_MulticastSocket_SetInterface(object, iface) \
+ATX_INTERFACE(object)->SetInterface(object, iface)
+
+/*----------------------------------------------------------------------
 |   ATX_ServerSocket
 +---------------------------------------------------------------------*/
 ATX_DECLARE_INTERFACE(ATX_ServerSocket)
