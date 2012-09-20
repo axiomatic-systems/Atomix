@@ -47,6 +47,8 @@ typedef enum {
     ENDPOINT_TYPE_UDP_SERVER,
     ENDPOINT_TYPE_TCP_CLIENT,
     ENDPOINT_TYPE_TCP_SERVER,
+    ENDPOINT_TYPE_MULTICAST_CLIENT,
+    ENDPOINT_TYPE_MULTICAST_SERVER,
     ENDPOINT_TYPE_FILE
 } EndPointType;
 
@@ -66,6 +68,15 @@ typedef struct {
             char* hostname;
             int   port;
         } udp_client;
+        struct {
+            char* groupname;
+            int   port;
+        } multicast_server;
+        struct {
+            char* groupname;
+            int   port;
+            int   ttl;
+        } multicast_client;
         struct {
             int port;
         } tcp_server;
@@ -98,6 +109,8 @@ PrintUsageAndExit(void)
             "    udp [client <hostname> <port>]|[server <port>]\n"
             "  or\n"
             "    tcp [client <hostname> <port>]|[server <port>]\n"
+            "  or\n"
+            "    multicast [client <groupname> <port> <ttl>]|[server <groupname> <port>]\n"
             "  or\n"
             "    file [<filename>|" ATX_FILE_STANDARD_INPUT "|" ATX_FILE_STANDARD_OUTPUT "|" ATX_FILE_STANDARD_ERROR "\n"
             "\n"
@@ -182,12 +195,42 @@ GetEndPointStreams(EndPoint*          endpoint,
 
             /* cast to ATX_Socket interface */
             socket = ATX_CAST(client, ATX_Socket);
-            if (result != ATX_SUCCESS) return result;
+            if (socket == NULL) return ATX_ERROR_INTERNAL;
 
             /* connect socket */
             return ConnectClient(socket, 
                                  endpoint->info.udp_client.hostname,
                                  endpoint->info.udp_client.port,
+                                 input_stream,
+                                 output_stream);
+        }
+        break;
+
+     case ENDPOINT_TYPE_MULTICAST_CLIENT:
+        {
+            ATX_DatagramSocket* client;
+            ATX_Socket*         socket;
+
+            /* create socket */
+            result = ATX_UdpSocket_Create(&client);
+            if (result) return result;
+
+            /* set the time to live */
+            {
+                ATX_MulticastSocket* mcast_socket = ATX_CAST(client, ATX_MulticastSocket);
+                if (mcast_socket) {
+                    ATX_MulticastSocket_SetTimeToLive(mcast_socket, endpoint->info.multicast_client.ttl);
+                }
+            }
+            
+            /* cast to ATX_Socket interface */
+            socket = ATX_CAST(client, ATX_Socket);
+            if (socket == NULL) return ATX_ERROR_INTERNAL;
+
+            /* connect socket */
+            return ConnectClient(socket,
+                                 endpoint->info.multicast_client.groupname,
+                                 endpoint->info.multicast_client.port,
                                  input_stream,
                                  output_stream);
         }
@@ -222,7 +265,7 @@ GetEndPointStreams(EndPoint*          endpoint,
 
             /* cast to ATX_Socket interface */
             socket = ATX_CAST(server, ATX_Socket);
-            if (result != ATX_SUCCESS) return result;
+            if (socket == NULL) return ATX_ERROR_INTERNAL;
 
             /* listen on port */
             fprintf(stderr, ":: listening on port %d\n", 
@@ -239,6 +282,47 @@ GetEndPointStreams(EndPoint*          endpoint,
         }
         break;
 
+      case ENDPOINT_TYPE_MULTICAST_SERVER:
+        {
+            ATX_DatagramSocket* server;
+            ATX_Socket*         socket;
+            ATX_SocketAddress   address;
+
+            /* create socket */
+            result = ATX_UdpSocket_Create(&server);
+            if (result) return result;
+
+            /* join the multicast group */
+            fprintf(stderr, ":: joining multicast group %s\n",
+                    endpoint->info.multicast_server.groupname);
+            {
+                ATX_MulticastSocket* mcast_socket = ATX_CAST(server, ATX_MulticastSocket);
+                if (mcast_socket) {
+                    ATX_IpAddress group_address;
+                    ATX_IpAddress_ResolveName(&group_address, endpoint->info.multicast_server.groupname, -1);
+                    ATX_MulticastSocket_JoinGroup(mcast_socket, &group_address, NULL);
+                }
+            }
+            
+            /* cast to ATX_Socket interface */
+            socket = ATX_CAST(server, ATX_Socket);
+            if (socket == NULL) return ATX_ERROR_INTERNAL;
+
+            /* listen on port */
+            fprintf(stderr, ":: listening on port %d\n", 
+                    endpoint->info.multicast_server.port);
+            ATX_SocketAddress_Set(&address,
+                                  NULL,
+                                  endpoint->info.multicast_server.port);
+            ATX_Socket_Bind(socket, &address);
+
+            /* get the input stream */
+            if (input_stream) {
+                ATX_Socket_GetInputStream(socket, input_stream);
+            }
+        }
+        break;  
+  
       case ENDPOINT_TYPE_TCP_SERVER:
         {
             ATX_ServerSocket*  server;
@@ -404,6 +488,42 @@ main(int argc, char** argv)
             } else {
                 fprintf(stderr, 
                         "ERROR: missing argument for 'udp' endpoint\n");
+                exit(1);
+            }
+        } else if (!strcmp(arg, "multicast")) {
+            if (argv[0] && argv[1]) {
+                if (!strcmp(argv[0], "server")) {
+                    if (current_endpoint->direction == ENDPOINT_DIRECTION_OUT){
+                        printf("ERROR: cannot use 'multicast server' as output\n");
+                        exit(1);
+                    }
+                    if (argv[2]) {
+                        current_endpoint->type = ENDPOINT_TYPE_MULTICAST_SERVER;
+                        current_endpoint->info.multicast_server.groupname = argv[1];
+                        current_endpoint->info.multicast_server.port = strtoul(argv[2], NULL, 10);
+                        argv += 3;                        
+                    } else {
+                        printf("ERROR: missing argument for 'multicast server'\n");
+                        exit(1);
+                    }
+                } else if (!strcmp(argv[0], "client")) {
+                    if (current_endpoint->direction == ENDPOINT_DIRECTION_IN) {
+                        printf("ERROR: cannot use 'udp client' as input\n");
+                        exit(1);
+                    }
+                    if (argv[2] && argv[3]) {
+                        current_endpoint->type = ENDPOINT_TYPE_MULTICAST_CLIENT;
+                        current_endpoint->info.multicast_client.groupname = argv[1];
+                        current_endpoint->info.multicast_client.port = strtoul(argv[2], NULL, 10);
+                        current_endpoint->info.multicast_client.ttl = strtoul(argv[3], NULL, 10);
+                        argv += 4;                        
+                    } else {
+                        printf("ERROR: missing argument for 'multicast client'\n");
+                        exit(1);
+                    }
+                }
+            } else {
+                printf("ERROR: missing argument for 'multicast' endpoint\n");
                 exit(1);
             }
         } else if (!strcmp(arg, "tcp")) {

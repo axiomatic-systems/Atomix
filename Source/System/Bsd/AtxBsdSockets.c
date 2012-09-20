@@ -87,6 +87,7 @@
 #include "AtxStreams.h"
 #include "AtxSockets.h"
 #include "AtxUtils.h"
+#include "AtxLogging.h"
 
 /*----------------------------------------------------------------------
 |   constants
@@ -233,7 +234,13 @@ typedef struct {
 
     /* interfaces */
     ATX_IMPLEMENTS(ATX_DatagramSocket);
+    ATX_IMPLEMENTS(ATX_MulticastSocket);
 } BsdUdpSocket;
+
+/*----------------------------------------------------------------------
+|    logging
++---------------------------------------------------------------------*/
+ATX_SET_LOCAL_LOGGER("atomix.bsd.sockets")
 
 #if defined(_WIN32)
 /*----------------------------------------------------------------------
@@ -1068,6 +1075,7 @@ ATX_IMPLEMENT_DESTROYABLE_INTERFACE(BsdSocket)
 |   forward declarations
 +---------------------------------------------------------------------*/
 ATX_DECLARE_INTERFACE_MAP(BsdUdpSocket, ATX_DatagramSocket)
+ATX_DECLARE_INTERFACE_MAP(BsdUdpSocket, ATX_MulticastSocket)
 ATX_DECLARE_INTERFACE_MAP(BsdUdpSocket, ATX_Socket)
 ATX_DECLARE_INTERFACE_MAP(BsdUdpSocket, ATX_Destroyable)
 
@@ -1104,6 +1112,7 @@ ATX_UdpSocket_Create(ATX_DatagramSocket** object)
 
     /* setup the interfaces */
     ATX_SET_INTERFACE(udp_socket, BsdUdpSocket, ATX_DatagramSocket);
+    ATX_SET_INTERFACE(udp_socket, BsdUdpSocket, ATX_MulticastSocket);
     ATX_SET_INTERFACE_EX(udp_socket, BsdUdpSocket, BsdSocket, ATX_Socket);
     ATX_SET_INTERFACE_EX(udp_socket, BsdUdpSocket, BsdSocket, ATX_Destroyable);
     *object = &ATX_BASE(udp_socket, ATX_DatagramSocket);
@@ -1251,12 +1260,130 @@ BsdUdpSocket_Receive(ATX_DatagramSocket* _self,
 }
 
 /*----------------------------------------------------------------------
+|   BsdUdpSocket_JoinGroup
++---------------------------------------------------------------------*/
+ATX_METHOD 
+BsdUdpSocket_JoinGroup(ATX_MulticastSocket* _self,
+                       const ATX_IpAddress* group,
+                       const ATX_IpAddress* iface)
+{
+    BsdUdpSocket*  self = ATX_SELF(BsdUdpSocket, ATX_MulticastSocket);
+    struct ip_mreq mreq;
+    int            io_result;
+    
+    /* set the interface address */
+    mreq.imr_interface.s_addr = iface?htonl(ATX_IpAddress_AsLong(iface)):0;
+
+    /* set the group address */
+    mreq.imr_multiaddr.s_addr = htonl(ATX_IpAddress_AsLong(group));
+
+    /* set socket option */
+    ATX_LOG_FINE_2("joining multicast addr %lx group %lx",
+                   ATX_IpAddress_AsLong(iface), ATX_IpAddress_AsLong(group));
+    io_result = setsockopt(ATX_BASE(self, BsdSocket).socket_ref->fd,
+                           IPPROTO_IP, IP_ADD_MEMBERSHIP,
+                           (SocketOption)&mreq, sizeof(mreq));
+    if (io_result == 0) {
+        return ATX_SUCCESS;
+    } else {
+        ATX_Result result = MapErrorCode(GetSocketError());
+        ATX_LOG_FINE_1("setsockopt error %d", result);
+        return result;
+    }
+}
+
+/*----------------------------------------------------------------------
+|   BsdUdpSocket_LeaveGroup
++---------------------------------------------------------------------*/
+ATX_METHOD 
+BsdUdpSocket_LeaveGroup(ATX_MulticastSocket* _self,
+                        const ATX_IpAddress* group,
+                        const ATX_IpAddress* iface)
+{
+    BsdUdpSocket*  self = ATX_SELF(BsdUdpSocket, ATX_MulticastSocket);
+    struct ip_mreq mreq;
+    int            io_result;
+    
+    /* set the interface address */
+    mreq.imr_interface.s_addr = htonl(ATX_IpAddress_AsLong(iface));
+
+    /* set the group address */
+    mreq.imr_multiaddr.s_addr = htonl(ATX_IpAddress_AsLong(group));
+
+    /* set socket option */
+    ATX_LOG_FINE_2("leaving multicast addr %lx group %lx",
+                   ATX_IpAddress_AsLong(iface), ATX_IpAddress_AsLong(group));
+    io_result = setsockopt(ATX_BASE(self, BsdSocket).socket_ref->fd,
+                           IPPROTO_IP, IP_DROP_MEMBERSHIP,
+                           (SocketOption)&mreq, sizeof(mreq));
+    if (io_result == 0) {
+        return ATX_SUCCESS;
+    } else {
+        ATX_Result result = MapErrorCode(GetSocketError());
+        ATX_LOG_FINE_1("setsockopt error %d", result);
+        return result;
+    }
+}
+
+/*----------------------------------------------------------------------
+|   BsdUdpSocket_SetTimeToLive
++---------------------------------------------------------------------*/
+ATX_METHOD 
+BsdUdpSocket_SetTimeToLive(ATX_MulticastSocket* _self, unsigned char ttl)
+{
+    BsdUdpSocket* self = ATX_SELF(BsdUdpSocket, ATX_MulticastSocket);
+    unsigned char ttl_opt = ttl;
+    int           io_result;
+    
+    /* set socket option */
+    ATX_LOG_FINE_1("setting multicast TTL to %d", (int)ttl);
+    io_result = setsockopt(ATX_BASE(self, BsdSocket).socket_ref->fd,
+                           IPPROTO_IP, IP_MULTICAST_TTL,
+                           (SocketOption)&ttl_opt, sizeof(ttl_opt));
+    if (io_result == 0) {
+        return ATX_SUCCESS;
+    } else {
+        ATX_Result result = MapErrorCode(GetSocketError());
+        ATX_LOG_FINE_1("setsockopt error %d", result);
+        return result;
+    }
+}
+
+/*----------------------------------------------------------------------
+|   BsdUdpSocket_SetInterface
++---------------------------------------------------------------------*/
+ATX_METHOD 
+BsdUdpSocket_SetInterface(ATX_MulticastSocket* _self, const ATX_IpAddress* iface)
+{
+    BsdUdpSocket*  self = ATX_SELF(BsdUdpSocket, ATX_MulticastSocket);
+    struct in_addr iface_addr;
+    int            io_result;
+    
+    /* set the interface address */
+    iface_addr.s_addr = htonl(ATX_IpAddress_AsLong(iface));
+
+    /* set socket option */
+    ATX_LOG_FINE_1("setting multicast interface %lx", ATX_IpAddress_AsLong(iface));
+    io_result = setsockopt(ATX_BASE(self, BsdSocket).socket_ref->fd,
+                           IPPROTO_IP, IP_MULTICAST_IF,
+                           (char*)&iface_addr, sizeof(iface_addr));
+    if (io_result == 0) {
+        return ATX_SUCCESS;
+    } else {
+        ATX_Result result = MapErrorCode(GetSocketError());
+        ATX_LOG_FINE_1("setsockopt error %d", result);
+        return result;
+    }
+}
+
+/*----------------------------------------------------------------------
 |   BsdUdpSocket_GetInterface
 +---------------------------------------------------------------------*/
 ATX_BEGIN_GET_INTERFACE_IMPLEMENTATION(BsdUdpSocket)
     ATX_GET_INTERFACE_ACCEPT_EX(BsdUdpSocket, BsdSocket, ATX_Socket)
     ATX_GET_INTERFACE_ACCEPT_EX(BsdUdpSocket, BsdSocket, ATX_Destroyable)
     ATX_GET_INTERFACE_ACCEPT(BsdUdpSocket, ATX_DatagramSocket)
+    ATX_GET_INTERFACE_ACCEPT(BsdUdpSocket, ATX_MulticastSocket)
 ATX_END_GET_INTERFACE_IMPLEMENTATION
 
 /*----------------------------------------------------------------------
@@ -1278,6 +1405,16 @@ ATX_INTERFACE_MAP(BsdUdpSocket, ATX_Socket) = {
 ATX_BEGIN_INTERFACE_MAP(BsdUdpSocket, ATX_DatagramSocket)
     BsdUdpSocket_Send,
     BsdUdpSocket_Receive
+ATX_END_INTERFACE_MAP
+
+/*----------------------------------------------------------------------
+|   ATX_MulticastSocket interface
++---------------------------------------------------------------------*/
+ATX_BEGIN_INTERFACE_MAP(BsdUdpSocket, ATX_MulticastSocket)
+    BsdUdpSocket_JoinGroup,
+    BsdUdpSocket_LeaveGroup,
+    BsdUdpSocket_SetTimeToLive,
+    BsdUdpSocket_SetInterface
 ATX_END_INTERFACE_MAP
 
 /*----------------------------------------------------------------------
