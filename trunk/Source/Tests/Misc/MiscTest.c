@@ -206,20 +206,20 @@ main(int argc, char** argv)
         SHOULD_FAIL(ATX_IpAddress_Parse(&ip, "1.2..3.4"));
         SHOULD_FAIL(ATX_IpAddress_Parse(&ip, "1.2.300.4"));
         SHOULD_SUCCEED(ATX_IpAddress_Parse(&ip, "1.2.3.4"));
-        SHOULD_EQUAL_I(ip[0],1);
-        SHOULD_EQUAL_I(ip[1],2);
-        SHOULD_EQUAL_I(ip[2],3);
-        SHOULD_EQUAL_I(ip[3],4);
+        SHOULD_EQUAL_I(ip.ip[0],1);
+        SHOULD_EQUAL_I(ip.ip[1],2);
+        SHOULD_EQUAL_I(ip.ip[2],3);
+        SHOULD_EQUAL_I(ip.ip[3],4);
         SHOULD_SUCCEED(ATX_IpAddress_Parse(&ip, "255.255.0.1"));
-        SHOULD_EQUAL_I(ip[0],255);
-        SHOULD_EQUAL_I(ip[1],255);
-        SHOULD_EQUAL_I(ip[2],0);
-        SHOULD_EQUAL_I(ip[3],1);
+        SHOULD_EQUAL_I(ip.ip[0],255);
+        SHOULD_EQUAL_I(ip.ip[1],255);
+        SHOULD_EQUAL_I(ip.ip[2],0);
+        SHOULD_EQUAL_I(ip.ip[3],1);
         SHOULD_SUCCEED(ATX_IpAddress_Parse(&ip, "0.0.0.0"));
-        SHOULD_EQUAL_I(ip[0],0);
-        SHOULD_EQUAL_I(ip[1],0);
-        SHOULD_EQUAL_I(ip[2],0);
-        SHOULD_EQUAL_I(ip[3],0);
+        SHOULD_EQUAL_I(ip.ip[0],0);
+        SHOULD_EQUAL_I(ip.ip[1],0);
+        SHOULD_EQUAL_I(ip.ip[2],0);
+        SHOULD_EQUAL_I(ip.ip[3],0);
     }
 
     return 0;
