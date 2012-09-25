@@ -423,7 +423,7 @@ ATX_IpAddress_ResolveName(ATX_IpAddress* address,
             if (info->ai_addrlen != sizeof(struct sockaddr_in)) continue;
             if (info->ai_protocol != 0 && info->ai_protocol != IPPROTO_TCP) continue; 
             inet_addr = (struct sockaddr_in*)info->ai_addr;
-            ATX_BytesFromInt32Be(&(*address)[0], ntohl(inet_addr->sin_addr.s_addr));
+            ATX_BytesFromInt32Be(&(address->ip)[0], ntohl(inet_addr->sin_addr.s_addr));
             found = ATX_TRUE;
         }
         freeaddrinfo(infos);
@@ -440,7 +440,7 @@ ATX_IpAddress_ResolveName(ATX_IpAddress* address,
             host_entry->h_addrtype != AF_INET) {
             return ATX_ERROR_HOST_UNKNOWN;
         }
-        ATX_CopyMemory(&(*address)[0], host_entry->h_addr, 4);
+        ATX_CopyMemory(&(address->ip)[0], host_entry->h_addr, 4);
     }
 #endif
 

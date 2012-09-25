@@ -43,19 +43,19 @@
 void
 ATX_IpAddress_Reset(ATX_IpAddress* address) 
 {
-    (*address)[0] = (*address)[1] = (*address)[2] = (*address)[3] = 0;
+    address->ip[0] = address->ip[1] = address->ip[2] = address->ip[3] = 0;
 }
 
 /*----------------------------------------------------------------------
 |   ATX_IpAddress_Copy
 +---------------------------------------------------------------------*/
 void
-ATX_IpAddress_Copy(ATX_IpAddress* address, ATX_IpAddress* other) 
+ATX_IpAddress_Copy(ATX_IpAddress* address, const ATX_IpAddress* other)
 {
-    (*address)[0] = (*other)[0];
-    (*address)[1] = (*other)[1];
-    (*address)[2] = (*other)[2];
-    (*address)[3] = (*other)[3];
+    address->ip[0] = other->ip[0];
+    address->ip[1] = other->ip[1];
+    address->ip[2] = other->ip[2];
+    address->ip[3] = other->ip[3];
 }
 
 /*----------------------------------------------------------------------
@@ -65,10 +65,10 @@ void
 ATX_IpAddress_SetFromLong(ATX_IpAddress* address,
                           unsigned long  long_addr)
 {
-    (*address)[0] = (unsigned char)((long_addr >> 24) & 0xFF);
-    (*address)[1] = (unsigned char)((long_addr >> 16) & 0xFF);
-    (*address)[2] = (unsigned char)((long_addr >>  8) & 0xFF);
-    (*address)[3] = (unsigned char)((long_addr      ) & 0xFF);
+    address->ip[0] = (unsigned char)((long_addr >> 24) & 0xFF);
+    address->ip[1] = (unsigned char)((long_addr >> 16) & 0xFF);
+    address->ip[2] = (unsigned char)((long_addr >>  8) & 0xFF);
+    address->ip[3] = (unsigned char)((long_addr      ) & 0xFF);
 }
 
 /*----------------------------------------------------------------------
@@ -78,10 +78,10 @@ unsigned long
 ATX_IpAddress_AsLong(const ATX_IpAddress* address)
 {
     return 
-        (((unsigned long)(*address)[0])<<24) |
-        (((unsigned long)(*address)[1])<<16) |
-        (((unsigned long)(*address)[2])<< 8) |
-        (((unsigned long)(*address)[3]));
+        (((unsigned long)address->ip[0])<<24) |
+        (((unsigned long)address->ip[1])<<16) |
+        (((unsigned long)address->ip[2])<< 8) |
+        (((unsigned long)address->ip[3]));
 }
 
 /*----------------------------------------------------------------------
@@ -99,7 +99,7 @@ ATX_IpAddress_Parse(ATX_IpAddress* address, const char* name)
     if (name == NULL) return ATX_ERROR_INVALID_PARAMETERS;
 
     /* clear the address */
-    (*address)[0] = (*address)[1] = (*address)[2] = (*address)[3] = 0;
+    address->ip[0] = address->ip[1] = address->ip[2] = address->ip[3] = 0;
 
     /* parse */
     for (fragment = 0, accumulator = 0; fragment < 4; ++name) {
@@ -122,10 +122,10 @@ ATX_IpAddress_Parse(ATX_IpAddress* address, const char* name)
     }
 
     if (fragment == 4 && *name == '\0' && !fragment_empty) {
-        (*address)[0] = parsed[0];
-        (*address)[1] = parsed[1];
-        (*address)[2] = parsed[2];
-        (*address)[3] = parsed[3];
+        address->ip[0] = parsed[0];
+        address->ip[1] = parsed[1];
+        address->ip[2] = parsed[2];
+        address->ip[3] = parsed[3];
         return ATX_SUCCESS;
     } else {
         return ATX_ERROR_INVALID_SYNTAX;
@@ -146,20 +146,20 @@ ATX_SocketAddress_Reset(ATX_SocketAddress* address)
 |   ATX_SocketAddress_Set
 +---------------------------------------------------------------------*/
 void
-ATX_SocketAddress_Set(ATX_SocketAddress* address, 
-                      ATX_IpAddress*     ip_address,
-                      ATX_IpPort         ip_port)
+ATX_SocketAddress_Set(ATX_SocketAddress*   address,
+                      const ATX_IpAddress* ip_address,
+                      ATX_IpPort           ip_port)
 {
     if (ip_address == NULL) {
-        (address->ip_address)[0] = 0;
-        (address->ip_address)[1] = 0;
-        (address->ip_address)[2] = 0;
-        (address->ip_address)[3] = 0;
+        address->ip_address.ip[0] = 0;
+        address->ip_address.ip[1] = 0;
+        address->ip_address.ip[2] = 0;
+        address->ip_address.ip[3] = 0;
     } else {
-        (address->ip_address)[0] = (*ip_address)[0];
-        (address->ip_address)[1] = (*ip_address)[1];
-        (address->ip_address)[2] = (*ip_address)[2];
-        (address->ip_address)[3] = (*ip_address)[3];
+        address->ip_address.ip[0] = ip_address->ip[0];
+        address->ip_address.ip[1] = ip_address->ip[1];
+        address->ip_address.ip[2] = ip_address->ip[2];
+        address->ip_address.ip[3] = ip_address->ip[3];
     }
     address->port = ip_port;
 }

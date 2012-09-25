@@ -43,7 +43,9 @@
 |   types
 +---------------------------------------------------------------------*/
 typedef unsigned int ATX_IpPort;
-typedef unsigned char ATX_IpAddress[4];
+typedef struct {
+    unsigned char ip[4];
+} ATX_IpAddress;
 
 typedef struct {
     ATX_IpAddress ip_address;
@@ -90,14 +92,14 @@ void ATX_IpAddress_SetFromLong(ATX_IpAddress* address,
 unsigned long ATX_IpAddress_AsLong(const ATX_IpAddress* address);
 ATX_Result ATX_IpAddress_Parse(ATX_IpAddress* address, ATX_CString name);
 ATX_Result ATX_IpAddress_ResolveName(ATX_IpAddress* address,
-                                     ATX_CString    name, 
+                                     ATX_CString    name,
                                      ATX_Timeout    timeout);
-void ATX_IpAddress_Copy(ATX_IpAddress* address,
-                        ATX_IpAddress* other);
+void ATX_IpAddress_Copy(ATX_IpAddress*       address,
+                        const ATX_IpAddress* other);
 void ATX_SocketAddress_Reset(ATX_SocketAddress* address);
-void ATX_SocketAddress_Set(ATX_SocketAddress* address,
-                           ATX_IpAddress*     ip_address,
-                           ATX_IpPort         port);
+void ATX_SocketAddress_Set(ATX_SocketAddress*   address,
+                           const ATX_IpAddress* ip_address,
+                           ATX_IpPort           port);
 
 #ifdef __cplusplus
 }
