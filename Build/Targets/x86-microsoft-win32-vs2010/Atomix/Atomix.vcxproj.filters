@@ -161,7 +161,7 @@
     <ClInclude Include="..\..\..\..\Source\Core\AtxUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\Source\Atomix\AtxVersion.h">
+    <ClInclude Include="..\..\..\..\Source\Core\AtxVersion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

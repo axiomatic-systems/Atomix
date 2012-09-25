@@ -139,7 +139,7 @@
     <ClInclude Include="..\..\..\..\Source\Core\AtxString.h" />
     <ClInclude Include="..\..\..\..\Source\Core\AtxTypes.h" />
     <ClInclude Include="..\..\..\..\Source\Core\AtxUtils.h" />
-    <ClInclude Include="..\..\..\..\Source\Atomix\AtxVersion.h" />
+    <ClInclude Include="..\..\..\..\Source\Core\AtxVersion.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
