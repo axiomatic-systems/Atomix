@@ -1279,7 +1279,7 @@ BsdUdpSocket_JoinGroup(ATX_MulticastSocket* _self,
 
     /* set socket option */
     ATX_LOG_FINE_2("joining multicast addr %lx group %lx",
-                   ATX_IpAddress_AsLong(iface), ATX_IpAddress_AsLong(group));
+                   mreq.imr_interface.s_addr, mreq.imr_multiaddr.s_addr);
     io_result = setsockopt(ATX_BASE(self, BsdSocket).socket_ref->fd,
                            IPPROTO_IP, IP_ADD_MEMBERSHIP,
                            (SocketOption)&mreq, sizeof(mreq));
@@ -1305,14 +1305,14 @@ BsdUdpSocket_LeaveGroup(ATX_MulticastSocket* _self,
     int            io_result;
     
     /* set the interface address */
-    mreq.imr_interface.s_addr = htonl(ATX_IpAddress_AsLong(iface));
+    mreq.imr_interface.s_addr = iface?htonl(ATX_IpAddress_AsLong(iface)):0;
 
     /* set the group address */
     mreq.imr_multiaddr.s_addr = htonl(ATX_IpAddress_AsLong(group));
 
     /* set socket option */
     ATX_LOG_FINE_2("leaving multicast addr %lx group %lx",
-                   ATX_IpAddress_AsLong(iface), ATX_IpAddress_AsLong(group));
+                   mreq.imr_interface.s_addr, mreq.imr_multiaddr.s_addr);
     io_result = setsockopt(ATX_BASE(self, BsdSocket).socket_ref->fd,
                            IPPROTO_IP, IP_DROP_MEMBERSHIP,
                            (SocketOption)&mreq, sizeof(mreq));
