@@ -1,0 +1,22 @@
+### compiler flags
+env.AppendUnique(CCFLAGS = ['-w9'])
+env.AppendUnique(CFLAGS  = [])
+env.AppendUnique(CPPFLAGS = [])
+
+if env['build_config'] == 'Debug':
+    env.AppendUnique(CCFLAGS = '-g')
+else:
+    env.AppendUnique(CCFLAGS = '-O')
+
+env['ARCOM']   = 'qcc -A $TARGET $SOURCES'
+env['RANLIB']  = 'echo'
+env['CC']      = 'qcc'
+env['LINK']    = 'qcc'
+
+env['ENV']['PATH'] = os.environ['PATH'] + ':' + env['ENV']['PATH']
+env['ENV']['QNX_HOST'] = os.environ['QNX_HOST']
+env['ENV']['QNX_TARGET'] = os.environ['QNX_TARGET']
+
+### Atomix System Files
+env['ATX_SYSTEM_SOURCES']={'System/StdC':'*.c', 'System/Bsd':'*.c', 'System/Posix':'*.c'}
+env['ATX_EXTRA_LIBS']=['m', 'socket']
