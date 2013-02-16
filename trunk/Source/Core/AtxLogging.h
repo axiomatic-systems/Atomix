@@ -391,7 +391,13 @@ void ATX_Logger_Log(ATX_Logger*  self,
                     unsigned int source_line,
                     const char*  source_function,
                     const char*  msg, 
-                                 ...);
+                                 ...)
+#ifdef __GNUC__
+        __attribute__ ((format (printf, 6, 7)))
+#endif
+    ;
+
+
 ATX_Result ATX_Logger_AddHandler(ATX_Logger* self, ATX_LogHandler* handler);
 
 #ifdef __cplusplus
