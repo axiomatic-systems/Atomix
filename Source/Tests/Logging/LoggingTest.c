@@ -139,7 +139,7 @@ TestLargeBuffer(void)
         buffer[i] = 'a';
     }
     buffer[32767] = 0;
-    ATX_LOG_SEVERE(buffer);
+    ATX_LOG_SEVERE_1("%s", buffer);
     ATX_FreeMemory((void*)buffer);
 }
 
