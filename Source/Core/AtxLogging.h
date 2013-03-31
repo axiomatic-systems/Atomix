@@ -61,8 +61,6 @@ typedef struct ATX_Logger ATX_Logger;
 typedef struct ATX_LogHandlerInstance ATX_LogHandlerInstance;
 typedef struct ATX_LogHandler ATX_LogHandler;
 typedef struct ATX_LogHandlerEntry ATX_LogHandlerEntry;
-typedef struct ATX_LogManagerLockerInstance ATX_LogManagerLockerInstance;
-typedef struct ATX_LogManagerLocker ATX_LogManagerLocker;
 
 typedef struct {
     void (*Log)(ATX_LogHandler* self, const ATX_LogRecord* record);
@@ -72,16 +70,6 @@ typedef struct {
 struct ATX_LogHandler {
     ATX_LogHandlerInstance*        instance;
     const ATX_LogHandlerInterface* iface;
-};
-
-typedef struct {
-    ATX_Result (*Lock)(ATX_LogManagerLocker* self);
-    ATX_Result (*Unlock)(ATX_LogManagerLocker* self);
-} ATX_LogManagerLockerInterface;
-
-struct ATX_LogManagerLocker {
-    ATX_LogManagerLockerInstance*  instance;
-    ATX_LogManagerLockerInterface* iface;
 };
 
 struct ATX_LogHandlerEntry {
@@ -380,7 +368,6 @@ extern "C" {
 
 ATX_Result  ATX_LogManager_Initialize(void);
 ATX_Result  ATX_LogManager_Terminate(void);
-ATX_Result  ATX_LogManager_SetLocker(ATX_LogManagerLocker locker);
 
 int         ATX_Log_GetLogLevel(const char* name);
 const char* ATX_Log_GetLogLevelName(int level);

@@ -117,6 +117,7 @@
 		CA0C9A1C0D15D13B00E23496 /* LoggingTest.c in Sources */ = {isa = PBXBuildFile; fileRef = CA0C99100D15C2C400E23496 /* LoggingTest.c */; };
 		CA0C9A2F0D15D17D00E23496 /* NetPump.c in Sources */ = {isa = PBXBuildFile; fileRef = CA0C98BE0D15C2C300E23496 /* NetPump.c */; };
 		CA0C9A300D15D18300E23496 /* libAtomix.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D2AAC046055464E500DB518D /* libAtomix.a */; };
+		CA8E74FB17077E45005896DF /* AtxPosixThreads.c in Sources */ = {isa = PBXBuildFile; fileRef = CA8E74FA17077E45005896DF /* AtxPosixThreads.c */; };
 		CAA3D5A70F97CD6F00BAE44C /* libAtomix.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D2AAC046055464E500DB518D /* libAtomix.a */; };
 		CAA3D5AC0F97CD9300BAE44C /* FilesTest.c in Sources */ = {isa = PBXBuildFile; fileRef = CAA3D5AB0F97CD9300BAE44C /* FilesTest.c */; };
 		CAE3A9231064D1CD00EBAD97 /* AtxJson.c in Sources */ = {isa = PBXBuildFile; fileRef = CAE3A9211064D1CD00EBAD97 /* AtxJson.c */; };
@@ -350,6 +351,7 @@
 		CA0C99FD0D15D0E900E23496 /* MiscTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MiscTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA0C9A120D15D12100E23496 /* LoggingTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LoggingTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA0C9A260D15D16C00E23496 /* NetPump */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NetPump; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA8E74FA17077E45005896DF /* AtxPosixThreads.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = AtxPosixThreads.c; sourceTree = "<group>"; };
 		CAA3D5A10F97CD6500BAE44C /* FilesTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FilesTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAA3D5AB0F97CD9300BAE44C /* FilesTest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = FilesTest.c; sourceTree = "<group>"; };
 		CAE3A9211064D1CD00EBAD97 /* AtxJson.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = AtxJson.c; sourceTree = "<group>"; };
@@ -605,6 +607,7 @@
 		CA0C98F10D15C2C400E23496 /* Posix */ = {
 			isa = PBXGroup;
 			children = (
+				CA8E74FA17077E45005896DF /* AtxPosixThreads.c */,
 				CA0C98F20D15C2C400E23496 /* AtxPosixSystem.c */,
 			);
 			path = Posix;
@@ -1086,6 +1089,7 @@
 				CA0C99580D15C35100E23496 /* AtxPosixSystem.c in Sources */,
 				CA0C99590D15C35200E23496 /* AtxStdcFile.c in Sources */,
 				CAE3A9231064D1CD00EBAD97 /* AtxJson.c in Sources */,
+				CA8E74FB17077E45005896DF /* AtxPosixThreads.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
