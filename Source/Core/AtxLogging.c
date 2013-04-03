@@ -63,12 +63,14 @@ typedef struct {
 } ATX_LogConfigEntry;
 
 typedef struct {
-    ATX_List*   config;
-    ATX_List*   loggers;
-    ATX_Logger* root;
-    ATX_Mutex*  lock;
-    ATX_Boolean disabled;
-    ATX_Boolean initialized;
+    ATX_List*    config;
+    ATX_List*    loggers;
+    ATX_Logger*  root;
+    ATX_Mutex*   lock;
+    ATX_ThreadId lock_owner;
+    ATX_UInt32   lock_recursion;
+    ATX_Boolean  disabled;
+    ATX_Boolean  initialized;
 } ATX_LogManager;
 
 typedef struct {
@@ -140,22 +142,6 @@ typedef struct {
 |   globals
 +---------------------------------------------------------------------*/
 static ATX_LogManager LogManager;
-
-/*----------------------------------------------------------------------
-|   macros
-+---------------------------------------------------------------------*/
-#define ATX_LOG_MANAGER_LOCK do {                 \
-    if (LogManager.lock) {                        \
-        ATX_Mutex_Lock(LogManager.lock);          \
-    }                                             \
-} while (0)
-
-#define ATX_LOG_MANAGER_UNLOCK do {               \
-    if (LogManager.lock) {                        \
-        ATX_Mutex_Lock(LogManager.lock);          \
-    }                                             \
-} while (0)
-
 
 /*----------------------------------------------------------------------
 |   ATX_GetSystemLogConfig
@@ -271,6 +257,36 @@ ATX_Log_GetLogLevelAnsiColor(int level)
         case ATX_LOG_LEVEL_FINER:   return "35";
         case ATX_LOG_LEVEL_FINEST:  return "36";
         default:                    return NULL;
+    }
+}
+
+/*----------------------------------------------------------------------
+|   ATX_LogManager_Lock
++---------------------------------------------------------------------*/
+static void
+ATX_LogManager_Lock(void)
+{
+    if (LogManager.lock) {
+        ATX_ThreadId me = ATX_GetCurrentThreadId();
+        if (LogManager.lock_owner != me) {
+            ATX_Mutex_Lock(LogManager.lock);
+            LogManager.lock_owner = me;
+        }
+        ++LogManager.lock_recursion;
+    }
+}
+
+/*----------------------------------------------------------------------
+|   ATX_LogManager_Lock
++---------------------------------------------------------------------*/
+static void
+ATX_LogManager_Unlock(void)
+{
+    if (LogManager.lock) {
+        if (--LogManager.lock_recursion == 0) {
+            LogManager.lock_owner = (ATX_ThreadId)0;
+            ATX_Mutex_Unlock(LogManager.lock);
+        }
     }
 }
 
@@ -623,7 +639,11 @@ ATX_LogManager_Initialize(void)
     LogManager.disabled = ATX_TRUE;
     
     /* create a lock */
-    ATX_Mutex_Create(&LogManager.lock);
+    ATX_Mutex_LockAutoCreate(&LogManager.lock);
+    if (LogManager.initialized) {
+        ATX_Mutex_Unlock(LogManager.lock);
+        return ATX_SUCCESS;
+    }
     
     /* create a logger list */
     ATX_List_Create(&LogManager.loggers);
@@ -673,9 +693,13 @@ ATX_LogManager_Initialize(void)
         ATX_LogManager_ConfigureLogger(LogManager.root);
     }
 
+    /* register a function to be called when the program exits */
+    ATX_AtExit(ATX_LogManager_AtExitHandler);
+
     /* we are now initialized */
     LogManager.disabled    = ATX_FALSE;
     LogManager.initialized = ATX_TRUE;
+    ATX_Mutex_Unlock(LogManager.lock);
     
     return ATX_SUCCESS;
 }
@@ -779,7 +803,7 @@ ATX_Logger_Log(ATX_Logger*  self,
 
         /* call all handlers for this logger and parents */
         LogManager.disabled = ATX_TRUE;
-        ATX_LOG_MANAGER_LOCK;
+        ATX_LogManager_Lock();
         while (logger) {
             /* call all handlers for the current logger */
             ATX_LogHandlerEntry* entry = logger->handlers;
@@ -795,7 +819,7 @@ ATX_Logger_Log(ATX_Logger*  self,
                 break;
             }
         }
-        ATX_LOG_MANAGER_UNLOCK;
+        ATX_LogManager_Unlock();
         LogManager.disabled = ATX_FALSE;
     }
 
@@ -878,28 +902,25 @@ ATX_Log_GetLogger(const char* name)
     /* first check if we're disabled (to prevent recursion) */
     if (LogManager.disabled) return NULL;
     
-    ATX_LOG_MANAGER_LOCK;
-
     /* check that the manager is initialized */
     if (!LogManager.initialized) {
         /* init the manager */
         ATX_LogManager_Initialize();
-
-        /* register a function to be called when the program exits */
-        ATX_AtExit(ATX_LogManager_AtExitHandler);
     }
+
+    ATX_LogManager_Lock();
 
     /* check if this logger is already configured */
     logger = ATX_Log_FindLogger(name);
     if (logger) {
-        ATX_LOG_MANAGER_UNLOCK;
+        ATX_LogManager_Unlock();
         return logger;
     }
 
     /* create a new logger */
     logger = ATX_Logger_Create(name);
     if (logger == NULL) {
-        ATX_LOG_MANAGER_UNLOCK;
+        ATX_LogManager_Unlock();
         return NULL;
     }
 
@@ -940,7 +961,7 @@ ATX_Log_GetLogger(const char* name)
     /* add this logger to the list */
     ATX_List_AddData(LogManager.loggers, (void*)logger);
 
-    ATX_LOG_MANAGER_UNLOCK;
+    ATX_LogManager_Unlock();
     return logger;
 }
 
