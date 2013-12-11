@@ -60,7 +60,6 @@ typedef struct {
 |   constants
 +---------------------------------------------------------------------*/
 #define ATX_INPUT_STREAM_LOAD_DEFAULT_READ_CHUNK 4096
-#define ATX_INPUT_STREAM_LOAD_MAX_SIZE           0x100000
 
 /*----------------------------------------------------------------------
 |   ATX_InputStream_ReadLine
@@ -276,18 +275,10 @@ ATX_InputStream_Load(ATX_InputStream* self, ATX_Size max_read, ATX_DataBuffer** 
     /* reset the buffer */
     ATX_DataBuffer_SetDataSize(*buffer, 0);
 
-    /* check args */
-    if (max_read > ATX_INPUT_STREAM_LOAD_MAX_SIZE) {
-        return ATX_ERROR_OUT_OF_RANGE;
-    }
-
     /* try to get the stream size */
     if (ATX_FAILED(ATX_InputStream_GetSize(self, &size))) {
         size = max_read;
     }  else {
-        if (size > ATX_INPUT_STREAM_LOAD_MAX_SIZE) {
-            return ATX_ERROR_OUT_OF_RANGE;
-        }
         if (max_read && max_read < size) size = max_read;
     }
 
@@ -319,12 +310,6 @@ ATX_InputStream_Load(ATX_InputStream* self, ATX_Size max_read, ATX_DataBuffer** 
         /* stop if we've read everything */
         if (bytes_to_read == 0) break;
 
-        /* check that we don't read too much */
-        if (total_bytes_read+bytes_to_read > ATX_INPUT_STREAM_LOAD_MAX_SIZE) {
-            ATX_DataBuffer_SetBufferSize(*buffer, 0);
-            return ATX_ERROR_OUT_OF_RANGE;
-        }
-
         /* allocate space in the buffer */
         ATX_CHECK(ATX_DataBuffer_Reserve(*buffer, (ATX_Size)(total_bytes_read+bytes_to_read)));
 
@@ -335,7 +320,7 @@ ATX_InputStream_Load(ATX_InputStream* self, ATX_Size max_read, ATX_DataBuffer** 
             total_bytes_read += bytes_read;
             ATX_DataBuffer_SetDataSize(*buffer, (ATX_Size)total_bytes_read);
         }
-    } while(ATX_SUCCEEDED(result) && (size==0 || total_bytes_read < size));
+    } while (ATX_SUCCEEDED(result) && (size==0 || total_bytes_read < size));
 
     if (result == ATX_ERROR_EOS) {
         return ATX_SUCCESS;
