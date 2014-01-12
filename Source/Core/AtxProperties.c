@@ -529,6 +529,7 @@ ATX_PropertyValue_Clone(const ATX_PropertyValue* self, ATX_PropertyValue* clone)
     clone->type = self->type;
     switch (self->type) {
       case ATX_PROPERTY_VALUE_TYPE_INTEGER:
+      case ATX_PROPERTY_VALUE_TYPE_LARGE_INTEGER:
       case ATX_PROPERTY_VALUE_TYPE_FLOAT:
       case ATX_PROPERTY_VALUE_TYPE_BOOLEAN:
       case ATX_PROPERTY_VALUE_TYPE_POINTER:

@@ -56,12 +56,13 @@
  * Type of data represented by the 'value' field of an ATX_Property structure.
  */
 typedef enum {
-    ATX_PROPERTY_VALUE_TYPE_INTEGER,  /**< The value is an integer              */
-    ATX_PROPERTY_VALUE_TYPE_FLOAT,    /**< The value is a floating point number */
-    ATX_PROPERTY_VALUE_TYPE_STRING,   /**< The value is a string                */
-    ATX_PROPERTY_VALUE_TYPE_BOOLEAN,  /**< The value is a boolean               */
-    ATX_PROPERTY_VALUE_TYPE_RAW_DATA, /**< The value is a raw data block        */
-    ATX_PROPERTY_VALUE_TYPE_POINTER   /**< The value is a pointer               */
+    ATX_PROPERTY_VALUE_TYPE_INTEGER,      /**< The value is an integer              */
+    ATX_PROPERTY_VALUE_TYPE_FLOAT,        /**< The value is a floating point number */
+    ATX_PROPERTY_VALUE_TYPE_STRING,       /**< The value is a string                */
+    ATX_PROPERTY_VALUE_TYPE_BOOLEAN,      /**< The value is a boolean               */
+    ATX_PROPERTY_VALUE_TYPE_RAW_DATA,     /**< The value is a raw data block        */
+    ATX_PROPERTY_VALUE_TYPE_POINTER,      /**< The value is a pointer               */
+    ATX_PROPERTY_VALUE_TYPE_LARGE_INTEGER /**< The value is a large integer         */
 } ATX_PropertyValueType;
 
 typedef struct {
@@ -74,12 +75,13 @@ typedef struct {
  * an ATX_PropertyValue struct.
  */
 typedef union {
-    const void*         pointer;  /**< A pointer                 */
-    ATX_CString         string;   /**< A character string        */
-    ATX_Int32           integer;  /**< An integer number         */
-    ATX_Float           fp;       /**< A floating point number   */
-    ATX_Boolean         boolean;  /**< A boolean value           */
-    ATX_PropertyRawData raw_data; /**< A pointer to untyped data */
+    const void*         pointer;       /**< A pointer                 */
+    ATX_CString         string;        /**< A character string        */
+    ATX_Int32           integer;       /**< An integer number         */
+    ATX_Int64           large_integer; /**< An integer number         */
+    ATX_Float           fp;            /**< A floating point number   */
+    ATX_Boolean         boolean;       /**< A boolean value           */
+    ATX_PropertyRawData raw_data;      /**< A pointer to untyped data */
 } ATX_PropertyValueData;
 
 /**
