@@ -112,6 +112,7 @@
     <ClCompile Include="..\..\..\..\Source\System\Win32\AtxWin32Debug.c" />
     <ClCompile Include="..\..\..\..\Source\System\Win32\AtxWin32File.c" />
     <ClCompile Include="..\..\..\..\Source\System\Win32\AtxWin32System.c" />
+    <ClCompile Include="..\..\..\..\Source\System\Win32\AtxWin32Threads.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Source\Core\Atomix.h" />
