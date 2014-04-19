@@ -66,8 +66,8 @@ ATX_System_GetCurrentTimeStamp(ATX_TimeStamp* now)
     }
 
     /* convert format */
-    now->seconds     = now_tv.tv_sec;
-    now->nanoseconds = now_tv.tv_usec * 1000;
+    now->seconds     = (ATX_Int32)now_tv.tv_sec;
+    now->nanoseconds = (ATX_Int32)(now_tv.tv_usec * 1000);
 
     return ATX_SUCCESS;
 }
@@ -79,7 +79,7 @@ ATX_Result
 ATX_System_Sleep(const ATX_TimeInterval* duration)
 {
     unsigned long usecs = 1000000*duration->seconds + duration->nanoseconds/1000;
-    usleep(usecs);
+    usleep((unsigned int)usecs);
 
     return ATX_SUCCESS;
 }

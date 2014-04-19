@@ -605,7 +605,7 @@ BsdSocketStream_Read(ATX_InputStream* _self,
                        (ssize_t)bytes_to_read, 
                        0);
         if (nb_read > 0) {
-            if (bytes_read) *bytes_read = nb_read;
+            if (bytes_read) *bytes_read = (ATX_Size)nb_read;
             return ATX_SUCCESS;
         } else {
             if (bytes_read) *bytes_read = 0;
@@ -649,7 +649,7 @@ BsdSocketStream_Write(ATX_OutputStream* _self,
                       0);
 
     if (nb_written > 0) {
-        if (bytes_written) *bytes_written = nb_written;
+        if (bytes_written) *bytes_written = (ATX_Size)nb_written;
         return ATX_SUCCESS;
     } else {
         if (bytes_written) *bytes_written = 0;
@@ -1170,7 +1170,7 @@ BsdUdpSocket_Send(ATX_DatagramSocket*      _self,
                   const ATX_SocketAddress* address) 
 {
     BsdUdpSocket* self = ATX_SELF(BsdUdpSocket, ATX_DatagramSocket);
-    int           io_result;
+    ssize_t       io_result;
 
     /* get the packet buffer */
     const ATX_Byte* buffer        = ATX_DataBuffer_GetData(packet);
@@ -1214,7 +1214,7 @@ BsdUdpSocket_Receive(ATX_DatagramSocket* _self,
                      ATX_SocketAddress*  address)
 {
     BsdUdpSocket* self = ATX_SELF(BsdUdpSocket, ATX_DatagramSocket);
-    int           io_result;
+    ssize_t       io_result;
 
     /* get the packet buffer */
     ATX_Byte* buffer        = ATX_DataBuffer_UseData(packet);
@@ -1252,10 +1252,10 @@ BsdUdpSocket_Receive(ATX_DatagramSocket* _self,
     /* check the result */
     if (ATX_BSD_SOCKET_CALL_FAILED(io_result)) {
         ATX_DataBuffer_SetDataSize(packet, 0);
-        return MapErrorCode(io_result);
+        return MapErrorCode((int)io_result);
     }
 
-    ATX_DataBuffer_SetDataSize(packet, io_result);
+    ATX_DataBuffer_SetDataSize(packet, (ATX_Size)io_result);
     return ATX_SUCCESS;
 }
 
@@ -1455,6 +1455,7 @@ ATX_TcpClientSocket_Create(ATX_Socket** object)
 
     /* setup the interfaces */
     ATX_SET_INTERFACE(client, BsdTcpClientSocket, ATX_Socket);
+    ATX_SET_INTERFACE(client, BsdTcpClientSocket, ATX_Destroyable);
     *object = &ATX_BASE(client, ATX_Socket);
 
     return ATX_SUCCESS;

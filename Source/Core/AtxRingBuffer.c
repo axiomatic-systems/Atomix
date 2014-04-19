@@ -104,12 +104,13 @@ ATX_RingBuffer_Destroy(ATX_RingBuffer* ring)
 ATX_Size
 ATX_RingBuffer_GetContiguousSpace(ATX_RingBuffer* ring)
 {
-    return 
+    return (ATX_Size)(
         (ring->in < ring->out) ?
         (ring->out - ring->in - 1) :
         ((ring->out == ring->data.start) ? 
          (ring->data.end - ring->in - 1) : 
-         (ring->data.end - ring->in));
+         (ring->data.end - ring->in))
+    );
 }
 
 /*----------------------------------------------------------------------
@@ -118,10 +119,11 @@ ATX_RingBuffer_GetContiguousSpace(ATX_RingBuffer* ring)
 ATX_Size
 ATX_RingBuffer_GetSpace(ATX_RingBuffer* ring)
 {
-    return 
+    return (ATX_Size)(
         (ring->in < ring->out) ? 
         (ring->out - ring->in - 1) : 
-        (ring->data.end - ring->in + ring->out - ring->data.start - 1);
+        (ring->data.end - ring->in + ring->out - ring->data.start - 1)
+    );
 }
 
 /*----------------------------------------------------------------------+
@@ -142,7 +144,7 @@ ATX_RingBuffer_Write(ATX_RingBuffer*      ring,
             ring->in = ring->data.start;
         }
     } else {
-        unsigned int chunk = ring->data.end - ring->in;
+        unsigned int chunk = (unsigned int)(ring->data.end - ring->in);
         if (chunk >= byte_count) {
             chunk = byte_count;
         }
@@ -174,10 +176,11 @@ ATX_RingBuffer_Write(ATX_RingBuffer*      ring,
 ATX_Size
 ATX_RingBuffer_GetContiguousAvailable(ATX_RingBuffer* ring)
 {
-    return 
+    return (ATX_Size)(
         (ring->out <= ring->in) ? 
         (ring->in-ring->out) :
-        (ring->data.end - ring->out);
+        (ring->data.end - ring->out)
+    );
 }
 
 /*----------------------------------------------------------------------
@@ -186,10 +189,11 @@ ATX_RingBuffer_GetContiguousAvailable(ATX_RingBuffer* ring)
 ATX_Size
 ATX_RingBuffer_GetAvailable(ATX_RingBuffer* ring)
 {
-    return 
+    return (ATX_Size)(
         (ring->out <= ring->in) ? 
         (ring->in-ring->out) :
-        (ring->data.end - ring->out + ring->in - ring->data.start);
+        (ring->data.end - ring->out + ring->in - ring->data.start)
+    );
 }
 
 /*----------------------------------------------------------------------+
@@ -210,7 +214,7 @@ ATX_RingBuffer_Read(ATX_RingBuffer* ring,
             ring->out = ring->data.start;
         }
     } else {
-        unsigned int chunk = ring->data.end - ring->out;
+        unsigned int chunk = (unsigned int)(ring->data.end - ring->out);
         if (chunk >= byte_count) {
             chunk = byte_count;
         }
