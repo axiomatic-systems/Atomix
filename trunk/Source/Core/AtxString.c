@@ -785,7 +785,7 @@ ATX_String_TrimCharsLeft(ATX_String* self, const char* chars)
     /* shift chars to the left */
     {
         char* d = self->chars;
-        ATX_String_GetBuffer(self)->length = ATX_String_GetLength(self)-(s-d);
+        ATX_String_GetBuffer(self)->length = (ATX_Cardinal)(ATX_String_GetLength(self)-(s-d));
         while ((*d++ = *s++)) {};
     }
 }
