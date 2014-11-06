@@ -675,6 +675,7 @@ ATX_LogManager_Initialize(void)
                     ATX_String_AssignN(&config_source, source, (ATX_Size)(cursor-source));
                     ATX_String_TrimWhitespace(&config_source);
                     ATX_LogManager_ParseConfigSource(&config_source);
+                    if (*cursor == '|') source = cursor+1;
                 }
                 if (*cursor == '\0') break;
             }
