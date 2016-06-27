@@ -11,7 +11,7 @@ def LoadTool(name, env, **kw):
     file, path, desc = imp.find_module(name, [config_path])
     module = imp.load_module(name, file, path, desc)
     module.generate(env, **kw)
-    
+
 def GlobSources(dir, patterns):
     root = GetBuildPath('#/'+dir)
     files = []
@@ -21,10 +21,10 @@ def GlobSources(dir, patterns):
 
 def GetDirPath(dir):
     return '#/'+dir
-    
+
 def DeclareBuildDir(env, dir):
     env.VariantDir(dir, GetDirPath(dir), duplicate=0)
-    
+
 def GetIncludeDirs(modules, exclude=None):
     dirs = []
     for module in Split(modules):
@@ -61,18 +61,18 @@ class Module:
 
     def GetLibraries(self):
         return self.product+GetLibraries(self.linked_modules)
-        
+
     def GetIncludeDirs(self):
         return GetIncludeDirs(self.included_modules, self.name)
-    
+
 class LibraryModule(Module):
-    def __init__(self, name, 
-                 build_source_dirs, 
+    def __init__(self, name,
+                 build_source_dirs,
                  build_source_files = {},
                  source_root = 'Source',
-                 build_source_pattern=['*.c', '*.cpp'], 
-                 build_include_dirs = [], 
-                 included_modules = [], 
+                 build_source_pattern=['*.c', '*.cpp'],
+                 build_include_dirs = [],
+                 included_modules = [],
                  include_dirs     = [],
                  linked_modules = []) :
         build_source_dirs = [source_root+'/'+dir for dir in Split(build_source_dirs)]
@@ -81,10 +81,10 @@ class LibraryModule(Module):
         self.env                = env.Clone()
         self.name               = name
         self.build_include_dirs = [source_root+'/'+dir for dir in Split(build_include_dirs)]
-        
+
         # store this new object in the module dictionary
         Modules[name] = self
-                
+
         # for each source dir to build, create a BuildDir
         # to say where we want the object files to be built,
         # and compute the list of source files to build
@@ -102,24 +102,24 @@ class LibraryModule(Module):
 
         # calculate our build include path
         cpp_path = GetIncludeDirs(Split(self.build_include_dirs) + Split(build_source_dirs) + Split(self.included_modules))
-                
+
         # the product is a library
         self.env.AppendUnique(CPPPATH=cpp_path)
         self.product = self.env.Library(target=name, source=sources)
         self.env.Alias(name, self.product)
-        
+
 def Application(name, dir):
     DeclareBuildDir(env, dir)
     libs = GetLibraries('Atomix')
     cpp_path = GetIncludeDirs('Atomix')
-    
-    prog = env.Program(name, 
-                       GlobSources(dir, ['*.c']), 
+
+    prog = env.Program(name,
+                       GlobSources(dir, ['*.c']),
                        LIBS=libs, CPPPATH=cpp_path)
     #env.Alias(name, prog)
     if env.has_key('ATX_EXECUTABLE_POST_PROCESSOR'):
         env.AddPostAction(prog, env['ATX_EXECUTABLE_POST_PROCESSOR'])
-        
+
 #######################################################
 # Main Build
 #######################################################
@@ -136,17 +136,17 @@ env['ATX_EXTRA_LIBS'] = ''
 ### try to read in any target specific configuration
 target_config_file = env.GetBuildPath('#/Build/Targets/'+env['target']+'/Config.scons')
 if os.path.exists(target_config_file):
-    # Load the target-specific config file    
+    # Load the target-specific config file
     execfile(target_config_file)
 
 #######################################################
 # modules
 #######################################################
-LibraryModule(name               = 'Atomix', 
+LibraryModule(name               = 'Atomix',
               build_source_dirs  = ['Core'],
               build_source_files = env['ATX_SYSTEM_SOURCES'],
               linked_modules     = env['ATX_EXTRA_LIBS'])
-            
+
 Application('NetPump', 'Source/Apps/NetPump')
-for test in ['Strings', 'Misc', 'Properties', 'RingBuffer', 'Http', 'Logging', 'Containers', 'Files']:
+for test in ['Strings', 'Misc', 'Properties', 'RingBuffer', 'Http', 'Logging', 'Containers', 'Files', 'LargeFiles']:
     Application(test+'Test', 'Source/Tests/'+test)

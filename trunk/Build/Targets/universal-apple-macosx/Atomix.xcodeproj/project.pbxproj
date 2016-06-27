@@ -13,6 +13,7 @@
 			buildPhases = (
 			);
 			dependencies = (
+				CAFE9C591D1B09C100F9FF67 /* PBXTargetDependency */,
 				CAE3A9301064D21400EBAD97 /* PBXTargetDependency */,
 				CAA3D5A90F97CD7E00BAE44C /* PBXTargetDependency */,
 				CA0C9A3C0D15D1B100E23496 /* PBXTargetDependency */,
@@ -100,7 +101,6 @@
 		CA0C99560D15C35000E23496 /* AtxStdcEnvironment.c in Sources */ = {isa = PBXBuildFile; fileRef = CA0C98F80D15C2C400E23496 /* AtxStdcEnvironment.c */; };
 		CA0C99570D15C35000E23496 /* AtxStdcDebug.c in Sources */ = {isa = PBXBuildFile; fileRef = CA0C98F70D15C2C400E23496 /* AtxStdcDebug.c */; };
 		CA0C99580D15C35100E23496 /* AtxPosixSystem.c in Sources */ = {isa = PBXBuildFile; fileRef = CA0C98F20D15C2C400E23496 /* AtxPosixSystem.c */; };
-		CA0C99590D15C35200E23496 /* AtxStdcFile.c in Sources */ = {isa = PBXBuildFile; fileRef = CA0C98F90D15C2C400E23496 /* AtxStdcFile.c */; };
 		CA0C995B0D15C35F00E23496 /* PropertiesTest.c in Sources */ = {isa = PBXBuildFile; fileRef = CA0C99140D15C2C400E23496 /* PropertiesTest.c */; };
 		CA0C997D0D15CEA200E23496 /* libAtomix.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D2AAC046055464E500DB518D /* libAtomix.a */; };
 		CA0C99A90D15CFCA00E23496 /* ContainersTest.c in Sources */ = {isa = PBXBuildFile; fileRef = CA0C990C0D15C2C400E23496 /* ContainersTest.c */; };
@@ -125,6 +125,9 @@
 		CAE3A92E1064D20400EBAD97 /* libAtomix.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D2AAC046055464E500DB518D /* libAtomix.a */; };
 		CAE3A9331064D22F00EBAD97 /* JsonTest.c in Sources */ = {isa = PBXBuildFile; fileRef = CAE3A9321064D22F00EBAD97 /* JsonTest.c */; };
 		CAF9556C1268EA390063F480 /* AtxThreads.h in Headers */ = {isa = PBXBuildFile; fileRef = CAF9556B1268EA390063F480 /* AtxThreads.h */; };
+		CAFE9C571D1B09AC00F9FF67 /* LargeFilesTest.c in Sources */ = {isa = PBXBuildFile; fileRef = CAFE9C551D1B099500F9FF67 /* LargeFilesTest.c */; };
+		CAFE9C5C1D1B09EC00F9FF67 /* libAtomix.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D2AAC046055464E500DB518D /* libAtomix.a */; };
+		CAFE9C5F1D1B3E3500F9FF67 /* AtxStdcFile.c in Sources */ = {isa = PBXBuildFile; fileRef = CA0C98F90D15C2C400E23496 /* AtxStdcFile.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -282,7 +285,33 @@
 			remoteGlobalIDString = CAE3A9271064D1F900EBAD97;
 			remoteInfo = JsonTest;
 		};
+		CAFE9C581D1B09C100F9FF67 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CAFE9C4C1D1B098000F9FF67;
+			remoteInfo = LargeFilesTest;
+		};
+		CAFE9C5A1D1B09DE00F9FF67 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
+			remoteInfo = Atomix;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		CAFE9C4B1D1B098000F9FF67 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		CA0C98B00D15C14800E23496 /* PropertiesTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = PropertiesTest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -359,6 +388,8 @@
 		CAE3A9281064D1F900EBAD97 /* JsonTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = JsonTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAE3A9321064D22F00EBAD97 /* JsonTest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = JsonTest.c; sourceTree = "<group>"; };
 		CAF9556B1268EA390063F480 /* AtxThreads.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AtxThreads.h; sourceTree = "<group>"; };
+		CAFE9C4D1D1B098000F9FF67 /* LargeFilesTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LargeFilesTest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CAFE9C551D1B099500F9FF67 /* LargeFilesTest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LargeFilesTest.c; sourceTree = "<group>"; };
 		D2AAC046055464E500DB518D /* libAtomix.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libAtomix.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -443,6 +474,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CAFE9C4A1D1B098000F9FF67 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CAFE9C5C1D1B09EC00F9FF67 /* libAtomix.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D289987405E68DCB004EDB86 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -477,6 +516,7 @@
 				CA0C9A260D15D16C00E23496 /* NetPump */,
 				CAA3D5A10F97CD6500BAE44C /* FilesTest */,
 				CAE3A9281064D1F900EBAD97 /* JsonTest */,
+				CAFE9C4D1D1B098000F9FF67 /* LargeFilesTest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -627,10 +667,11 @@
 		CA0C990A0D15C2C400E23496 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				CAE3A9311064D22F00EBAD97 /* Json */,
-				CAA3D5AA0F97CD9300BAE44C /* Files */,
 				CA0C990B0D15C2C400E23496 /* Containers */,
+				CAA3D5AA0F97CD9300BAE44C /* Files */,
 				CA0C990D0D15C2C400E23496 /* Http */,
+				CAE3A9311064D22F00EBAD97 /* Json */,
+				CAFE9C541D1B099500F9FF67 /* LargeFiles */,
 				CA0C990F0D15C2C400E23496 /* Logging */,
 				CA0C99110D15C2C400E23496 /* Misc */,
 				CA0C99130D15C2C400E23496 /* Properties */,
@@ -710,6 +751,14 @@
 				CAE3A9321064D22F00EBAD97 /* JsonTest.c */,
 			);
 			path = Json;
+			sourceTree = "<group>";
+		};
+		CAFE9C541D1B099500F9FF67 /* LargeFiles */ = {
+			isa = PBXGroup;
+			children = (
+				CAFE9C551D1B099500F9FF67 /* LargeFilesTest.c */,
+			);
+			path = LargeFiles;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -924,6 +973,24 @@
 			productReference = CAE3A9281064D1F900EBAD97 /* JsonTest */;
 			productType = "com.apple.product-type.tool";
 		};
+		CAFE9C4C1D1B098000F9FF67 /* LargeFilesTest */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CAFE9C531D1B098100F9FF67 /* Build configuration list for PBXNativeTarget "LargeFilesTest" */;
+			buildPhases = (
+				CAFE9C491D1B098000F9FF67 /* Sources */,
+				CAFE9C4A1D1B098000F9FF67 /* Frameworks */,
+				CAFE9C4B1D1B098000F9FF67 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CAFE9C5B1D1B09DE00F9FF67 /* PBXTargetDependency */,
+			);
+			name = LargeFilesTest;
+			productName = LargeFilesTest;
+			productReference = CAFE9C4D1D1B098000F9FF67 /* LargeFilesTest */;
+			productType = "com.apple.product-type.tool";
+		};
 		D2AAC045055464E500DB518D /* Atomix */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1DEB91EB08733DB70010E9CD /* Build configuration list for PBXNativeTarget "Atomix" */;
@@ -948,6 +1015,11 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0510;
+				TargetAttributes = {
+					CAFE9C4C1D1B098000F9FF67 = {
+						CreatedOnToolsVersion = 7.3;
+					};
+				};
 			};
 			buildConfigurationList = 1DEB91EF08733DB70010E9CD /* Build configuration list for PBXProject "Atomix" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -972,6 +1044,7 @@
 				CA0C99FC0D15D0E900E23496 /* MiscTest */,
 				CA0C9A110D15D12100E23496 /* LoggingTest */,
 				CAA3D5A00F97CD6500BAE44C /* FilesTest */,
+				CAFE9C4C1D1B098000F9FF67 /* LargeFilesTest */,
 				CAE3A9271064D1F900EBAD97 /* JsonTest */,
 				CA0C9A250D15D16C00E23496 /* NetPump */,
 				CA0C9A370D15D1A700E23496 /* Tests */,
@@ -1062,6 +1135,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CAFE9C491D1B098000F9FF67 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CAFE9C571D1B09AC00F9FF67 /* LargeFilesTest.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D2AAC044055464E500DB518D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1083,11 +1164,11 @@
 				CA0C994C0D15C33200E23496 /* AtxConsole.c in Sources */,
 				CA0C99530D15C33A00E23496 /* AtxFile.c in Sources */,
 				CA0C99540D15C34E00E23496 /* AtxStdcConsole.c in Sources */,
+				CAFE9C5F1D1B3E3500F9FF67 /* AtxStdcFile.c in Sources */,
 				CA0C99550D15C34F00E23496 /* AtxBsdSockets.c in Sources */,
 				CA0C99560D15C35000E23496 /* AtxStdcEnvironment.c in Sources */,
 				CA0C99570D15C35000E23496 /* AtxStdcDebug.c in Sources */,
 				CA0C99580D15C35100E23496 /* AtxPosixSystem.c in Sources */,
-				CA0C99590D15C35200E23496 /* AtxStdcFile.c in Sources */,
 				CAE3A9231064D1CD00EBAD97 /* AtxJson.c in Sources */,
 				CA8E74FB17077E45005896DF /* AtxPosixThreads.c in Sources */,
 			);
@@ -1205,6 +1286,16 @@
 			isa = PBXTargetDependency;
 			target = CAE3A9271064D1F900EBAD97 /* JsonTest */;
 			targetProxy = CAE3A92F1064D21400EBAD97 /* PBXContainerItemProxy */;
+		};
+		CAFE9C591D1B09C100F9FF67 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CAFE9C4C1D1B098000F9FF67 /* LargeFilesTest */;
+			targetProxy = CAFE9C581D1B09C100F9FF67 /* PBXContainerItemProxy */;
+		};
+		CAFE9C5B1D1B09DE00F9FF67 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D2AAC045055464E500DB518D /* Atomix */;
+			targetProxy = CAFE9C5A1D1B09DE00F9FF67 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1469,6 +1560,86 @@
 			};
 			name = Release;
 		};
+		CAFE9C511D1B098100F9FF67 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		CAFE9C521D1B098100F9FF67 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1606,6 +1777,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		CAFE9C531D1B098100F9FF67 /* Build configuration list for PBXNativeTarget "LargeFilesTest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CAFE9C511D1B098100F9FF67 /* Debug */,
+				CAFE9C521D1B098100F9FF67 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};
