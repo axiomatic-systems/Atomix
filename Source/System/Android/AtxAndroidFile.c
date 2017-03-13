@@ -120,7 +120,7 @@ AndroidFileWrapper_Create(int               fd,
     if (name) {
         ATX_String_Copy(&(*wrapper)->name, name);
     }
-    
+
     return ATX_SUCCESS;
 }
 
@@ -136,7 +136,7 @@ AndroidFileWrapper_UpdateSize(AndroidFileWrapper* self)
         self->fd == STDERR_FILENO) {
         return;
     }
-        
+
     {
         struct stat info;
         if (stat(ATX_CSTR(self->name), &info) == 0) {
@@ -302,12 +302,12 @@ AndroidFileInputStream_Read(ATX_InputStream* _self,
         if (bytes_read) *bytes_read = 0;
         return ATX_SUCCESS;
     }
-    
+
     /* if we try to read past the end, update the size in case the file has grown */
     if (self->file->position+bytes_to_read > self->file->size) {
         AndroidFileWrapper_UpdateSize(self->file);
     }
-    
+
     /* read from the file */
     nb_read = read(self->file->fd, buffer, (size_t)bytes_to_read);
     if (nb_read == 0) {
@@ -329,7 +329,7 @@ AndroidFileInputStream_Read(ATX_InputStream* _self,
 |       AndroidFileInputStream_Seek
 +---------------------------------------------------------------------*/
 ATX_METHOD
-AndroidFileInputStream_Seek(ATX_InputStream* _self, 
+AndroidFileInputStream_Seek(ATX_InputStream* _self,
                             ATX_Position     where)
 {
     return AndroidFileStream_Seek(ATX_SELF(AndroidFileStream, ATX_InputStream), where);
@@ -339,7 +339,7 @@ AndroidFileInputStream_Seek(ATX_InputStream* _self,
 |       AndroidFileInputStream_Tell
 +---------------------------------------------------------------------*/
 ATX_METHOD
-AndroidFileInputStream_Tell(ATX_InputStream* _self, 
+AndroidFileInputStream_Tell(ATX_InputStream* _self,
                             ATX_Position*    where)
 {
     return AndroidFileStream_Tell(ATX_SELF(AndroidFileStream, ATX_InputStream), where);
@@ -349,13 +349,13 @@ AndroidFileInputStream_Tell(ATX_InputStream* _self,
 |       AndroidFileInputStream_GetSize
 +---------------------------------------------------------------------*/
 ATX_METHOD
-AndroidFileInputStream_GetSize(ATX_InputStream* _self, 
+AndroidFileInputStream_GetSize(ATX_InputStream* _self,
                                ATX_LargeSize*   size)
 {
     AndroidFileStream* self = ATX_SELF(AndroidFileStream, ATX_InputStream);
     AndroidFileWrapper_UpdateSize(self->file);
     *size = self->file->size;
-    
+
     return ATX_SUCCESS;
 }
 
@@ -363,11 +363,11 @@ AndroidFileInputStream_GetSize(ATX_InputStream* _self,
 |       AndroidFileInputStream_GetAvailable
 +---------------------------------------------------------------------*/
 ATX_METHOD
-AndroidFileInputStream_GetAvailable(ATX_InputStream* _self, 
+AndroidFileInputStream_GetAvailable(ATX_InputStream* _self,
                                     ATX_LargeSize*   size)
 {
     AndroidFileStream* self = ATX_SELF(AndroidFileStream, ATX_InputStream);
-    
+
     AndroidFileWrapper_UpdateSize(self->file);
     if (self->file->position > self->file->size) {
         *size = self->file->size - self->file->position;
@@ -429,7 +429,7 @@ AndroidFileOutputStream_Write(ATX_OutputStream* _self,
 |       AndroidFileOutputStream_Seek
 +---------------------------------------------------------------------*/
 ATX_METHOD
-AndroidFileOutputStream_Seek(ATX_OutputStream* _self, 
+AndroidFileOutputStream_Seek(ATX_OutputStream* _self,
                              ATX_Position      where)
 {
     return AndroidFileStream_Seek(ATX_SELF(AndroidFileStream, ATX_OutputStream), where);
@@ -439,7 +439,7 @@ AndroidFileOutputStream_Seek(ATX_OutputStream* _self,
 |       AndroidFileOutputStream_Tell
 +---------------------------------------------------------------------*/
 ATX_METHOD
-AndroidFileOutputStream_Tell(ATX_OutputStream* _self, 
+AndroidFileOutputStream_Tell(ATX_OutputStream* _self,
                              ATX_Position*     where)
 {
     return AndroidFileStream_Tell(ATX_SELF(AndroidFileStream, ATX_OutputStream), where);
@@ -544,27 +544,27 @@ AndroidFile_Destroy(ATX_Destroyable* _self)
 +---------------------------------------------------------------------*/
 ATX_METHOD
 AndroidFile_Open(ATX_File* _self, ATX_Flags mode)
-{ 
+{
     AndroidFile* self = ATX_SELF(AndroidFile, ATX_File);
     int          fd   = -1;
 
     /* decide wheter this is a file or stdin/stdout/stderr */
-    if (ATX_String_Equals(&self->name, 
-                          ATX_FILE_STANDARD_INPUT, 
+    if (ATX_String_Equals(&self->name,
+                          ATX_FILE_STANDARD_INPUT,
                           ATX_FALSE)) {
         fd = STDIN_FILENO;
-    } else if (ATX_String_Equals(&self->name, 
-                                 ATX_FILE_STANDARD_OUTPUT, 
+    } else if (ATX_String_Equals(&self->name,
+                                 ATX_FILE_STANDARD_OUTPUT,
                                  ATX_FALSE)) {
         fd = STDOUT_FILENO;
-    } else if (ATX_String_Equals(&self->name, 
+    } else if (ATX_String_Equals(&self->name,
                                  ATX_FILE_STANDARD_ERROR,
                                  ATX_FALSE)) {
         fd = STDERR_FILENO;
     } else {
         int open_flags  = 0;
         int create_perm = 0;
-        
+
         /* compute the open flags */
         if (mode & ATX_FILE_OPEN_MODE_WRITE) {
             if (mode & ATX_FILE_OPEN_MODE_READ) {
@@ -583,9 +583,9 @@ AndroidFile_Open(ATX_File* _self, ATX_Flags mode)
                 open_flags |= O_TRUNC;
             }
         } else {
-            mode |= O_RDONLY;
+            open_flags |= O_RDONLY;
         }
-        
+
         /* try to open the file */
         fd = open(ATX_CSTR(self->name), open_flags, create_perm);
         if (fd < 0) {
@@ -630,7 +630,7 @@ AndroidFile_GetSize(ATX_File* _self, ATX_LargeSize* size)
     /* return the size */
     AndroidFileWrapper_UpdateSize(self->file);
     *size = self->file->size;
-    
+
     return ATX_SUCCESS;
 }
 
@@ -658,7 +658,7 @@ AndroidFile_GetInputStream(ATX_File*         _self,
 |       AndroidFile_GetOutputStream
 +---------------------------------------------------------------------*/
 ATX_METHOD
-AndroidFile_GetOutputStream(ATX_File*          _self, 
+AndroidFile_GetOutputStream(ATX_File*          _self,
                          ATX_OutputStream** stream)
 {
     AndroidFile* self = ATX_SELF(AndroidFile, ATX_File);
