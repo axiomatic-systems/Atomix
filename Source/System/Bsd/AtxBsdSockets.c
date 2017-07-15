@@ -98,19 +98,42 @@
 |   WinSock adaptation layer
 +---------------------------------------------------------------------*/
 #if defined(_WIN32)
+#if !defined(EWOULDBLOCK)
 #define EWOULDBLOCK  WSAEWOULDBLOCK
+#endif
+#if !defined(EINPROGRESS)
 #define EINPROGRESS  WSAEINPROGRESS
+#endif
+#if !defined(ECONNREFUSED)
 #define ECONNREFUSED WSAECONNREFUSED
+#endif
+#if !defined(ECONNABORTED)
 #define ECONNABORTED WSAECONNABORTED
+#endif
+#if !defined(ECONNRESET)
 #define ECONNRESET   WSAECONNRESET
+#endif
+#if !defined(ETIMEDOUT)
 #define ETIMEDOUT    WSAETIMEDOUT
+#endif
+#if !defined(ENETRESET)
 #define ENETRESET    WSAENETRESET
+#endif
+#if !defined(EADDRINUSE)
 #define EADDRINUSE   WSAEADDRINUSE
+#endif
+#if !defined(ENETDOWN)
 #define ENETDOWN     WSAENETDOWN
+#endif
+#if !defined(ENETUNREACH)
 #define ENETUNREACH  WSAENETUNREACH
+#endif
+#if !defined(EAGAIN)
 #define EAGAIN       WSAEWOULDBLOCK
+#endif
+#if !defined(EINTR)
 #define EINTR        WSAEINTR
-
+#endif
 #if !defined(__MINGW32__)
 typedef int          ssize_t;
 #endif
