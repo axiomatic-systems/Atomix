@@ -7,7 +7,6 @@ $Id: Build.py 75 2008-08-15 19:25:28Z bok $
 
 """
 
-import os
 import sys
 import getopt
 import subprocess

@@ -134,7 +134,7 @@ while len(sys.argv):
         action = ScanNakedErrors
     elif arg == '--find-tabs':
         action = FindTabs
-    elif top == None:
+    elif top is None:
         top = arg
     else:
         raise "unexpected argument " + arg
